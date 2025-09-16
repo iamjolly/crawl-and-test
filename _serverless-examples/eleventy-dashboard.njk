@@ -1,0 +1,189 @@
+---
+layout: base.njk
+title: CATS Dashboard
+---
+
+<div class="dashboard">
+  <header class="dashboard-header">
+    <h1>🐱 CATS Dashboard</h1>
+    <p>Crawl and Test System - Manage and view your website accessibility scans</p>
+  </header>
+
+  <!-- Start New Crawl Form -->
+  <section class="crawl-form">
+    <h2>Start New Accessibility Scan</h2>
+    <form id="crawlForm" class="form">
+      <div class="form-group">
+        <label for="seedUrl">Website URL</label>
+        <input 
+          type="url" 
+          id="seedUrl" 
+          name="seedUrl" 
+          placeholder="https://example.com"
+          required
+        >
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="maxDepth">Crawl Depth</label>
+          <select id="maxDepth" name="maxDepth">
+            <option value="1">1 (Homepage only)</option>
+            <option value="2" selected>2 (Homepage + linked pages)</option>
+            <option value="3">3 (Deep crawl)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="maxPages">Max Pages</label>
+          <input 
+            type="number" 
+            id="maxPages" 
+            name="maxPages" 
+            value="50" 
+            min="1" 
+            max="500"
+          >
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="wcagLevel">WCAG Version</label>
+          <select id="wcagLevel" name="wcagLevel">
+            <option value="2.0">WCAG 2.0</option>
+            <option value="2.1" selected>WCAG 2.1</option>
+            <option value="2.2">WCAG 2.2</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="conformanceLevel">Conformance Level</label>
+          <select id="conformanceLevel" name="conformanceLevel">
+            <option value="A">A</option>
+            <option value="AA" selected>AA</option>
+            <option value="AAA">AAA</option>
+          </select>
+        </div>
+      </div>
+      
+      <button type="submit" class="btn btn-primary">
+        🚀 Start Scan
+      </button>
+    </form>
+  </section>
+
+  <!-- Reports List -->
+  <section class="reports-section">
+    <h2>Recent Reports</h2>
+    <div id="reportsList" class="reports-list">
+      <!-- This will be populated by JavaScript from your S3 bucket or reports API -->
+      <div class="report-item">
+        <div class="report-info">
+          <h3>example.com</h3>
+          <p class="report-meta">
+            <span class="report-date">September 15, 2025</span>
+            <span class="report-pages">25 pages scanned</span>
+            <span class="report-level">WCAG 2.1 AA</span>
+          </p>
+        </div>
+        <div class="report-actions">
+          <a href="/reports/example.com/example.com_wcag2.1_AA_2025-09-15T10-30-00.html" class="btn btn-secondary">
+            📊 View Report
+          </a>
+          <a href="/reports/example.com/example.com_wcag2.1_AA_2025-09-15T10-30-00.json" class="btn btn-outline" download>
+            📄 Download JSON
+          </a>
+        </div>
+      </div>
+      
+      <div class="report-item">
+        <div class="report-info">
+          <h3>mysite.org</h3>
+          <p class="report-meta">
+            <span class="report-date">September 14, 2025</span>
+            <span class="report-pages">12 pages scanned</span>
+            <span class="report-level">WCAG 2.1 AA</span>
+          </p>
+        </div>
+        <div class="report-actions">
+          <a href="/reports/mysite.org/mysite.org_wcag2.1_AA_2025-09-14T15-45-00.html" class="btn btn-secondary">
+            📊 View Report
+          </a>
+          <a href="/reports/mysite.org/mysite.org_wcag2.1_AA_2025-09-14T15-45-00.json" class="btn btn-outline" download>
+            📄 Download JSON
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+// Form submission handler for starting new crawls
+document.getElementById('crawlForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const formData = new FormData(e.target);
+  const crawlData = Object.fromEntries(formData.entries());
+  
+  try {
+    // In a real Eleventy + serverless setup, this would call your Lambda function
+    const response = await fetch('/api/start-crawl', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(crawlData)
+    });
+    
+    if (response.ok) {
+      const result = await response.json();
+      alert(`✅ Crawl started! Job ID: ${result.jobId}`);
+      // Optionally refresh the reports list
+      loadReports();
+    } else {
+      alert('❌ Failed to start crawl. Please try again.');
+    }
+  } catch (error) {
+    console.error('Error starting crawl:', error);
+    alert('❌ Error starting crawl. Please check your connection.');
+  }
+});
+
+// Function to load reports from your API/S3
+async function loadReports() {
+  try {
+    // In a real setup, this would fetch from your reports API or S3
+    const response = await fetch('/api/reports');
+    const reports = await response.json();
+    
+    const reportsList = document.getElementById('reportsList');
+    reportsList.innerHTML = reports.map(report => `
+      <div class="report-item">
+        <div class="report-info">
+          <h3>${report.domain}</h3>
+          <p class="report-meta">
+            <span class="report-date">${new Date(report.timestamp).toLocaleDateString()}</span>
+            <span class="report-pages">${report.pageCount} pages scanned</span>
+            <span class="report-level">${report.wcagLevel} ${report.conformanceLevel}</span>
+          </p>
+        </div>
+        <div class="report-actions">
+          <a href="/reports/${report.domain}/${report.filename}.html" class="btn btn-secondary">
+            📊 View Report
+          </a>
+          <a href="/reports/${report.domain}/${report.filename}.json" class="btn btn-outline" download>
+            📄 Download JSON
+          </a>
+        </div>
+      </div>
+    `).join('');
+  } catch (error) {
+    console.error('Error loading reports:', error);
+  }
+}
+
+// Load reports on page load
+document.addEventListener('DOMContentLoaded', loadReports);
+</script>

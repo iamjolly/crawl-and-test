@@ -1,0 +1,5 @@
+# This file ensures the reports directory is tracked by git
+# while keeping the directory structure intact for new installations.
+# 
+# Generated accessibility reports will be created in this directory
+# but are excluded from version control via .gitignore

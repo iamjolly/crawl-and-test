@@ -1,0 +1,52 @@
+{
+  "name": "cats-accessibility-crawler",
+  "version": "1.0.0",
+  "description": "CATS (Crawl and Test System) - A web crawler that performs accessibility scans using axe-core",
+  "main": "src/core/crawler.js",
+  "bin": {
+    "cats-crawl": "./src/core/crawler.js"
+  },
+  "scripts": {
+    "start": "node src/core/crawler.js",
+    "test": "node src/core/crawler.js --help",
+    "install-browsers": "npx playwright install chromium",
+    "dev": "node src/servers/dashboard.js",
+    "serve:reports": "node src/servers/static.js",
+    "serve:dashboard": "node src/servers/dashboard.js",
+    "build": "node src/generators/html.js --detailed",
+    "build:domain": "node src/generators/html.js --detailed --domain",
+    "regenerate-html": "node src/generators/html.js",
+    "regenerate-detailed": "node src/generators/html.js --detailed",
+    "generate-index": "node src/generators/index.js",
+    "clean": "rm -rf public/reports/*",
+    "clean:public": "rm -rf public/reports/*",
+    "cleanup-old-html": "node src/utils/cleanup.js"
+  },
+  "keywords": [
+    "accessibility",
+    "a11y",
+    "cats",
+    "crawl-and-test",
+    "crawler",
+    "axe-core",
+    "wcag",
+    "playwright"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axe-core": "^4.8.2",
+    "commander": "^11.1.0",
+    "dotenv": "^17.2.2",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "p-limit": "^3.1.0",
+    "playwright": "^1.40.0",
+    "robots-txt-parse": "^2.0.1",
+    "uuid": "^9.0.1",
+    "xml2js": "^0.6.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

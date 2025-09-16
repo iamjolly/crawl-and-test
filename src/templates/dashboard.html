@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/styles/navigation.css">
+    <link rel="stylesheet" href="/styles/dashboard.css">
+</head>
+<body>
+    <nav class="site-nav" role="navigation" aria-label="Main navigation">
+        <div class="nav-container">
+            <a href="/" class="nav-brand" aria-label="CATS Home">
+                <span>CATS</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/" class="nav-link active" aria-current="page">Dashboard</a></li>
+                <li><a href="/reports/" class="nav-link">Reports</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="header">
+            <h1>{{pageTitle}}</h1>
+            <p>{{pageDescription}}</p>
+        </div>
+        
+        <main>
+            <div class="grid">
+                <div class="card">
+                    <h2>Start New Crawl</h2>
+                    <form id="crawlForm" action="/crawl" method="POST">
+                        <div class="form-group">
+                            <label for="url">Website URL:</label>
+                            <input type="url" id="url" name="url" required placeholder="https://example.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="wcagVersion">WCAG Version:</label>
+                            <select id="wcagVersion" name="wcagVersion">
+                                <option value="wcag2.1">WCAG 2.1 AA (Default)</option>
+                                <option value="wcag2.0">WCAG 2.0 AA</option>
+                                <option value="wcag2.2">WCAG 2.2 AA</option>
+                                <option value="wcag21-aaa">WCAG 2.1 AAA</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="maxDepth">Crawl Depth:</label>
+                            <select id="maxDepth" name="maxDepth">
+                                <option value="1">1 - Homepage only</option>
+                                <option value="2" selected>2 - Homepage + linked pages</option>
+                                <option value="3">3 - Deep crawl (recommended)</option>
+                                <option value="4">4 - Very deep crawl</option>
+                                <option value="5">5 - Maximum depth</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="maxPages">Max Pages to Scan:</label>
+                            <select id="maxPages" name="maxPages">
+                                <option value="5">5 - Quick test</option>
+                                <option value="10">10 - Small site</option>
+                                <option value="25">25 - Medium site</option>
+                                <option value="50" selected>50 - Default</option>
+                                <option value="100">100 - Large site</option>
+                                <option value="250">250 - Very large site</option>
+                                <option value="0">Unlimited - Scan all pages</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Start Crawl</button>
+                    </form>
+                </div>
+                
+                <div class="card">
+                    <h2>Active Jobs</h2>
+                    <div id="jobsSection" class="jobs-section">
+                        <div id="jobsList"></div>
+                        <p id="noJobsMessage" class="no-reports">No active crawls</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Generated Reports 
+                    <button onclick="updateReports()" class="btn btn-refresh" title="Refresh reports list">↻</button>
+                </h2>
+                <div id="reportsSection" class="reports-section">
+                    <div id="reportsList"></div>
+                    <p id="noReportsMessage" class="no-reports">No reports generated yet. Start a crawl to create your first report!</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // Update jobs display
+        function updateJobs() {
+            fetch('/api/jobs')
+                .then(response => response.json())
+                .then(jobs => {
+                    const jobsList = document.getElementById('jobsList');
+                    const noJobsMessage = document.getElementById('noJobsMessage');
+                    
+                    if (jobs.length === 0) {
+                        jobsList.innerHTML = '';
+                        noJobsMessage.style.display = 'block';
+                    } else {
+                        noJobsMessage.style.display = 'none';
+                        jobsList.innerHTML = jobs.map(job => `
+                            <div class="job-item">
+                                <div>
+                                    <strong>${job.url}</strong>
+                                    <br>
+                                    <small>Started: ${new Date(job.startTime).toLocaleString()}</small>
+                                </div>
+                                <span class="job-status ${job.status}">${job.status}</span>
+                            </div>
+                        `).join('');
+                    }
+                })
+                .catch(err => console.error('Error fetching jobs:', err));
+        }
+        
+        // Update reports display
+        function updateReports() {
+            fetch('/api/reports')
+                .then(response => response.json())
+                .then(reports => {
+                    const reportsList = document.getElementById('reportsList');
+                    const noReportsMessage = document.getElementById('noReportsMessage');
+                    
+                    if (reports.length === 0) {
+                        reportsList.innerHTML = '';
+                        noReportsMessage.style.display = 'block';
+                    } else {
+                        noReportsMessage.style.display = 'none';
+                        reportsList.innerHTML = reports.map(dir => {
+                            const lastReportUrl = dir.lastReport 
+                                ? `/reports/${dir.domain}/${dir.lastReport}`
+                                : '#';
+                            return `
+                                <div class="report-item">
+                                    <h3>${dir.domain}</h3>
+                                    <p>${dir.reportCount} report(s) available</p>
+                                    ${dir.lastReport ? `
+                                        <a href="${lastReportUrl}" class="btn btn-view">View Latest Report</a>
+                                        <a href="/browse/${dir.domain}" class="btn btn-browse">Browse All</a>
+                                    ` : '<p class="no-reports">No reports yet</p>'}
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                })
+                .catch(err => console.error('Error fetching reports:', err));
+        }
+        
+        // Update jobs every 5 seconds
+        setInterval(updateJobs, 5000);
+        updateJobs(); // Initial load
+        
+        // Update reports every 30 seconds and on initial load
+        setInterval(updateReports, 30000);
+        updateReports(); // Initial load
+        
+        // Handle form submission
+        document.getElementById('crawlForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Starting...';
+            
+            // Convert FormData to URLSearchParams for proper server parsing
+            const params = new URLSearchParams();
+            for (const [key, value] of formData.entries()) {
+                params.append(key, value);
+            }
+            
+            fetch('/crawl', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: params
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Crawl started successfully! Job ID: ' + data.jobId);
+                    this.reset();
+                    updateJobs(); // Refresh job list
+                    // Reports will auto-update when the crawl completes
+                } else {
+                    alert('Error starting crawl: ' + data.error);
+                }
+            })
+            .catch(err => {
+                alert('Error starting crawl: ' + err.message);
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Start Crawl';
+            });
+        });
+    </script>
+</body>
+</html>
