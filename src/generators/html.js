@@ -385,9 +385,36 @@ function generateHTMLReport(data, filename) {
   }
 
   // Assemble final HTML
-  // Generate correct JSON download URL - need relative path from HTML location
-  // HTML is at /reports/domain/file.html, JSON is at /reports/domain/file.json
-  const jsonFilename = filename.replace('.html', '.json');
+  // Generate correct JSON download URL - find the actual JSON file
+  // The JSON file might have a different timestamp due to generation timing
+  let jsonFilename = filename.replace('.html', '.json');
+  
+  // If we're regenerating from a specific JSON file, extract the correct name
+  // This handles cases where JSON and HTML have different timestamps
+  const domainFromFilename = filename.split('_')[0];
+  const wcagVersionFromFilename = filename.match(/wcag(\d\.\d)/)?.[1];
+  const wcagLevelFromFilename = filename.match(/wcag\d\.\d_([A-Z]{1,3})/)?.[1];
+  
+  if (domainFromFilename && wcagVersionFromFilename && wcagLevelFromFilename) {
+    // Try to find the actual JSON file with matching domain, version, and level
+    try {
+      const reportDir = path.dirname(filename);
+      const domainDir = path.join(config.REPORTS_DIR, domainFromFilename);
+      if (fs.existsSync(domainDir)) {
+        const files = fs.readdirSync(domainDir);
+        const matchingJson = files.find(file => 
+          file.startsWith(`${domainFromFilename}_wcag${wcagVersionFromFilename}_${wcagLevelFromFilename}_`) &&
+          file.endsWith('.json')
+        );
+        if (matchingJson) {
+          jsonFilename = matchingJson;
+        }
+      }
+    } catch (error) {
+      // Fall back to simple replacement if anything goes wrong
+      console.warn('Could not find matching JSON file, using default name:', error.message);
+    }
+  }
   
   // Create readable date and time for title to ensure uniqueness
   const reportDateTime = new Date(timestamp).toLocaleString('en-US', { 
