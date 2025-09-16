@@ -18,7 +18,7 @@ A modern web accessibility testing platform that crawls websites and generates b
 
 ```bash
 # Clone the repository
-git clone <your-repo-url>
+git clone https://github.com/iamjolly/crawl-and-test.git
 cd crawl-and-test
 
 # Install Node.js dependencies
