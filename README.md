@@ -1,24 +1,18 @@
 # 🐱 CATS (Crawl and Test System)
 
-A modern web accessibility testing plat│       └── cleanup.js              # Cleanup utilities
-├── 📁 public/                       # Generated output (served by dashboard)
-│   ├── 📊 reports/                  # Generated accessibility reports
-│   ├── 🎨 styles/                   # Copied CSS files
-│   └── 📜 scripts/                  # Copied JavaScript files
-├── � _serverless-examples/         # Cloud deployment examples
-└── � Configuration files           # package.json, .env.example, etc.at crawls websites and generates beautiful, actionable accessibility reports. CATS helps developers, QA teams, and accessibility professionals ensure their websites meet WCAG compliance standards with automated scanning and comprehensive reporting.
+A modern web accessibility testing platform that crawls websites and generates beautiful, actionable accessibility reports. CATS helps developers, QA teams, and accessibility professionals ensure their websites meet WCAG compliance standards with automated scanning and comprehensive reporting.
 
 ## ✨ Key Features
 
-- 🌐 **Smart Crawling**: Automatically detects sitemaps or discovers pages through link crawling
-- ♿ **Comprehensive Testing**: Uses axe-core for industry-standard accessibility scanning
-- 📊 **Beautiful Reports**: Interactive HTML reports with detailed violation breakdowns
-- 🎯 **Web Dashboard**: Browser-based interface for managing scans and browsing reports
-- ⚡ **High Performance**: Concurrent crawling with configurable limits and delays
-- 🔧 **Flexible Configuration**: Support for WCAG 2.0/2.1/2.2 and A/AA/AAA compliance levels
-- 📱 **Modern UI**: Responsive design with navigation, breadcrumbs, and accessibility features
+- **Smart Crawling**: Automatically detects sitemaps or discovers pages through link crawling
+- **Reliable Automated Testing**: Uses axe-core for industry-standard automated accessibility scanning
+- **Beautiful Reports**: Interactive HTML reports with detailed violation breakdowns
+- **Web Dashboard**: Browser-based interface for managing scans and browsing reports
+- **High Performance**: Concurrent crawling with configurable limits and delays
+- **Flexible Configuration**: Support for WCAG 2.0/2.1/2.2 and A/AA/AAA compliance levels
+- **Modern UI**: Responsive design with navigation, breadcrumbs, and accessibility features
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Install Dependencies
 
@@ -55,39 +49,41 @@ node src/core/crawler.js -s https://example.com --html
 npm run serve:reports
 ```
 
-## 📋 Prerequisites
+## Prerequisites
 
 - **Node.js** 16.0.0 or higher
 - **npm** or yarn package manager
 - **Internet connection** for crawling websites
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
-├── 📁 src/                          # Source files and application code
-│   ├── 🔧 core/                     # Core functionality
+├── src/                             # Source files and application code
+│   ├── core/                       # Core functionality
 │   │   ├── config.js               # Configuration management
 │   │   └── crawler.js              # Main accessibility crawler
-│   ├── 🌐 servers/                  # Server applications
+│   ├── servers/                    # Server applications
 │   │   ├── dashboard.js            # Web dashboard server
 │   │   └── static.js               # Static report viewer server
-│   ├── 📝 generators/               # Report generation utilities
+│   ├── generators/                 # Report generation utilities
 │   │   ├── html.js                 # HTML report generator
 │   │   └── index.js                # Dashboard index generator
-│   ├── 🎨 styles/                   # CSS stylesheets
-│   ├── 📜 scripts/                  # JavaScript utilities
-│   ├── 📄 templates/                # HTML templates
-│   └── 🛠️ utils/                    # Utility scripts
+│   ├── styles/                     # CSS stylesheets
+│   ├── scripts/                    # JavaScript utilities
+│   ├── templates/                  # HTML templates
+│   └── utils/                      # Utility scripts
 │       └── cleanup.js              # Cleanup utilities
-├── 📁 public/                       # Generated output (served by dashboard)
-│   ├── 📊 reports/                  # Generated accessibility reports
-│   ├── 🎨 styles/                   # Copied CSS files
-│   └── 📜 scripts/                  # Copied JavaScript files
-├── � serverless-examples/          # Cloud deployment examples
-└── � Configuration files           # package.json, .env.example, etc.
+├── public/                         # Generated output (served by dashboard)
+│   ├── reports/                    # Generated accessibility reports
+│   ├── styles/                     # Copied CSS files
+│   └── scripts/                    # Copied JavaScript files
+├── _serverless-examples/            # Cloud deployment examples
+├── package.json                     # Node.js dependencies and scripts
+├── .env.example                     # Environment configuration template
+└── .gitignore                       # Git ignore rules
 ```
 
-## 🌐 Web Dashboard
+## Web Dashboard
 
 The web dashboard provides a user-friendly interface for managing accessibility scans:
 
@@ -103,13 +99,13 @@ npm run serve:dashboard
 
 ### Dashboard Features
 
-- 🚀 **Start New Crawls**: Simple form interface with all configuration options
-- 📈 **Monitor Progress**: Real-time job tracking with progress indicators  
-- 📂 **Browse Reports**: Organized view of all reports by domain
-- 🔍 **Search & Filter**: Find specific reports quickly
-- 📊 **Report Navigation**: Seamless navigation between dashboard and individual reports
+- **Start New Crawls**: Simple form interface with all configuration options
+- **Monitor Progress**: Real-time job tracking with progress indicators  
+- **Browse Reports**: Organized view of all reports by domain
+- **Search & Filter**: Find specific reports quickly
+- **Report Navigation**: Seamless navigation between dashboard and individual reports
 
-## 📊 Static Report Viewer
+## Static Report Viewer
 
 For sharing reports or viewing without the dashboard:
 
@@ -121,7 +117,7 @@ npm run serve:reports
 
 Serves all generated reports from the `public/` directory with a clean, browsable interface.
 
-## 🛠️ Command Line Usage
+## Command Line Usage
 
 ### Basic Commands
 
@@ -170,7 +166,7 @@ node crawler.js -s https://large-site.com -p 100 -d 3 -c 2 --html
 node crawler.js -s https://example.com --wcag-version 2.2 --wcag-level AA --html
 ```
 
-## 🔧 Development Scripts
+## Development Scripts
 
 | Command | Description |
 |---------|-------------|
@@ -181,7 +177,7 @@ node crawler.js -s https://example.com --wcag-version 2.2 --wcag-level AA --html
 | `npm run clean` | Remove all generated reports |
 | `npm run install-browsers` | Install Playwright browsers |
 
-## ⚙️ Configuration
+## Configuration
 
 ### Environment Variables (.env Support)
 
@@ -213,14 +209,14 @@ Key configuration options:
 - `AA` - Standard compliance (recommended)
 - `AAA` - Enhanced accessibility
 
-## 📈 How It Works
+## How It Works
 
 1. **🕷️ Crawling**: Discovers pages via sitemap.xml or link crawling
 2. **🔍 Scanning**: Runs axe-core accessibility tests on each page
 3. **📊 Reporting**: Generates JSON data and beautiful HTML reports
 4. **🌐 Serving**: Makes reports available via web dashboard or static server
 
-## 🔍 Smart Crawling Modes
+## Smart Crawling Modes
 
 ### Mixed Mode (Default)
 1. **Tries sitemap.xml** at common locations
@@ -234,14 +230,14 @@ node src/core/crawler.js -s https://example.com --no-sitemap
 
 Uses link discovery with depth limits instead of sitemap.
 
-## 📊 Report Features
+## Report Features
 
 ### Generated Reports Include:
-- 📈 **Summary Statistics**: Total issues, pages scanned, compliance overview
-- 🎯 **Violation Breakdown**: Grouped by severity and type
-- � **Detailed Issues**: Specific elements, selectors, and remediation guidance
-- 🔗 **Page-by-Page Results**: Complete scan results for each URL
-- � **Multiple Formats**: Both JSON (raw data) and HTML (visual reports)
+- **Summary Statistics**: Total issues, pages scanned, compliance overview
+- **Violation Breakdown**: Grouped by severity and type
+- **Detailed Issues**: Specific elements, selectors, and remediation guidance
+- **Page-by-Page Results**: Complete scan results for each URL
+- **Multiple Formats**: Both JSON (raw data) and HTML (visual reports)
 
 ### Report Organization:
 ```
@@ -254,7 +250,7 @@ public/reports/
     └── ...
 ```
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -278,16 +274,16 @@ npm run install-browsers
 
 ```bash
 # Conservative (safe for any site)
-node crawler.js -s https://site.com -c 1 -t 2000 -d 2
+node src/core/crawler.js -s https://site.com -c 1 -t 2000 -d 2
 
 # Balanced (recommended)
-node crawler.js -s https://site.com -c 4 -t 1000 -d 2
+node src/core/crawler.js -s https://site.com -c 4 -t 1000 -d 2
 
 # Aggressive (use with caution)
-node crawler.js -s https://site.com -c 8 -t 500 -d 3
+node src/core/crawler.js -s https://site.com -c 8 -t 500 -d 3
 ```
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -295,7 +291,7 @@ node crawler.js -s https://site.com -c 8 -t 500 -d 3
 4. Test thoroughly
 5. Submit a pull request
 
-## 📄 License
+## License
 
 MIT License - See LICENSE file for details.
 
@@ -304,10 +300,10 @@ MIT License - See LICENSE file for details.
 **Made with ❤️ for web accessibility**
 
 **Features**:
-- 📖 **Browse reports**: Clean directory interface for all generated accessibility reports
-- ⬇️ **Download data**: Direct access to both HTML reports and raw JSON data
-- 🚀 **Fast serving**: Optimized static file serving of the `/public/` directory
-- 📱 **Responsive**: Modern, accessible interface for report browsing
+- **Browse reports**: Clean directory interface for all generated accessibility reports
+- **Download data**: Direct access to both HTML reports and raw JSON data
+- **Fast serving**: Optimized static file serving of the `/public/` directory
+- **Responsive**: Modern, accessible interface for report browsing
 
 **Use Cases**:
 - **Dashboard** (`npm run dev`): Active development, creating new scans, managing crawls
@@ -520,40 +516,26 @@ node src/generators/html.js --file reports/example.com/example.com_wcag2.1_AA_20
 
 # Force regenerate ALL reports with enhanced detailed information (even if HTML exists)
 node src/generators/html.js --detailed
-```
-```
-
-### Advanced Usage
-
-```bash
-# Regenerate HTML reports for a specific domain only
-node regenerate-html.js --domain example.com
-
-# Regenerate HTML for a specific JSON file
-node regenerate-html.js --file reports/example.com/example.com_wcag2.1_AA_2025-09-14T10-03-03.json
-
-# Force regenerate ALL reports with enhanced detailed information (even if HTML exists)
-node regenerate-html.js --detailed
 
 # Force detailed regeneration for specific domain
-node regenerate-html.js --detailed --domain example.com
+node src/generators/html.js --detailed --domain example.com
 
 # Or use the npm script
 npm run regenerate-detailed
 
 # Show help
-node regenerate-html.js --help
+node src/generators/html.js --help
 ```
 
 ### Enhanced Detailed Reports
 
 The `--detailed` flag forces regeneration of HTML reports with comprehensive violation details including:
 
-- **🎯 Impact Level Badges**: Visual indicators for critical, serious, moderate, and minor violations
-- **🔍 DOM Selectors**: Precise CSS selectors showing exactly which elements have issues
-- **📝 HTML Snippets**: Actual markup of problematic elements for better context
-- **📋 Failure Summaries**: Specific explanations of what's wrong and how to fix it
-- **💡 Remediation Links**: Direct links to Deque University help pages with detailed guidance
+- **Impact Level Badges**: Helpful indicators for critical, serious, moderate, and minor violations
+- **DOM Selectors**: Precise CSS selectors showing exactly which elements have issues
+- **HTML Snippets**: Actual markup of problematic elements for better context
+- **Failure Summaries**: Specific explanations of what's wrong and how to fix it
+- **Remediation Links**: Direct links to Deque University help pages with detailed guidance
 
 ### When to Use This Utility
 
@@ -569,38 +551,6 @@ The utility will:
 - ✅ Preserve all original data and metadata
 - ✅ Generate properly formatted, styled HTML reports
 - ✅ Update the web dashboard to display the new reports
-
-## Troubleshooting
-
-### Common Issues
-
-**"Failed to launch browser"**
-- Run `npm run install-browsers` to install Playwright browsers
-
-**"Timeout" errors**
-- Increase the delay (`-t` option) between requests
-- Reduce concurrency (`-c` option)
-
-**"HTTPS required" error**
-- Ensure your seed URL starts with `https://`
-
-**Large output files**
-- Use smaller depth values for initial testing
-- Consider filtering specific pages rather than full site crawls
-
-### Performance Tuning
-
-For large sites:
-```bash
-# Conservative approach
-node crawler.js -s https://large-site.com -d 2 -c 2 -t 2000
-
-# Balanced approach
-node crawler.js -s https://medium-site.com -d 2 -c 4 -t 1000
-
-# Aggressive approach (use with caution)
-node crawler.js -s https://fast-site.com -d 3 -c 6 -t 500
-```
 
 ## Mixed Mode: Sitemap + Discovery
 
@@ -624,19 +574,19 @@ By default, the crawler uses **mixed mode** which automatically:
 **Default mixed mode:**
 ```bash
 node crawler.js -s https://example.com
-# 🗺️ Tries sitemap first, falls back to discovery
+# Tries sitemap first, falls back to discovery
 ```
 
 **Force discovery crawling only:**
 ```bash
 node crawler.js -s https://example.com --no-sitemap
-# 🔍 Skips sitemap, uses link discovery with depth limit
+# Skips sitemap, uses link discovery with depth limit
 ```
 
 **Mixed mode with fallback settings:**
 ```bash
 node crawler.js -s https://example.com -d 3 -c 2
-# 🗺️ Tries sitemap first, if not found uses depth 3 discovery
+# Tries sitemap first, if not found uses depth 3 discovery
 ```
 
 ## WCAG Testing Configuration

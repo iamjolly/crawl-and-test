@@ -1,4 +1,4 @@
-# Serverless Examples - Updated for Current Project Structure
+# Serverless Examples 
 
 ## ⚠️ Important Notes
 
