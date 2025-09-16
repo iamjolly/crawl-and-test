@@ -39,10 +39,18 @@
                         <div class="form-group">
                             <label for="wcagVersion">WCAG Version:</label>
                             <select id="wcagVersion" name="wcagVersion">
-                                <option value="wcag2.1">WCAG 2.1 AA (Default)</option>
-                                <option value="wcag2.0">WCAG 2.0 AA</option>
-                                <option value="wcag2.2">WCAG 2.2 AA</option>
-                                <option value="wcag21-aaa">WCAG 2.1 AAA</option>
+                                <option value="2.1" selected>WCAG 2.1 (Default)</option>
+                                <option value="2.0">WCAG 2.0</option>
+                                <option value="2.2">WCAG 2.2 (Latest)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="wcagLevel">WCAG Level:</label>
+                            <select id="wcagLevel" name="wcagLevel">
+                                <option value="A">Level A (Basic)</option>
+                                <option value="AA" selected>Level AA (Standard)</option>
+                                <option value="AAA">Level AAA (Enhanced)</option>
                             </select>
                         </div>
                         
