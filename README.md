@@ -141,16 +141,16 @@ npm start -- --help
 
 ```bash
 # Conservative scan for testing
-node crawler.js -s https://example.com -c 1 -t 2000 -d 1 --html
+node src/core/crawler.js -s https://example.com -c 1 -t 2000 -d 1 --html
 
 # Balanced production scan
-node crawler.js -s https://example.com -d 2 -c 4 -t 1000 --wcag-version 2.1 --wcag-level AA --html
+node src/core/crawler.js -s https://example.com -d 2 -c 4 -t 1000 --wcag-version 2.1 --wcag-level AA --html
 
 # Comprehensive large site scan
-node crawler.js -s https://large-site.com -p 100 -d 3 -c 2 --html
+node src/core/crawler.js -s https://large-site.com -p 100 -d 3 -c 2 --html
 
 # Latest WCAG 2.2 compliance
-node crawler.js -s https://example.com --wcag-version 2.2 --wcag-level AA --html
+node src/core/crawler.js -s https://example.com --wcag-version 2.2 --wcag-level AA --html
 ```
 
 ## Development Scripts
@@ -349,20 +349,20 @@ The `/reports/` directory contains the **source data** (raw axe-core JSON result
 
 ## Usage
 
-> **Note**: All command examples below show `node crawler.js` for clarity, but we recommend using `npm start --` instead as it works from any directory. For example: `npm start -- -s https://example.com`
+> **Note**: All command examples below show `node src/core/crawler.js` for clarity, but we recommend using `npm start --` instead as it works from any directory. For example: `npm start -- -s https://example.com`
 
 ### Basic Usage
 
 Crawl a website starting from a seed URL:
 
 ```bash
-node crawler.js -s https://example.com
+node src/core/crawler.js -s https://example.com
 ```
 
 ### Command Line Options
 
 ```bash
-node crawler.js [options]
+node src/core/crawler.js [options]
 
 Options:
   -s, --seed <url>          Seed URL (must be HTTPS) [required]
@@ -383,37 +383,37 @@ Options:
 
 **Basic crawl with default settings:**
 ```bash
-node crawler.js -s https://example.com
+node src/core/crawler.js -s https://example.com
 ```
 
 **Deep crawl with custom output:**
 ```bash
-node crawler.js -s https://example.com -d 3 -o accessibility-report.json
+node src/core/crawler.js -s https://example.com -d 3 -o accessibility-report.json
 ```
 
 **High-performance crawl (use with caution):**
 ```bash
-node crawler.js -s https://example.com -c 8 -t 500 -d 2
+node src/core/crawler.js -s https://example.com -c 8 -t 500 -d 2
 ```
 
 **Conservative crawl for testing:**
 ```bash
-node crawler.js -s https://example.com -c 1 -t 2000 -d 1
+node src/core/crawler.js -s https://example.com -c 1 -t 2000 -d 1
 ```
 
 **Quick test scan (limit to 10 pages):**
 ```bash
-node crawler.js -s https://example.com -p 10 -d 2
+node src/core/crawler.js -s https://example.com -p 10 -d 2
 ```
 
 **Testing large sites (limit to 100 pages):**
 ```bash
-node crawler.js -s https://large-site.com -p 100 -d 3 -c 2
+node src/core/crawler.js -s https://large-site.com -p 100 -d 3 -c 2
 ```
 
 **Unlimited scan (scan all discoverable pages):**
 ```bash
-node crawler.js -s https://small-site.com -p 0 -d 2
+node src/core/crawler.js -s https://small-site.com -p 0 -d 2
 ```
 
 ## Output Format
@@ -559,19 +559,19 @@ By default, the crawler uses **mixed mode** which automatically:
 
 **Default mixed mode:**
 ```bash
-node crawler.js -s https://example.com
+node src/core/crawler.js -s https://example.com
 # Tries sitemap first, falls back to discovery
 ```
 
 **Force discovery crawling only:**
 ```bash
-node crawler.js -s https://example.com --no-sitemap
+node src/core/crawler.js -s https://example.com --no-sitemap
 # Skips sitemap, uses link discovery with depth limit
 ```
 
 **Mixed mode with fallback settings:**
 ```bash
-node crawler.js -s https://example.com -d 3 -c 2
+node src/core/crawler.js -s https://example.com -d 3 -c 2
 # Tries sitemap first, if not found uses depth 3 discovery
 ```
 
@@ -595,22 +595,22 @@ The crawler supports testing against different WCAG versions and compliance leve
 
 **WCAG 2.2 Level AA (latest standard):**
 ```bash
-node crawler.js -s https://example.com --wcag-version 2.2 --wcag-level AA
+node src/core/crawler.js -s https://example.com --wcag-version 2.2 --wcag-level AA
 ```
 
 **WCAG 2.1 Level AAA (comprehensive):**
 ```bash
-node crawler.js -s https://example.com --wcag-version 2.1 --wcag-level AAA
+node src/core/crawler.js -s https://example.com --wcag-version 2.1 --wcag-level AAA
 ```
 
 **WCAG 2.0 Level A (basic compliance):**
 ```bash
-node crawler.js -s https://example.com --wcag-version 2.0 --wcag-level A
+node src/core/crawler.js -s https://example.com --wcag-version 2.0 --wcag-level A
 ```
 
 **Custom axe tags (advanced):**
 ```bash
-node crawler.js -s https://example.com --custom-tags "wcag2aa,best-practice,cat.color"
+node src/core/crawler.js -s https://example.com --custom-tags "wcag2aa,best-practice,cat.color"
 ```
 
 ### What Gets Tested
@@ -661,20 +661,20 @@ reports/
 
 **Generate both JSON and HTML reports:**
 ```bash
-node crawler.js -s https://example.com --html
+node src/core/crawler.js -s https://example.com --html
 ```
 
 **Custom output filename (in domain directory):**
 ```bash
-node crawler.js -s https://example.com -o my-custom-report.json --html
+node src/core/crawler.js -s https://example.com -o my-custom-report.json --html
 ```
 
 **Multiple scans organized by domain:**
 ```bash
 # Scan multiple sites - automatically organized
-node crawler.js -s https://site1.com --html
-node crawler.js -s https://site2.com --html
-node crawler.js -s https://site3.com --html
+node src/core/crawler.js -s https://site1.com --html
+node src/core/crawler.js -s https://site2.com --html
+node src/core/crawler.js -s https://site3.com --html
 ```
 
 ### Report Features
