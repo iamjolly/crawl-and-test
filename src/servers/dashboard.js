@@ -358,11 +358,8 @@ function generateDomainReportsHTML(domain) {
 
 // Routes
 app.get('/', (req, res) => {
-    // Generate fresh index.html if it doesn't exist or regenerate it
+    // Serve the dashboard index.html (regenerated on server startup)
     const indexPath = path.join(config.PUBLIC_DIR, 'index.html');
-    if (!fs.existsSync(indexPath)) {
-        generateIndexHTML();
-    }
     res.sendFile(indexPath);
 });
 
@@ -508,4 +505,9 @@ app.listen(PORT, () => {
     console.log(`🚀 CATS Dashboard running at http://localhost:${PORT}`);
     console.log(`📊 View your dashboard: http://localhost:${PORT}`);
     console.log(`📁 Reports directory: ${config.REPORTS_DIR}`);
+    
+    // Always regenerate index.html on server startup
+    console.log('🔄 Regenerating dashboard index.html...');
+    generateIndexHTML();
+    console.log('✅ Dashboard index.html regenerated');
 });
