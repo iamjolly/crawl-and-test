@@ -63,8 +63,7 @@ npm run serve:reports
 │   │   ├── config.js               # Configuration management
 │   │   └── crawler.js              # Main accessibility crawler
 │   ├── servers/                    # Server applications
-│   │   ├── dashboard.js            # Web dashboard server
-│   │   └── static.js               # Static report viewer server
+│   │   └── dashboard.js            # Web dashboard and report server
 │   ├── generators/                 # Report generation utilities
 │   │   ├── html.js                 # HTML report generator
 │   │   └── index.js                # Dashboard index generator
@@ -104,18 +103,6 @@ npm run serve:dashboard
 - **Browse Reports**: Organized view of all reports by domain
 - **Search & Filter**: Find specific reports quickly
 - **Report Navigation**: Seamless navigation between dashboard and individual reports
-
-## Static Report Viewer
-
-For sharing reports or viewing without the dashboard:
-
-```bash
-npm run serve:reports
-```
-
-**URL**: http://localhost:3001
-
-Serves all generated reports from the `public/` directory with a clean, browsable interface.
 
 ## Command Line Usage
 
@@ -170,8 +157,8 @@ node crawler.js -s https://example.com --wcag-version 2.2 --wcag-level AA --html
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start web dashboard (port 3000) |
-| `npm run serve:reports` | Start static report viewer (port 3001) |
+| `npm run dev` | Start web dashboard and report server (port 3000) |
+| `npm run serve` | Alternative command to start dashboard |
 | `npm run build` | Generate HTML reports from JSON data |
 | `npm run regenerate-html` | Regenerate missing HTML reports |
 | `npm run clean` | Remove all generated reports |
@@ -214,7 +201,7 @@ Key configuration options:
 1. **🕷️ Crawling**: Discovers pages via sitemap.xml or link crawling
 2. **🔍 Scanning**: Runs axe-core accessibility tests on each page
 3. **📊 Reporting**: Generates JSON data and beautiful HTML reports
-4. **🌐 Serving**: Makes reports available via web dashboard or static server
+4. **🌐 Serving**: Makes reports available via web dashboard
 
 ## Smart Crawling Modes
 
@@ -300,14 +287,14 @@ MIT License - See LICENSE file for details.
 **Made with ❤️ for web accessibility**
 
 **Features**:
-- **Browse reports**: Clean directory interface for all generated accessibility reports
-- **Download data**: Direct access to both HTML reports and raw JSON data
-- **Fast serving**: Optimized static file serving of the `/public/` directory
-- **Responsive**: Modern, accessible interface for report browsing
+- **Browse reports**: Navigate domain reports and individual accessibility reports
+- **Download data**: Direct access to both HTML reports and raw JSON data  
+- **Fast serving**: Integrated report serving within the dashboard
+- **Responsive**: Modern, accessible interface optimized for all screen sizes
 
 **Use Cases**:
-- **Dashboard** (`npm run dev`): Active development, creating new scans, managing crawls
-- **Report Viewer** (`npm run serve:reports`): Sharing reports, presentations, reviewing completed scans
+- **Dashboard** (`npm run dev`): Complete accessibility testing workflow - scan, analyze, and browse reports
+- **Development**: Integrated development experience with live report generation and browsing
 
 ## Build & Development Workflow
 
@@ -333,19 +320,18 @@ npm run clean
 
 ### Serve Generated Reports
 
-Start a static server to browse generated reports:
+The dashboard automatically serves all generated reports:
 
 ```bash
-npm run serve:reports
+npm run dev
 ```
 
-This starts a server at `http://localhost:3001` serving the `public/` directory with a browsable interface for all generated accessibility reports.
+This starts the complete CATS system at `http://localhost:3000` with integrated report browsing, crawling interface, and report generation.
 
 ### Development Scripts
 
-- `npm run dev` (or `npm run serve:dashboard`) - Start the crawling dashboard (port 3000)
-- `npm run serve:reports` - Serve generated reports in static viewer (port 3001)
-- `npm run build` - Generate all HTML reports
+- `npm run dev` (or `npm run serve`) - Start the complete CATS dashboard and report system (port 3000)
+- `npm run build` - Generate all HTML reports from existing JSON data
 - `npm run clean` - Clean generated reports
 - `npm run cleanup-old-html` - Remove old HTML files from /reports/, preserving JSON data
 

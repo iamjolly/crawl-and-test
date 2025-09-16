@@ -53,20 +53,22 @@ function generateReportsIndexHTML() {
             
             const reportItems = reports.map(reportFile => {
                 const reportPath = `/reports/${dir.domain}/${reportFile}`;
-                // Handle both formats: 2025-09-14T11-35-12 and 2025-09-16T15-33-55-999Z
-                const reportDate = reportFile.match(/(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}(?:-\d{3})?(?:Z)?)/);
+                // Handle multiple timestamp formats in filenames
+                const reportDate = reportFile.match(/(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}(?:-\d{3}Z?)?)/);
                 let displayDate = 'Unknown';
                 
                 if (reportDate) {
                     // Convert filename timestamp format to ISO format
                     let isoTimestamp = reportDate[1];
-                    // Handle format with milliseconds: 2025-09-16T15-33-55-999Z
-                    if (isoTimestamp.includes('-999Z')) {
-                        isoTimestamp = isoTimestamp.replace(/T(\d{2})-(\d{2})-(\d{2})-999Z/, 'T$1:$2:$3.999Z');
+                    
+                    // Handle format with milliseconds: 2025-09-16T18-42-30-245Z or similar
+                    if (isoTimestamp.match(/-\d{3}Z?$/)) {
+                        isoTimestamp = isoTimestamp.replace(/T(\d{2})-(\d{2})-(\d{2})-(\d{3})(Z?)/, 'T$1:$2:$3.$4$5');
                     } else {
                         // Handle standard format: 2025-09-14T11-35-12
                         isoTimestamp = isoTimestamp.replace(/T(\d{2})-(\d{2})-(\d{2})/, 'T$1:$2:$3');
                     }
+                    
                     displayDate = formatTimestamp(isoTimestamp);
                 }
                 
@@ -104,7 +106,7 @@ function generateReportsIndexHTML() {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reports - CATS (Crawl and Test System)</title>
+    <title>Accessibility Reports - CATS</title>
     <link rel="stylesheet" href="/styles/navigation.css">
     <style>
         * {
@@ -260,20 +262,22 @@ function generateDomainReportsHTML(domain) {
     const reportsList = reports.length > 0 
         ? reports.map(reportFile => {
             const reportPath = `/reports/${domain}/${reportFile}`;
-            // Handle both formats: 2025-09-14T11-35-12 and 2025-09-16T15-33-55-999Z
-            const reportDate = reportFile.match(/(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}(?:-\d{3})?(?:Z)?)/);
+            // Handle multiple timestamp formats in filenames
+            const reportDate = reportFile.match(/(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}(?:-\d{3}Z?)?)/);
             let displayDate = 'Unknown';
             
             if (reportDate) {
                 // Convert filename timestamp format to ISO format
                 let isoTimestamp = reportDate[1];
-                // Handle format with milliseconds: 2025-09-16T15-33-55-999Z
-                if (isoTimestamp.includes('-999Z')) {
-                    isoTimestamp = isoTimestamp.replace(/T(\d{2})-(\d{2})-(\d{2})-999Z/, 'T$1:$2:$3.999Z');
+                
+                // Handle format with milliseconds: 2025-09-16T18-42-30-245Z or similar
+                if (isoTimestamp.match(/-\d{3}Z?$/)) {
+                    isoTimestamp = isoTimestamp.replace(/T(\d{2})-(\d{2})-(\d{2})-(\d{3})(Z?)/, 'T$1:$2:$3.$4$5');
                 } else {
                     // Handle standard format: 2025-09-14T11-35-12
                     isoTimestamp = isoTimestamp.replace(/T(\d{2})-(\d{2})-(\d{2})/, 'T$1:$2:$3');
                 }
+                
                 displayDate = formatTimestamp(isoTimestamp);
             }
             
@@ -292,7 +296,7 @@ function generateDomainReportsHTML(domain) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reports for ${domain} - CATS</title>
+    <title>Domain Reports: ${domain} - CATS</title>
     <link rel="stylesheet" href="/styles/report.css">
     <link rel="stylesheet" href="/styles/navigation.css">
     <link rel="stylesheet" href="/styles/accessibility.css">
@@ -380,7 +384,7 @@ app.get('/browse/:domain', (req, res) => {
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Domain Not Found - CATS</title>
+                <title>Error: Domain Not Found - CATS</title>
                 <link rel="stylesheet" href="/styles/report.css">
             </head>
             <body>

@@ -356,8 +356,19 @@ function generateHTMLReport(data, filename) {
 
   // Assemble final HTML
   const jsonFilename = filename; // The JSON filename for download link
+  
+  // Create readable date and time for title to ensure uniqueness
+  const reportDateTime = new Date(timestamp).toLocaleString('en-US', { 
+    year: 'numeric', 
+    month: 'short', 
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+  
   const html = baseTemplate
-    .replace(/{{title}}/g, `CATS Accessibility Report - ${domain}`)
+    .replace(/{{title}}/g, `Accessibility Report: ${domain} (${reportDateTime}) - CATS`)
     .replace(/{{domain}}/g, domain)
     .replace(/{{timestamp}}/g, timestamp)
     .replace(/{{wcagInfo}}/g, wcagInfo)
