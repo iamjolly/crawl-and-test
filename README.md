@@ -63,8 +63,7 @@ npm run serve:reports
 │   │   ├── config.js               # Configuration management
 │   │   └── crawler.js              # Main accessibility crawler
 │   ├── servers/                    # Server applications
-│   │   ├── dashboard.js            # Web dashboard server
-│   │   └── static.js               # Static report viewer server
+│   │   └── dashboard.js            # Web dashboard and report server
 │   ├── generators/                 # Report generation utilities
 │   │   ├── html.js                 # HTML report generator
 │   │   └── index.js                # Dashboard index generator
@@ -105,18 +104,6 @@ npm run serve:dashboard
 - **Search & Filter**: Find specific reports quickly
 - **Report Navigation**: Seamless navigation between dashboard and individual reports
 
-## Static Report Viewer
-
-For sharing reports or viewing without the dashboard:
-
-```bash
-npm run serve:reports
-```
-
-**URL**: http://localhost:3001
-
-Serves all generated reports from the `public/` directory with a clean, browsable interface.
-
 ## Command Line Usage
 
 ### Basic Commands
@@ -154,24 +141,24 @@ npm start -- --help
 
 ```bash
 # Conservative scan for testing
-node crawler.js -s https://example.com -c 1 -t 2000 -d 1 --html
+node src/core/crawler.js -s https://example.com -c 1 -t 2000 -d 1 --html
 
 # Balanced production scan
-node crawler.js -s https://example.com -d 2 -c 4 -t 1000 --wcag-version 2.1 --wcag-level AA --html
+node src/core/crawler.js -s https://example.com -d 2 -c 4 -t 1000 --wcag-version 2.1 --wcag-level AA --html
 
 # Comprehensive large site scan
-node crawler.js -s https://large-site.com -p 100 -d 3 -c 2 --html
+node src/core/crawler.js -s https://large-site.com -p 100 -d 3 -c 2 --html
 
 # Latest WCAG 2.2 compliance
-node crawler.js -s https://example.com --wcag-version 2.2 --wcag-level AA --html
+node src/core/crawler.js -s https://example.com --wcag-version 2.2 --wcag-level AA --html
 ```
 
 ## Development Scripts
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start web dashboard (port 3000) |
-| `npm run serve:reports` | Start static report viewer (port 3001) |
+| `npm run dev` | Start web dashboard and report server (port 3000) |
+| `npm run serve` | Alternative command to start dashboard |
 | `npm run build` | Generate HTML reports from JSON data |
 | `npm run regenerate-html` | Regenerate missing HTML reports |
 | `npm run clean` | Remove all generated reports |
@@ -214,7 +201,7 @@ Key configuration options:
 1. **🕷️ Crawling**: Discovers pages via sitemap.xml or link crawling
 2. **🔍 Scanning**: Runs axe-core accessibility tests on each page
 3. **📊 Reporting**: Generates JSON data and beautiful HTML reports
-4. **🌐 Serving**: Makes reports available via web dashboard or static server
+4. **🌐 Serving**: Makes reports available via web dashboard
 
 ## Smart Crawling Modes
 
@@ -300,14 +287,14 @@ MIT License - See LICENSE file for details.
 **Made with ❤️ for web accessibility**
 
 **Features**:
-- **Browse reports**: Clean directory interface for all generated accessibility reports
-- **Download data**: Direct access to both HTML reports and raw JSON data
-- **Fast serving**: Optimized static file serving of the `/public/` directory
-- **Responsive**: Modern, accessible interface for report browsing
+- **Browse reports**: Navigate domain reports and individual accessibility reports
+- **Download data**: Direct access to both HTML reports and raw JSON data  
+- **Fast serving**: Integrated report serving within the dashboard
+- **Responsive**: Modern, accessible interface optimized for all screen sizes
 
 **Use Cases**:
-- **Dashboard** (`npm run dev`): Active development, creating new scans, managing crawls
-- **Report Viewer** (`npm run serve:reports`): Sharing reports, presentations, reviewing completed scans
+- **Dashboard** (`npm run dev`): Complete accessibility testing workflow - scan, analyze, and browse reports
+- **Development**: Integrated development experience with live report generation and browsing
 
 ## Build & Development Workflow
 
@@ -333,19 +320,18 @@ npm run clean
 
 ### Serve Generated Reports
 
-Start a static server to browse generated reports:
+The dashboard automatically serves all generated reports:
 
 ```bash
-npm run serve:reports
+npm run dev
 ```
 
-This starts a server at `http://localhost:3001` serving the `public/` directory with a browsable interface for all generated accessibility reports.
+This starts the complete CATS system at `http://localhost:3000` with integrated report browsing, crawling interface, and report generation.
 
 ### Development Scripts
 
-- `npm run dev` (or `npm run serve:dashboard`) - Start the crawling dashboard (port 3000)
-- `npm run serve:reports` - Serve generated reports in static viewer (port 3001)
-- `npm run build` - Generate all HTML reports
+- `npm run dev` (or `npm run serve`) - Start the complete CATS dashboard and report system (port 3000)
+- `npm run build` - Generate all HTML reports from existing JSON data
 - `npm run clean` - Clean generated reports
 - `npm run cleanup-old-html` - Remove old HTML files from /reports/, preserving JSON data
 
@@ -363,20 +349,20 @@ The `/reports/` directory contains the **source data** (raw axe-core JSON result
 
 ## Usage
 
-> **Note**: All command examples below show `node crawler.js` for clarity, but we recommend using `npm start --` instead as it works from any directory. For example: `npm start -- -s https://example.com`
+> **Note**: All command examples below show `node src/core/crawler.js` for clarity, but we recommend using `npm start --` instead as it works from any directory. For example: `npm start -- -s https://example.com`
 
 ### Basic Usage
 
 Crawl a website starting from a seed URL:
 
 ```bash
-node crawler.js -s https://example.com
+node src/core/crawler.js -s https://example.com
 ```
 
 ### Command Line Options
 
 ```bash
-node crawler.js [options]
+node src/core/crawler.js [options]
 
 Options:
   -s, --seed <url>          Seed URL (must be HTTPS) [required]
@@ -397,37 +383,37 @@ Options:
 
 **Basic crawl with default settings:**
 ```bash
-node crawler.js -s https://example.com
+node src/core/crawler.js -s https://example.com
 ```
 
 **Deep crawl with custom output:**
 ```bash
-node crawler.js -s https://example.com -d 3 -o accessibility-report.json
+node src/core/crawler.js -s https://example.com -d 3 -o accessibility-report.json
 ```
 
 **High-performance crawl (use with caution):**
 ```bash
-node crawler.js -s https://example.com -c 8 -t 500 -d 2
+node src/core/crawler.js -s https://example.com -c 8 -t 500 -d 2
 ```
 
 **Conservative crawl for testing:**
 ```bash
-node crawler.js -s https://example.com -c 1 -t 2000 -d 1
+node src/core/crawler.js -s https://example.com -c 1 -t 2000 -d 1
 ```
 
 **Quick test scan (limit to 10 pages):**
 ```bash
-node crawler.js -s https://example.com -p 10 -d 2
+node src/core/crawler.js -s https://example.com -p 10 -d 2
 ```
 
 **Testing large sites (limit to 100 pages):**
 ```bash
-node crawler.js -s https://large-site.com -p 100 -d 3 -c 2
+node src/core/crawler.js -s https://large-site.com -p 100 -d 3 -c 2
 ```
 
 **Unlimited scan (scan all discoverable pages):**
 ```bash
-node crawler.js -s https://small-site.com -p 0 -d 2
+node src/core/crawler.js -s https://small-site.com -p 0 -d 2
 ```
 
 ## Output Format
@@ -573,19 +559,19 @@ By default, the crawler uses **mixed mode** which automatically:
 
 **Default mixed mode:**
 ```bash
-node crawler.js -s https://example.com
+node src/core/crawler.js -s https://example.com
 # Tries sitemap first, falls back to discovery
 ```
 
 **Force discovery crawling only:**
 ```bash
-node crawler.js -s https://example.com --no-sitemap
+node src/core/crawler.js -s https://example.com --no-sitemap
 # Skips sitemap, uses link discovery with depth limit
 ```
 
 **Mixed mode with fallback settings:**
 ```bash
-node crawler.js -s https://example.com -d 3 -c 2
+node src/core/crawler.js -s https://example.com -d 3 -c 2
 # Tries sitemap first, if not found uses depth 3 discovery
 ```
 
@@ -609,22 +595,22 @@ The crawler supports testing against different WCAG versions and compliance leve
 
 **WCAG 2.2 Level AA (latest standard):**
 ```bash
-node crawler.js -s https://example.com --wcag-version 2.2 --wcag-level AA
+node src/core/crawler.js -s https://example.com --wcag-version 2.2 --wcag-level AA
 ```
 
 **WCAG 2.1 Level AAA (comprehensive):**
 ```bash
-node crawler.js -s https://example.com --wcag-version 2.1 --wcag-level AAA
+node src/core/crawler.js -s https://example.com --wcag-version 2.1 --wcag-level AAA
 ```
 
 **WCAG 2.0 Level A (basic compliance):**
 ```bash
-node crawler.js -s https://example.com --wcag-version 2.0 --wcag-level A
+node src/core/crawler.js -s https://example.com --wcag-version 2.0 --wcag-level A
 ```
 
 **Custom axe tags (advanced):**
 ```bash
-node crawler.js -s https://example.com --custom-tags "wcag2aa,best-practice,cat.color"
+node src/core/crawler.js -s https://example.com --custom-tags "wcag2aa,best-practice,cat.color"
 ```
 
 ### What Gets Tested
@@ -675,20 +661,20 @@ reports/
 
 **Generate both JSON and HTML reports:**
 ```bash
-node crawler.js -s https://example.com --html
+node src/core/crawler.js -s https://example.com --html
 ```
 
 **Custom output filename (in domain directory):**
 ```bash
-node crawler.js -s https://example.com -o my-custom-report.json --html
+node src/core/crawler.js -s https://example.com -o my-custom-report.json --html
 ```
 
 **Multiple scans organized by domain:**
 ```bash
 # Scan multiple sites - automatically organized
-node crawler.js -s https://site1.com --html
-node crawler.js -s https://site2.com --html
-node crawler.js -s https://site3.com --html
+node src/core/crawler.js -s https://site1.com --html
+node src/core/crawler.js -s https://site2.com --html
+node src/core/crawler.js -s https://site3.com --html
 ```
 
 ### Report Features

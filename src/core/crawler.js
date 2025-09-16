@@ -164,12 +164,12 @@ async function ensureReportsDirectory(domain) {
 // ------------------------------------------------------------------
 // Legacy HTML Report Generator (DEPRECATED)
 // ------------------------------------------------------------------
-// This function has been replaced by generateHTMLReport from regenerate-html.js
+// This function has been replaced by generateHTMLReport from src/generators/html.js
 // which provides modern templates with navigation and better UX
 /*
 function generateHtmlReport(results, domain, wcagVersion, wcagLevel) {
   // Note: This function now just provides a simple legacy report
-  // The modern template system in regenerate-html.js handles full HTML generation
+  // The modern template system in src/generators/html.js handles full HTML generation
   // ... [Legacy code commented out for brevity]
 }
 */
@@ -461,7 +461,7 @@ async function main() {
   if (generateHtml) {
     const htmlFilename = generateHtmlFilename(domain, wcagVersion, wcagLevel);
     htmlOutput = path.join(reportsDir, htmlFilename);
-    // Use modern template system from regenerate-html.js
+    // Use modern template system from src/generators/html.js
     const htmlContent = generateHTMLReport(results, htmlFilename);
     await fs.writeFile(htmlOutput, htmlContent, 'utf-8');
   }

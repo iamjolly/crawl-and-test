@@ -65,8 +65,8 @@ function generateIndexHTML() {
     
     // Replace placeholders
     const html = template
-        .replace('{{title}}', 'CATS (Crawl and Test System) Dashboard')
-        .replace('{{pageTitle}}', 'CATS (Crawl and Test System)')
+        .replace('{{title}}', 'CATS Accessibility Dashboard')
+        .replace('{{pageTitle}}', 'CATS Accessibility Dashboard')
         .replace('{{pageDescription}}', 'Monitor and test website accessibility compliance');
     
     // Write to public directory

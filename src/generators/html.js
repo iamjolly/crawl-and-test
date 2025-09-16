@@ -7,11 +7,11 @@
  * Useful when HTML reports weren't generated due to missing --html flag or other issues.
  * 
  * Usage:
- *   node regenerate-html.js                    # Regenerate all missing HTML reports
- *   node regenerate-html.js --domain example.com  # Regenerate for specific domain
- *   node regenerate-html.js --file path/to/report.json  # Regenerate specific file
- *   node regenerate-html.js --detailed         # Force regenerate with detailed info (even if HTML exists)
- *   node regenerate-html.js --detailed --domain example.com  # Force detailed for specific domain
+ *   node src/generators/html.js                    # Regenerate all missing HTML reports
+ *   node src/generators/html.js --domain example.com  # Regenerate for specific domain
+ *   node src/generators/html.js --file path/to/report.json  # Regenerate specific file
+ *   node src/generators/html.js --detailed         # Force regenerate with detailed info (even if HTML exists)
+ *   node src/generators/html.js --detailed --domain example.com  # Force detailed for specific domain
  */
 
 const fs = require('fs');
@@ -356,8 +356,19 @@ function generateHTMLReport(data, filename) {
 
   // Assemble final HTML
   const jsonFilename = filename; // The JSON filename for download link
+  
+  // Create readable date and time for title to ensure uniqueness
+  const reportDateTime = new Date(timestamp).toLocaleString('en-US', { 
+    year: 'numeric', 
+    month: 'short', 
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+  
   const html = baseTemplate
-    .replace(/{{title}}/g, `CATS Accessibility Report - ${domain}`)
+    .replace(/{{title}}/g, `Accessibility Report: ${domain} (${reportDateTime}) - CATS`)
     .replace(/{{domain}}/g, domain)
     .replace(/{{timestamp}}/g, timestamp)
     .replace(/{{wcagInfo}}/g, wcagInfo)
@@ -520,12 +531,12 @@ function main() {
       forceDetailed = true;
     } else if (args[i] === '--help' || args[i] === '-h') {
       console.log('Usage:');
-      console.log('  node regenerate-html.js                    # Regenerate all missing HTML reports');
-      console.log('  node regenerate-html.js --domain example.com  # Regenerate for specific domain');
-      console.log('  node regenerate-html.js --file path/to/report.json  # Regenerate specific file');
-      console.log('  node regenerate-html.js --detailed         # Force regenerate with detailed info (even if HTML exists)');
-      console.log('  node regenerate-html.js --detailed --domain example.com  # Force detailed for specific domain');
-      console.log('  node regenerate-html.js --help             # Show this help');
+      console.log('  node src/generators/html.js                    # Regenerate all missing HTML reports');
+      console.log('  node src/generators/html.js --domain example.com  # Regenerate for specific domain');
+      console.log('  node src/generators/html.js --file path/to/report.json  # Regenerate specific file');
+      console.log('  node src/generators/html.js --detailed         # Force regenerate with detailed info (even if HTML exists)');
+      console.log('  node src/generators/html.js --detailed --domain example.com  # Force detailed for specific domain');
+      console.log('  node src/generators/html.js --help             # Show this help');
       process.exit(0);
     }
   }
