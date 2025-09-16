@@ -260,14 +260,44 @@ function generateHTMLReport(data, filename) {
     }
   }
   
-  // Get WCAG info from first page or filename
+  // Get WCAG info from first page toolOptions or filename
   let wcagInfo = 'WCAG 2.1 Level AA';
+  
+  // First try to extract from toolOptions in the JSON data
   if (pages.length > 0 && pages[0].toolOptions?.runOnly?.values) {
     const tags = pages[0].toolOptions.runOnly.values;
-    if (tags.includes('wcag21aa')) wcagInfo = 'WCAG 2.1 Level AA';
-    else if (tags.includes('wcag21a')) wcagInfo = 'WCAG 2.1 Level A';
-    else if (tags.includes('wcag2aa')) wcagInfo = 'WCAG 2.0 Level AA';
-    else if (tags.includes('wcag2a')) wcagInfo = 'WCAG 2.0 Level A';
+    
+    // Determine the highest WCAG version and level being tested
+    // When testing WCAG X.X Level Y, all lower versions/levels are included
+    // So we need to find the highest combination present
+    
+    if (tags.includes('wcag22aaa')) {
+      wcagInfo = 'WCAG 2.2 Level AAA';
+    } else if (tags.includes('wcag21aaa')) {
+      wcagInfo = 'WCAG 2.1 Level AAA';
+    } else if (tags.includes('wcag2aaa')) {
+      wcagInfo = 'WCAG 2.0 Level AAA';
+    } else if (tags.includes('wcag22aa')) {
+      wcagInfo = 'WCAG 2.2 Level AA';
+    } else if (tags.includes('wcag21aa')) {
+      wcagInfo = 'WCAG 2.1 Level AA';
+    } else if (tags.includes('wcag2aa')) {
+      wcagInfo = 'WCAG 2.0 Level AA';
+    } else if (tags.includes('wcag22a')) {
+      wcagInfo = 'WCAG 2.2 Level A';
+    } else if (tags.includes('wcag21a')) {
+      wcagInfo = 'WCAG 2.1 Level A';
+    } else if (tags.includes('wcag2a')) {
+      wcagInfo = 'WCAG 2.0 Level A';
+    }
+  } else {
+    // Fallback: extract WCAG info from filename format: domain_wcag2.2_AAA_timestamp.json
+    const wcagMatch = filename.match(/wcag(\d\.\d)_([A-Z]{1,3})/);
+    if (wcagMatch) {
+      const version = wcagMatch[1];
+      const level = wcagMatch[2];
+      wcagInfo = `WCAG ${version} Level ${level}`;
+    }
   }
 
   // Load templates and assets
@@ -355,7 +385,9 @@ function generateHTMLReport(data, filename) {
   }
 
   // Assemble final HTML
-  const jsonFilename = filename; // The JSON filename for download link
+  // Generate correct JSON download URL - need relative path from HTML location
+  // HTML is at /reports/domain/file.html, JSON is at /reports/domain/file.json
+  const jsonFilename = filename.replace('.html', '.json');
   
   // Create readable date and time for title to ensure uniqueness
   const reportDateTime = new Date(timestamp).toLocaleString('en-US', { 
