@@ -263,7 +263,7 @@ function generateDomainReportsHTML(domain) {
         ? reports.map(reportFile => {
             const reportPath = `/reports/${domain}/${reportFile}`;
             // Handle multiple timestamp formats in filenames
-            const reportDate = reportFile.match(/(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}(?:-\d{3}Z?)?)/);
+            const reportDate = reportFile.match(/(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}(-\d{3}Z|-\d{3})?)/);
             let displayDate = 'Unknown';
             
             if (reportDate) {
