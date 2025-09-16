@@ -54,7 +54,7 @@ function generateReportsIndexHTML() {
             const reportItems = reports.map(reportFile => {
                 const reportPath = `/reports/${dir.domain}/${reportFile}`;
                 // Handle multiple timestamp formats in filenames
-                const reportDate = reportFile.match(/(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}(?:-\d{3}Z?)?)/);
+                const reportDate = reportFile.match(/(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}(?:-\d{3}Z|-\d{3})?)/);
                 let displayDate = 'Unknown';
                 
                 if (reportDate) {
