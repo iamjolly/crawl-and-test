@@ -418,7 +418,7 @@ app.get('/api/reports', (req, res) => {
 
 // Start a new crawl
 app.post('/crawl', (req, res) => {
-    const { url, wcagVersion = 'wcag2.1', maxDepth = '2', maxPages = '50' } = req.body;
+    const { url, wcagVersion = '2.1', wcagLevel = 'AA', maxDepth = '2', maxPages = '50' } = req.body;
     
     if (!url) {
         return res.status(400).json({ success: false, error: 'URL is required' });
@@ -431,6 +431,7 @@ app.post('/crawl', (req, res) => {
     activeJobs.set(jobId, {
         url,
         wcagVersion,
+        wcagLevel,
         maxDepth: parseInt(maxDepth),
         maxPages: parseInt(maxPages),
         status: 'running',
@@ -440,13 +441,14 @@ app.post('/crawl', (req, res) => {
     // Start crawl process
     const domain = new URL(url).hostname;
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const outputFilename = `${domain}_${wcagVersion}_${timestamp}.json`;
+    const outputFilename = `${domain}_wcag${wcagVersion}_${wcagLevel}_${timestamp}.json`;
     
     const args = [
         '--seed', url,
         '--depth', maxDepth,
         '--max-pages', maxPages,
         '--wcag-version', wcagVersion,
+        '--wcag-level', wcagLevel,
         '--output', outputFilename,
         '--html'  // Generate HTML report
     ];
