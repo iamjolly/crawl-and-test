@@ -163,7 +163,7 @@
     <script>
         // Update jobs display
         function updateJobs() {
-            fetch('/api/jobs')
+            return fetch('/api/jobs')
                 .then(response => response.json())
                 .then(jobs => {
                     const jobsList = document.getElementById('jobsList');
@@ -175,7 +175,11 @@
                     } else {
                         noJobsMessage.style.display = 'none';
                         jobsList.innerHTML = jobs.map((job, index) => `
-                            <div class="job-item" id="job-${job.id || Date.now() + index}" tabindex="-1">
+                            <div class="job-item" 
+                                 id="job-${job.id}" 
+                                 tabindex="-1" 
+                                 role="article"
+                                 aria-label="Crawl job for ${job.url}, status: ${job.status}">
                                 <div>
                                     <strong>${job.url}</strong>
                                     <br>
@@ -185,8 +189,31 @@
                             </div>
                         `).join('');
                     }
+                    return jobs; // Return jobs for chaining
                 })
-                .catch(err => console.error('Error fetching jobs:', err));
+                .catch(err => {
+                    console.error('Error fetching jobs:', err);
+                    throw err; // Re-throw to allow caller to handle
+                });
+        }
+        
+        // Reliable focus management for new jobs
+        function focusNewJob(jobId, maxAttempts = 5) {
+            const attempt = (attemptsLeft) => {
+                const jobElement = document.getElementById(`job-${jobId}`);
+                if (jobElement) {
+                    jobElement.focus();
+                    console.log(`Successfully focused job: ${jobId}`);
+                    return true;
+                } else if (attemptsLeft > 0) {
+                    console.log(`Job ${jobId} not found, retrying... (${attemptsLeft} attempts left)`);
+                    setTimeout(() => attempt(attemptsLeft - 1), 200);
+                } else {
+                    console.warn(`Failed to focus job ${jobId} after ${maxAttempts} attempts`);
+                    return false;
+                }
+            };
+            return attempt(maxAttempts);
         }
         
         // Enhanced URL validation and formatting
@@ -469,8 +496,12 @@
         }
         
         // Update jobs every 5 seconds
-        setInterval(updateJobs, 5000);
-        updateJobs(); // Initial load
+        setInterval(() => {
+            updateJobs().catch(err => console.error('Error in periodic job update:', err));
+        }, 5000);
+        
+        // Initial load
+        updateJobs().catch(err => console.error('Error in initial job load:', err));
         
         // Update reports every 30 seconds and on initial load
         setInterval(updateReports, 30000);
@@ -543,19 +574,20 @@
                     this.reset();
                     validateUrlField(); // Clear any validation messages
                     
-                    // Update jobs list and focus on new job
-                    setTimeout(() => {
-                        updateJobs();
-                        // Focus on the newly created job after a short delay to ensure it's rendered
-                        setTimeout(() => {
-                            const newJobElement = document.querySelector('#jobsList .job-item:first-child');
-                            if (newJobElement) {
-                                newJobElement.focus();
-                                // Announce to screen readers
-                                announceToScreenReader('New crawl job has been started and is now visible in the Active Jobs section.');
+                    // Update jobs list and focus on the specific new job
+                    updateJobs()
+                        .then(() => {
+                            // Focus on the newly created job using its actual ID
+                            if (data.jobId) {
+                                focusNewJob(data.jobId);
+                                announceToScreenReader(`New crawl job for ${normalizedUrl} has been started and is now active.`);
                             }
-                        }, 500);
-                    }, 100);
+                        })
+                        .catch(err => {
+                            console.error('Error updating jobs after submission:', err);
+                            // Fallback: still announce success even if focus fails
+                            announceToScreenReader(`New crawl job for ${normalizedUrl} has been started.`);
+                        });
                     
                     // Reports will auto-update when the crawl completes
                 } else {
