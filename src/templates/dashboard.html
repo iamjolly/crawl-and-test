@@ -176,7 +176,7 @@
                         noJobsMessage.style.display = 'none';
                         jobsList.innerHTML = jobs.map((job, index) => `
                             <div class="job-item" 
-                                 id="job-${job.id}" 
+                                 id="job-${job.jobId}" 
                                  tabindex="-1" 
                                  role="article"
                                  aria-label="Crawl job for ${job.url}, status: ${job.status}">
@@ -199,17 +199,25 @@
         
         // Reliable focus management for new jobs
         function focusNewJob(jobId, maxAttempts = 5) {
+            console.log(`Attempting to focus job: ${jobId}`);
             const attempt = (attemptsLeft) => {
                 const jobElement = document.getElementById(`job-${jobId}`);
+                console.log(`Looking for element: job-${jobId}, found:`, jobElement);
                 if (jobElement) {
                     jobElement.focus();
                     console.log(`Successfully focused job: ${jobId}`);
                     return true;
                 } else if (attemptsLeft > 0) {
                     console.log(`Job ${jobId} not found, retrying... (${attemptsLeft} attempts left)`);
+                    // Also log what job elements actually exist
+                    const allJobs = document.querySelectorAll('.job-item');
+                    console.log(`Current job elements:`, Array.from(allJobs).map(el => el.id));
                     setTimeout(() => attempt(attemptsLeft - 1), 200);
                 } else {
                     console.warn(`Failed to focus job ${jobId} after ${maxAttempts} attempts`);
+                    // Final check of what's actually in the DOM
+                    const allJobs = document.querySelectorAll('.job-item');
+                    console.log(`Final DOM state - job elements:`, Array.from(allJobs).map(el => el.id));
                     return false;
                 }
             };
