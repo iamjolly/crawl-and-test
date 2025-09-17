@@ -21,6 +21,7 @@ class CATSConfig {
     this.ROOT_DIR = process.env.CATS_ROOT_DIR || process.cwd();
     this.PUBLIC_DIR = process.env.CATS_PUBLIC_DIR || path.join(this.ROOT_DIR, 'public');
     this.SRC_DIR = process.env.CATS_SRC_DIR || path.join(this.ROOT_DIR, 'src');
+    this.DATA_DIR = process.env.CATS_DATA_DIR || path.join(this.ROOT_DIR, 'data');
     
     // Reports configuration
     this.REPORTS_DIR = process.env.CATS_REPORTS_DIR || path.join(this.PUBLIC_DIR, 'reports');
@@ -32,6 +33,9 @@ class CATSConfig {
     this.SCRIPTS_DIR = process.env.CATS_SCRIPTS_DIR || path.join(this.SRC_DIR, 'scripts');
     this.PUBLIC_STYLES_DIR = process.env.CATS_PUBLIC_STYLES_DIR || path.join(this.PUBLIC_DIR, 'styles');
     this.PUBLIC_SCRIPTS_DIR = process.env.CATS_PUBLIC_SCRIPTS_DIR || path.join(this.PUBLIC_DIR, 'scripts');
+    
+    // Data files
+    this.WCAG_DATA_FILE = process.env.CATS_WCAG_DATA_FILE || path.join(this.DATA_DIR, 'wcag.json');
     
     // Server configuration
     this.SERVER_PORT = parseInt(process.env.CATS_SERVER_PORT || '3000', 10);
