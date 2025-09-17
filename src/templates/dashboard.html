@@ -169,6 +169,12 @@
                     const jobsList = document.getElementById('jobsList');
                     const noJobsMessage = document.getElementById('noJobsMessage');
                     
+                    // Preserve current focus before updating DOM
+                    const currentlyFocused = document.activeElement;
+                    const focusedJobId = currentlyFocused && currentlyFocused.classList.contains('job-item') 
+                        ? currentlyFocused.id.replace('job-', '') 
+                        : null;
+                    
                     if (jobs.length === 0) {
                         jobsList.innerHTML = '';
                         noJobsMessage.style.display = 'block';
@@ -188,6 +194,18 @@
                                 <span class="job-status ${job.status}">${job.status}</span>
                             </div>
                         `).join('');
+                        
+                        // Restore focus if a job was previously focused and still exists
+                        if (focusedJobId) {
+                            const jobStillExists = jobs.find(job => job.jobId === focusedJobId);
+                            if (jobStillExists) {
+                                const restoredElement = document.getElementById(`job-${focusedJobId}`);
+                                if (restoredElement) {
+                                    restoredElement.focus();
+                                    console.log(`Restored focus to job: ${focusedJobId}`);
+                                }
+                            }
+                        }
                     }
                     return jobs; // Return jobs for chaining
                 })
