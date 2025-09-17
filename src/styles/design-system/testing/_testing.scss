@@ -1,0 +1,561 @@
+/**
+ * Design System Testing Framework
+ * 
+ * A comprehensive testing suite for validating visual consistency,
+ * accessibility compliance, and component functionality.
+ */
+
+/* ===================================================================
+   Visual Regression Testing
+   =================================================================== */
+
+/**
+ * Test component variants for visual consistency
+ */
+.test-component-variants {
+  --spacing: var(--space-4);
+  display: grid;
+  gap: var(--spacing);
+  padding: var(--spacing);
+  
+  /* Grid layout for component comparison */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.test-component-item {
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  background: var(--color-background-secondary);
+  
+  /* Visual debugging */
+  position: relative;
+  
+  &::before {
+    content: attr(data-component);
+    position: absolute;
+    top: -8px;
+    left: var(--space-2);
+    background: var(--color-background-primary);
+    padding: 0 var(--space-1);
+    font-size: var(--text-caption);
+    color: var(--color-text-muted);
+    border-radius: var(--radius-sm);
+  }
+}
+
+/* ===================================================================
+   Accessibility Testing Utilities
+   =================================================================== */
+
+/**
+ * Focus testing - Make focus indicators highly visible for testing
+ */
+.test-focus-indicators {
+  --focus-width: 3px;
+  --focus-color: #ff0000; /* High contrast red for testing */
+  
+  * {
+    &:focus-visible {
+      outline: var(--focus-width) solid var(--focus-color) !important;
+      outline-offset: 3px !important;
+      box-shadow: 0 0 0 1px var(--color-background-primary) !important;
+    }
+  }
+}
+
+/**
+ * Color contrast testing
+ */
+.test-contrast {
+  /* High contrast mode simulation */
+  &.contrast-high {
+    --color-text-primary: #000000;
+    --color-text-secondary: #000000;
+    --color-background-primary: #ffffff;
+    --color-background-secondary: #f8f9fa;
+    
+    /* Remove background images and gradients */
+    background-image: none !important;
+    
+    * {
+      background-image: none !important;
+      text-shadow: none !important;
+      box-shadow: none !important;
+    }
+  }
+  
+  /* Low contrast simulation for testing */
+  &.contrast-low {
+    --color-text-primary: #888888;
+    --color-text-secondary: #aaaaaa;
+    filter: contrast(0.5);
+  }
+}
+
+/**
+ * Screen reader testing utilities
+ */
+.test-screen-reader {
+  /* Highlight screen reader only content */
+  .sr-only {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    background: yellow !important;
+    color: black !important;
+    border: 2px solid red !important;
+    padding: var(--space-1) !important;
+    margin: var(--space-1) !important;
+    clip: none !important;
+    overflow: visible !important;
+  }
+  
+  /* Show aria labels and descriptions */
+  [aria-label]::after {
+    content: " [aria-label: " attr(aria-label) "]";
+    background: #ffeb3b;
+    color: #000;
+    font-size: 0.75rem;
+    padding: 2px 4px;
+    border-radius: 2px;
+    margin-left: 4px;
+  }
+  
+  [aria-describedby]::after {
+    content: " [aria-describedby: " attr(aria-describedby) "]";
+    background: #e1f5fe;
+    color: #000;
+    font-size: 0.75rem;
+    padding: 2px 4px;
+    border-radius: 2px;
+    margin-left: 4px;
+  }
+}
+
+/* ===================================================================
+   Component State Testing
+   =================================================================== */
+
+/**
+ * Test all interactive states
+ */
+.test-interactive-states {
+  .btn {
+    margin: var(--space-2);
+    
+    /* Force all states to be visible for testing */
+    &.test-hover {
+      @extend .btn:hover;
+    }
+    
+    &.test-focus {
+      @extend .btn:focus;
+    }
+    
+    &.test-active {
+      @extend .btn:active;
+    }
+    
+    &.test-disabled {
+      @extend .btn:disabled;
+    }
+  }
+  
+  .form-control {
+    margin: var(--space-2) 0;
+    
+    &.test-focus {
+      @extend .form-control:focus;
+    }
+    
+    &.test-valid {
+      @extend .form-control.is-valid;
+    }
+    
+    &.test-invalid {
+      @extend .form-control.is-invalid;
+    }
+  }
+}
+
+/* ===================================================================
+   Responsive Testing Grid
+   =================================================================== */
+
+/**
+ * Visual breakpoint testing
+ */
+.test-responsive-grid {
+  display: grid;
+  gap: var(--space-2);
+  
+  /* Show breakpoint indicators */
+  &::before {
+    content: "XS: < 576px";
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: var(--space-2);
+    background: var(--color-info);
+    color: white;
+    border-radius: var(--radius-md);
+    
+    @media (min-width: 576px) {
+      content: "SM: ≥ 576px";
+      background: var(--color-success);
+    }
+    
+    @media (min-width: 768px) {
+      content: "MD: ≥ 768px";
+      background: var(--color-warning);
+    }
+    
+    @media (min-width: 992px) {
+      content: "LG: ≥ 992px";
+      background: var(--color-danger);
+    }
+    
+    @media (min-width: 1200px) {
+      content: "XL: ≥ 1200px";
+      background: var(--color-primary);
+    }
+    
+    @media (min-width: 1400px) {
+      content: "XXL: ≥ 1400px";
+      background: var(--color-dark);
+    }
+  }
+  
+  /* Test responsive utilities */
+  .test-responsive-item {
+    background: var(--color-background-secondary);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    text-align: center;
+    
+    /* Show/hide at different breakpoints */
+    &.d-none { background: red; opacity: 0.3; }
+    &.d-sm-block { background: green; }
+    &.d-md-block { background: blue; }
+    &.d-lg-block { background: orange; }
+    &.d-xl-block { background: purple; }
+  }
+}
+
+/* ===================================================================
+   Typography Testing
+   =================================================================== */
+
+/**
+ * Typography scale and spacing testing
+ */
+.test-typography {
+  .heading-test {
+    margin: var(--space-2) 0;
+    
+    /* Show computed font sizes */
+    &::after {
+      content: " (" var(--font-size-computed, "unknown") ")";
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      font-weight: normal;
+    }
+  }
+  
+  .text-test {
+    margin: var(--space-1) 0;
+    
+    &::before {
+      content: attr(class) ": ";
+      font-weight: bold;
+      color: var(--color-primary);
+    }
+  }
+}
+
+/* ===================================================================
+   Color Palette Testing
+   =================================================================== */
+
+/**
+ * Color system validation
+ */
+.test-color-palette {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-2);
+  
+  .color-swatch {
+    height: 80px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-light);
+    position: relative;
+    display: flex;
+    align-items: end;
+    
+    &::after {
+      content: attr(data-color);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: var(--space-1);
+      font-size: 0.75rem;
+      width: 100%;
+      text-align: center;
+      border-bottom-left-radius: var(--radius-md);
+      border-bottom-right-radius: var(--radius-md);
+    }
+    
+    /* Color variants */
+    &.swatch-primary { background: var(--color-primary); }
+    &.swatch-secondary { background: var(--color-secondary); }
+    &.swatch-success { background: var(--color-success); }
+    &.swatch-warning { background: var(--color-warning); }
+    &.swatch-danger { background: var(--color-danger); }
+    &.swatch-info { background: var(--color-info); }
+    &.swatch-light { background: var(--color-light); }
+    &.swatch-dark { background: var(--color-dark); }
+  }
+}
+
+/* ===================================================================
+   Layout Testing
+   =================================================================== */
+
+/**
+ * Grid and flexbox testing
+ */
+.test-layout {
+  /* Grid testing */
+  .grid-test {
+    background: rgba(var(--color-primary-rgb), 0.1);
+    border: 1px dashed var(--color-primary);
+    min-height: 100px;
+    
+    .grid-item {
+      background: rgba(var(--color-success-rgb), 0.2);
+      border: 1px solid var(--color-success);
+      padding: var(--space-2);
+      text-align: center;
+      
+      &::before {
+        content: "Grid Item";
+        font-size: 0.75rem;
+        color: var(--color-text-muted);
+      }
+    }
+  }
+  
+  /* Flexbox testing */
+  .flex-test {
+    background: rgba(var(--color-info-rgb), 0.1);
+    border: 1px dashed var(--color-info);
+    min-height: 100px;
+    
+    .flex-item {
+      background: rgba(var(--color-warning-rgb), 0.2);
+      border: 1px solid var(--color-warning);
+      padding: var(--space-2);
+      
+      &::before {
+        content: "Flex Item";
+        font-size: 0.75rem;
+        color: var(--color-text-muted);
+      }
+    }
+  }
+}
+
+/* ===================================================================
+   Performance Testing
+   =================================================================== */
+
+/**
+ * CSS performance and optimization testing
+ */
+.test-performance {
+  /* Test containment */
+  contain: layout style;
+  
+  /* Large list performance testing */
+  .performance-list {
+    contain: layout style;
+    height: 300px;
+    overflow-y: auto;
+    
+    .list-item {
+      contain: layout;
+      height: 40px;
+      padding: var(--space-2);
+      border-bottom: 1px solid var(--color-border-light);
+      
+      &:nth-child(even) {
+        background: var(--color-background-secondary);
+      }
+    }
+  }
+}
+
+/* ===================================================================
+   Dark Mode Testing
+   =================================================================== */
+
+/**
+ * Dark mode color scheme testing
+ */
+.test-dark-mode {
+  /* Force dark mode for testing */
+  color-scheme: dark;
+  
+  --color-background-primary: #1a1a1a;
+  --color-background-secondary: #2d2d2d;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #e0e0e0;
+  --color-text-muted: #a0a0a0;
+  --color-border-light: #404040;
+  --color-border-medium: #606060;
+  
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
+  
+  .card {
+    background: var(--color-background-secondary);
+    border-color: var(--color-border-light);
+  }
+  
+  .btn {
+    /* Ensure buttons work in dark mode */
+    &.btn-light {
+      background: var(--color-dark);
+      color: var(--color-light);
+      border-color: var(--color-dark);
+    }
+  }
+}
+
+/* ===================================================================
+   Animation Testing
+   =================================================================== */
+
+/**
+ * Animation and transition testing
+ */
+.test-animations {
+  /* Reduced motion testing */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      transition-delay: 0s !important;
+    }
+  }
+  
+  /* Animation performance testing */
+  .animation-test {
+    animation: float 2s ease-in-out infinite;
+    
+    &:hover {
+      animation-play-state: paused;
+    }
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* ===================================================================
+   Print Testing
+   =================================================================== */
+
+/**
+ * Print styles testing
+ */
+@media print {
+  .test-print {
+    /* Force print mode for testing */
+    background: white !important;
+    color: black !important;
+    
+    /* Hide interactive elements */
+    .btn, button, input[type="button"] {
+      display: none !important;
+    }
+    
+    /* Show link URLs */
+    a[href]::after {
+      content: " (" attr(href) ")";
+      font-size: 0.8em;
+      color: #666;
+    }
+    
+    /* Page break controls */
+    .page-break-before {
+      page-break-before: always;
+    }
+    
+    .page-break-after {
+      page-break-after: always;
+    }
+    
+    .page-break-inside-avoid {
+      page-break-inside: avoid;
+    }
+  }
+}
+
+/* ===================================================================
+   Debug Utilities
+   =================================================================== */
+
+/**
+ * Development debugging utilities
+ */
+.debug-mode {
+  /* Show layout boxes */
+  * {
+    outline: 1px solid rgba(255, 0, 0, 0.3) !important;
+  }
+  
+  /* Show grid lines */
+  .grid, .d-grid {
+    background-image: 
+      repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(255, 0, 0, 0.1) 10px,
+        rgba(255, 0, 0, 0.1) 20px
+      );
+  }
+  
+  /* Show flexbox direction */
+  .flex, .d-flex {
+    &::before {
+      content: "FLEX";
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: rgba(0, 0, 255, 0.8);
+      color: white;
+      padding: 2px 4px;
+      font-size: 10px;
+      z-index: 9999;
+    }
+  }
+}
+
+/* Hide debug utilities in production */
+@media (prefers-reduced-data: reduce) {
+  .debug-mode,
+  .test-focus-indicators,
+  .test-screen-reader,
+  .test-responsive-grid::before {
+    display: none !important;
+  }
+}

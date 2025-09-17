@@ -1,0 +1,170 @@
+// ==========================================================================
+// Breakpoint Tokens
+// ==========================================================================
+//
+// Design tokens for responsive breakpoints using CSS custom properties.
+// Provides consistent viewport breakpoints for responsive design.
+//
+
+:root {
+  // ==========================================================================
+  // Breakpoint Values
+  // ==========================================================================
+  
+  --breakpoint-xs: 0;
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-xxl: 1400px;
+  
+  // ==========================================================================
+  // Container Max Widths
+  // ==========================================================================
+  
+  --container-max-width-sm: 540px;
+  --container-max-width-md: 720px;
+  --container-max-width-lg: 960px;
+  --container-max-width-xl: 1140px;
+  --container-max-width-xxl: 1320px;
+  
+  // ==========================================================================
+  // Common Viewport Sizes
+  // ==========================================================================
+  
+  --viewport-mobile-portrait: 320px;
+  --viewport-mobile-landscape: 568px;
+  --viewport-tablet-portrait: 768px;
+  --viewport-tablet-landscape: 1024px;
+  --viewport-desktop-small: 1280px;
+  --viewport-desktop-large: 1920px;
+  --viewport-desktop-ultra: 2560px;
+}
+
+// ==========================================================================
+// SASS Variables for Compatibility
+// ==========================================================================
+// These maintain compatibility with existing code during migration
+
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px
+);
+
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px,
+  xxl: 1320px
+);
+
+// Individual breakpoint variables
+$breakpoint-xs: 0;
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+$breakpoint-xxl: 1400px;
+
+// ==========================================================================
+// Breakpoint Mixins
+// ==========================================================================
+
+// Media query mixins for responsive design
+@mixin media-xs {
+  @media (min-width: #{$breakpoint-xs}) {
+    @content;
+  }
+}
+
+@mixin media-sm {
+  @media (min-width: #{$breakpoint-sm}) {
+    @content;
+  }
+}
+
+@mixin media-md {
+  @media (min-width: #{$breakpoint-md}) {
+    @content;
+  }
+}
+
+@mixin media-lg {
+  @media (min-width: #{$breakpoint-lg}) {
+    @content;
+  }
+}
+
+@mixin media-xl {
+  @media (min-width: #{$breakpoint-xl}) {
+    @content;
+  }
+}
+
+@mixin media-xxl {
+  @media (min-width: #{$breakpoint-xxl}) {
+    @content;
+  }
+}
+
+// Max-width media queries
+@mixin media-max-xs {
+  @media (max-width: #{$breakpoint-sm - 1px}) {
+    @content;
+  }
+}
+
+@mixin media-max-sm {
+  @media (max-width: #{$breakpoint-md - 1px}) {
+    @content;
+  }
+}
+
+@mixin media-max-md {
+  @media (max-width: #{$breakpoint-lg - 1px}) {
+    @content;
+  }
+}
+
+@mixin media-max-lg {
+  @media (max-width: #{$breakpoint-xl - 1px}) {
+    @content;
+  }
+}
+
+@mixin media-max-xl {
+  @media (max-width: #{$breakpoint-xxl - 1px}) {
+    @content;
+  }
+}
+
+// Range media queries (between breakpoints)
+@mixin media-between($min, $max) {
+  @media (min-width: #{$min}) and (max-width: #{$max - 1px}) {
+    @content;
+  }
+}
+
+// Custom media query mixin
+@mixin media-custom($min: null, $max: null) {
+  $query: "";
+  
+  @if $min != null and $max != null {
+    $query: "(min-width: #{$min}) and (max-width: #{$max - 1px})";
+  } @else if $min != null {
+    $query: "(min-width: #{$min})";
+  } @else if $max != null {
+    $query: "(max-width: #{$max - 1px})";
+  }
+  
+  @if $query != "" {
+    @media #{$query} {
+      @content;
+    }
+  }
+}

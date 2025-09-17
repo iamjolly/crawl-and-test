@@ -1,0 +1,254 @@
+// ==========================================================================
+// Base Reset
+// ==========================================================================
+//
+// Minimal CSS reset and normalization for consistent cross-browser rendering.
+//
+
+@import '../abstracts/variables';
+
+// ==========================================================================
+// Box Sizing Reset
+// ==========================================================================
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+// ==========================================================================
+// Document & Body
+// ==========================================================================
+
+html {
+  font-size: $font-size-base;
+  line-height: $line-height-base;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  line-height: $line-height-base;
+  color: $color-text;
+  background-color: $color-background;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ==========================================================================
+// Content Sectioning
+// ==========================================================================
+
+main {
+  display: block;
+}
+
+section,
+article,
+aside,
+nav,
+header,
+footer {
+  display: block;
+}
+
+// ==========================================================================
+// Text Content
+// ==========================================================================
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 $spacing-lg 0;
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-tight;
+  color: $color-text;
+}
+
+p {
+  margin: 0 0 $spacing-lg 0;
+}
+
+ul, ol {
+  margin: 0 0 $spacing-lg 0;
+  padding-left: $spacing-xl;
+}
+
+li {
+  margin-bottom: $spacing-xs;
+}
+
+blockquote {
+  margin: $spacing-xl 0;
+  padding-left: $spacing-lg;
+  border-left: 4px solid $color-border;
+  font-style: italic;
+}
+
+// ==========================================================================
+// Inline Text Semantics
+// ==========================================================================
+
+a {
+  color: $color-primary;
+  text-decoration: underline;
+  background-color: transparent;
+  
+  &:hover {
+    color: $color-primary-dark;
+    text-decoration: underline;
+  }
+  
+  &:focus {
+    outline: $focus-outline-width $focus-outline-style $focus-outline-color;
+    outline-offset: 2px;
+  }
+}
+
+strong, b {
+  font-weight: $font-weight-bold;
+}
+
+em, i {
+  font-style: italic;
+}
+
+code {
+  font-family: $font-family-monospace;
+  font-size: $font-size-small;
+  background-color: $color-background-light;
+  padding: 2px 4px;
+  border-radius: $border-radius-small;
+}
+
+pre {
+  font-family: $font-family-monospace;
+  font-size: $font-size-small;
+  background-color: $color-background-light;
+  padding: $spacing-lg;
+  border-radius: $border-radius-base;
+  overflow-x: auto;
+  margin: $spacing-xl 0;
+  
+  code {
+    background: none;
+    padding: 0;
+    border-radius: 0;
+  }
+}
+
+// ==========================================================================
+// Forms
+// ==========================================================================
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 100%;
+  line-height: $line-height-base;
+  margin: 0;
+}
+
+button,
+[type="button"],
+[type="reset"],
+[type="submit"] {
+  appearance: button;
+  -webkit-appearance: button;
+  cursor: pointer;
+  
+  &:focus {
+    outline: $focus-outline-width $focus-outline-style $focus-outline-color;
+    outline-offset: 2px;
+  }
+}
+
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+select,
+textarea {
+  padding: $spacing-sm;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-base;
+  background-color: $color-background-white;
+  
+  &:focus {
+    outline: $focus-outline-width $focus-outline-style $focus-outline-color;
+    outline-offset: 2px;
+    border-color: $color-primary;
+  }
+}
+
+// ==========================================================================
+// Tables
+// ==========================================================================
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+}
+
+th,
+td {
+  text-align: left;
+  padding: $spacing-sm;
+  border-bottom: 1px solid $color-border;
+}
+
+th {
+  font-weight: $font-weight-semibold;
+  background-color: $color-background-light;
+}
+
+// ==========================================================================
+// Media
+// ==========================================================================
+
+img {
+  max-width: 100%;
+  height: auto;
+  border-style: none;
+}
+
+// ==========================================================================
+// Accessibility
+// ==========================================================================
+
+// Screen reader only content
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+// Focus management
+:focus {
+  outline: $focus-outline-width $focus-outline-style $focus-outline-color;
+  outline-offset: 2px;
+}
+
+// Reduce motion for users who prefer it
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

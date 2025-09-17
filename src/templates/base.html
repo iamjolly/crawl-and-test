@@ -4,65 +4,106 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}}</title>
-    <link rel="stylesheet" href="/styles/report.css">
-    <link rel="stylesheet" href="/styles/accordion.css">
-    <link rel="stylesheet" href="/styles/accessibility.css">
-    <link rel="stylesheet" href="/styles/navigation.css">
+    <link rel="stylesheet" href="/styles/design-system.css">
+    <link rel="stylesheet" href="/styles/shared.css">
 </head>
-<body>
-    <nav class="site-nav" role="navigation" aria-label="Main navigation">
-        <div class="nav-container">
-            <a href="/" class="nav-brand" aria-label="CATS Home">
-                <span>CATS</span>
+<body class="page-container">
+    <!-- Skip Links -->
+    <div class="skip-links">
+        <a href="#main-content" class="skip-links__link">Skip to main content</a>
+    </div>
+    
+    <!-- Site Header -->
+    <header class="site-header" role="banner">
+        <div class="site-header__container">
+            <a href="/" class="site-header__brand" aria-label="CATS Home">
+                <div class="site-header__logo">
+                    <span>C</span>
+                </div>
+                <h1 class="site-header__title">
+                    CATS
+                    <span class="site-header__subtitle">Accessibility Testing</span>
+                </h1>
             </a>
-            <ul class="nav-links">
-                <li><a href="/" class="nav-link">Dashboard</a></li>
-                <li><a href="/reports/" class="nav-link active" aria-current="page">Reports</a></li>
+            
+            <nav class="site-header__nav">
+                <div id="nav-main" class="main-nav main-nav--horizontal" role="navigation" aria-label="Main navigation">
+                    <ul class="main-nav__list">
+                        <li class="main-nav__item">
+                            <a href="/" class="main-nav__link">Dashboard</a>
+                        </li>
+                        <li class="main-nav__item">
+                            <a href="/reports/" class="main-nav__link main-nav__link--active" aria-current="page">Reports</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+            <div class="site-header__utilities">
+                <!-- Future: user menu, settings, etc. -->
+            </div>
+        </div>
+    </header>
+    
+    <!-- Breadcrumb Navigation -->
+    <nav id="breadcrumb-nav" class="main-nav main-nav--breadcrumb" aria-label="Breadcrumb">
+        <div class="main-nav__container">
+            <ul class="main-nav__list">
+                <li class="main-nav__item">
+                    <a href="/" class="main-nav__link">Dashboard</a>
+                </li>
+                <li class="main-nav__item">
+                    <a href="/reports/" class="main-nav__link">Reports</a>
+                </li>
+                <li class="main-nav__item">
+                    <span class="main-nav__link main-nav__link--current">{{domain}} Report</span>
+                </li>
             </ul>
         </div>
     </nav>
     
-    <nav class="breadcrumb-nav" aria-label="Breadcrumb">
-        <div class="breadcrumb-container">
-            <ol class="breadcrumb">
-                <li><a href="/">Dashboard</a></li>
-                <li><a href="/reports/">Reports</a></li>
-                <li><span class="current">{{domain}} Report</span></li>
-            </ol>
-        </div>
-    </nav>
-    
-    <a href="#main-content" class="skip-link">Skip to main content</a>
-    
-    <div class="container">
-        <a href="/reports/" class="back-button">
-            <span class="icon">←</span>
-            Back to Reports
-        </a>
-        
-        <div class="header">
-            <h1>CATS Accessibility Report</h1>
-            <div class="meta">
-                <strong>Domain:</strong> {{domain}}<br>
-                <strong>Generated:</strong> {{timestamp}}<br>
-                <strong>Standards:</strong> {{wcagInfo}}
-            </div>
-            <div class="download-section">
-                <a href="{{jsonFilename}}" class="download-btn" download title="Download raw JSON data for analysis">
-                    Download Raw Data (JSON)
+    <!-- Main Content Area -->
+    <main id="main-content" class="page-main">
+        <div class="page-main__container">
+            
+            <!-- Back Navigation -->
+            <div style="margin-bottom: var(--space-4);">
+                <a href="/reports/" class="btn btn-secondary">
+                    <span class="icon" style="margin-right: var(--space-2);">←</span>
+                    Back to Reports
                 </a>
             </div>
-        </div>
+            
+            <!-- Report Header -->
+            <header class="content-section__header">
+                <h1 class="content-section__title">CATS Accessibility Report</h1>
+                <div class="content-section__description" style="display: grid; grid-template-columns: 1fr auto; gap: var(--space-6); align-items: start;">
+                    <div class="report-meta" style="font-size: var(--text-body-small); line-height: 1.6;">
+                        <p style="margin: 0 0 var(--space-1) 0;"><strong>Domain:</strong> {{domain}}</p>
+                        <p style="margin: 0 0 var(--space-1) 0;"><strong>Generated:</strong> {{timestamp}}</p>
+                        <p style="margin: 0;"><strong>Standards:</strong> {{wcagInfo}}</p>
+                    </div>
+                    <div class="download-section">
+                        <a href="{{jsonFilename}}" class="btn btn-primary" download title="Download raw JSON data for analysis">
+                            Download Raw Data (JSON)
+                        </a>
+                    </div>
+                </div>
+            </header>
 
-        <main id="main-content">
-            <section class="summary" aria-labelledby="summary-heading">
+            <!-- Report Summary -->
+            <section class="content-section" aria-labelledby="summary-heading">
                 <h2 id="summary-heading" class="sr-only">Report Summary</h2>
                 {{summaryCards}}
             </section>
 
-            {{content}}
-        </main>
-    </div>
+            <!-- Report Content -->
+            <section class="content-section">
+                {{content}}
+            </section>
+            
+        </div>
+    </main>
     
     <script src="/scripts/utils.js"></script>
     <script src="/scripts/accordion.js"></script>

@@ -1,0 +1,301 @@
+// ==========================================================================
+// Modern Shared Styles
+// ==========================================================================
+//
+// Updated shared styles using the new design system architecture.
+// This replaces the old shared.scss with modern @use-based imports.
+//
+
+// ==========================================================================
+// Design System Import
+// ==========================================================================
+
+// Import the complete design system
+@use "design-system" as ds;
+
+// ==========================================================================
+// Legacy Compatibility Layer
+// ==========================================================================
+
+// For backward compatibility during migration, we provide legacy variable
+// mappings. These should be removed once all files are updated.
+
+// Legacy color variables
+$primary-color: ds.$color-primary;
+$background-light: ds.$color-background-secondary;
+$text-color: ds.$color-text-primary;
+$border-color: ds.$color-border-primary;
+
+// Legacy spacing variables  
+$padding-base: ds.$space-4;
+$margin-base: ds.$space-4;
+
+// Legacy typography variables
+$font-size-base: ds.$font-size-base;
+$line-height-base: ds.$line-height-normal;
+
+// ==========================================================================
+// Application-Specific Styles
+// ==========================================================================
+
+// Global application styles that build on the design system
+body {
+  // The design system handles most body styles
+  // Add any application-specific overrides here
+  overflow-x: hidden; // Prevent horizontal scroll issues
+}
+
+// ==========================================================================
+// Custom Utility Extensions
+// ==========================================================================
+
+// Application-specific utilities that extend the design system
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+// ==========================================================================
+// Page-Specific Component Overrides
+// ==========================================================================
+
+// Dashboard-specific styling
+.dashboard {
+  // Use design system layout classes
+  @extend .dashboard-layout;
+  
+  .dashboard-card {
+    // Use design system card component
+    @extend .card;
+    
+    // Application-specific card enhancements
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// Report-specific styling
+.report {
+  // Use design system report layout
+  @extend .report-layout;
+  
+  .report-summary {
+    // Summary cards use design system components
+    .summary-card {
+      @extend .card;
+      @extend .card-sm;
+    }
+  }
+  
+  .violations-list {
+    // Use design system accordion
+    @extend .report-accordion;
+  }
+}
+
+// ==========================================================================
+// Animation Enhancements
+// ==========================================================================
+
+// Smooth page transitions
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.page-transition-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+// Loading states
+.loading-shimmer {
+  @extend .card-loading;
+}
+
+// ==========================================================================
+// Accessibility Enhancements
+// ==========================================================================
+
+// Enhanced focus indicators for specific components
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible {
+  // Enhanced focus for critical actions
+  outline: 3px solid ds.$color-primary-focus;
+  outline-offset: 3px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .btn {
+    border-width: 2px;
+  }
+  
+  .card {
+    border-width: 2px;
+  }
+  
+  .form-control {
+    border-width: 2px;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .page-transition-enter-active,
+  .page-transition-exit-active {
+    transition-duration: 0.01ms;
+  }
+  
+  .card:hover {
+    transform: none;
+  }
+  
+  .dashboard-card:hover {
+    transform: none;
+  }
+}
+
+// ==========================================================================
+// Print Optimizations
+// ==========================================================================
+
+@media print {
+  // Application-specific print styles
+  .dashboard {
+    display: block;
+    
+    .dashboard-card {
+      break-inside: avoid;
+      margin-bottom: ds.$space-4;
+    }
+  }
+  
+  .report {
+    .report-sidebar {
+      display: none;
+    }
+    
+    .report-main {
+      width: 100%;
+    }
+  }
+  
+  // Ensure important links are visible
+  .btn-view::after {
+    content: " (View Report)";
+  }
+  
+  .btn-download::after {
+    content: " (Download)";
+  }
+}
+
+// ==========================================================================
+// Error Handling
+// ==========================================================================
+
+// Global error styles
+.error-boundary {
+  @extend .card;
+  @extend .card-danger;
+  
+  text-align: center;
+  padding: ds.$space-8;
+  
+  .error-title {
+    font-size: ds.$text-heading-3;
+    margin-bottom: ds.$space-4;
+  }
+  
+  .error-message {
+    color: ds.$color-text-secondary;
+    margin-bottom: ds.$space-6;
+  }
+  
+  .error-actions {
+    .btn {
+      margin: 0 ds.$space-2;
+    }
+  }
+}
+
+// ==========================================================================
+// Development Helpers
+// ==========================================================================
+
+// Development-only styles (removed in production builds)
+@if ds.$debug-mode {
+  .debug-info {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: ds.$space-2;
+    font-size: ds.$font-size-xs;
+    z-index: 99999;
+    
+    &::before {
+      content: "DS: " ds.$design-system-version " | ";
+    }
+  }
+}
+
+// ==========================================================================
+// Critical CSS Inlining
+// ==========================================================================
+
+// These styles should be inlined in the HTML head for better performance
+// (This would be handled by build tooling in a real application)
+
+.critical-path {
+  // Above-the-fold styles for faster rendering
+  .page-header {
+    display: block;
+    background: ds.$color-background-primary;
+    border-bottom: 1px solid ds.$color-border-primary;
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 ds.$space-4;
+  }
+  
+  .btn-primary {
+    background: ds.$color-primary;
+    color: ds.$color-text-inverse;
+    padding: ds.$space-2 ds.$space-4;
+    border: none;
+    border-radius: ds.$radius-button;
+  }
+}

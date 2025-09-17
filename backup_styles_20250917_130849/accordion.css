@@ -1,0 +1,160 @@
+/* Accordion Styles */
+
+.accordion-header { 
+    cursor: pointer; 
+    user-select: none; 
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    background: #f8f9fa;
+    border: none; /* Reset button border */
+    border-bottom: 1px solid #e0e0e0;
+    transition: background-color 0.2s ease;
+    width: 100%; /* Ensure full width */
+    text-align: left; /* Align text to left */
+    font-family: inherit; /* Inherit font family */
+    font-size: inherit; /* Inherit font size */
+}
+
+.accordion-header:hover { 
+    background: #e9ecef; 
+}
+
+.accordion-header:focus { 
+    outline: 3px solid #0056b3; 
+    outline-offset: -3px; 
+}
+
+.accordion-toggle { 
+    font-size: 18px; 
+    transition: transform 0.2s ease; 
+    margin-left: 10px;
+    color: #000;
+}
+
+.accordion-header[aria-expanded="true"] .accordion-toggle { 
+    transform: rotate(90deg); 
+}
+
+.accordion-content { 
+    display: none; 
+    padding: 15px; 
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.accordion-content.expanded { 
+    display: block; 
+}
+
+.page-summary { 
+    display: flex; 
+    align-items: center; 
+    gap: 15px; 
+    flex-wrap: wrap;
+}
+
+.page-url { 
+    color: #333; 
+    font-size: 14px; 
+    word-break: break-all; 
+    flex: 1; 
+    min-width: 200px;
+}
+
+.page-stats { 
+    display: flex; 
+    gap: 10px; 
+    align-items: center;
+}
+
+.stat-badge { 
+    padding: 4px 8px; 
+    border-radius: 4px; 
+    font-size: 12px; 
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-violations { 
+    background: #f5c6cb; 
+    color: #5a1f29; 
+}
+
+.stat-warnings { 
+    background: #fff3cd; 
+    color: #664d03; 
+}
+
+.stat-passed { 
+    background: #d1e7dd; 
+    color: #0a3622; 
+}
+
+/* Page Details Header and Controls */
+.page-details-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 20px; 
+    flex-wrap: wrap; 
+    gap: 15px;
+}
+
+.accordion-controls { 
+    display: flex; 
+    gap: 10px; 
+}
+
+.control-btn { 
+    background: #0056b3; 
+    color: white; 
+    border: none; 
+    padding: 8px 16px; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    font-size: 14px; 
+    font-weight: 500; 
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.control-btn:hover { 
+    background: #004085; 
+}
+
+.control-btn:focus { 
+    outline: 3px solid #0056b3; 
+    outline-offset: 3px; 
+}
+
+.expand-all-btn { 
+    background: #1e7e34; 
+}
+
+.expand-all-btn:hover { 
+    background: #155724; 
+}
+
+.expand-all-btn:focus { 
+    outline: 3px solid #1e7e34; 
+    outline-offset: 3px; 
+}
+
+.collapse-all-btn { 
+    background: #545b62; 
+}
+
+.collapse-all-btn:hover { 
+    background: #3d4349; 
+}
+
+.collapse-all-btn:focus { 
+    outline: 3px solid #545b62; 
+    outline-offset: 3px; 
+}

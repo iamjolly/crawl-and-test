@@ -1,0 +1,235 @@
+// ==========================================================================
+// Foundation Index
+// ==========================================================================
+//
+// Central index for all foundation styles.
+// Import this file to access the complete foundation system.
+//
+
+// Import design tokens first
+@use "../tokens" as tokens;
+
+// Import foundation modules
+@use "reset";
+@use "typography";
+@use "utilities";
+
+// ==========================================================================
+// Foundation Exports
+// ==========================================================================
+//
+// This provides a single source of truth for all foundation styles.
+// Components and layouts should import from this index rather than
+// individual foundation files to ensure consistency.
+//
+
+// Re-export all foundation modules for external use
+@forward "reset";
+@forward "typography";
+@forward "utilities";
+
+// Re-export tokens for convenience
+@forward "../tokens";
+
+// ==========================================================================
+// Foundation Base Styles
+// ==========================================================================
+//
+// Additional global styles that combine foundation elements
+//
+
+// Ensure proper focus management across all interactive elements
+a, button, input, select, textarea, [tabindex]:not([tabindex="-1"]) {
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-focus);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+}
+
+// Common layout patterns
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+  
+  @media (min-width: 576px) {
+    max-width: var(--container-max-width-sm);
+  }
+  
+  @media (min-width: 768px) {
+    max-width: var(--container-max-width-md);
+  }
+  
+  @media (min-width: 992px) {
+    max-width: var(--container-max-width-lg);
+  }
+  
+  @media (min-width: 1200px) {
+    max-width: var(--container-max-width-xl);
+  }
+  
+  @media (min-width: 1400px) {
+    max-width: var(--container-max-width-xxl);
+  }
+}
+
+// Fluid container
+.container-fluid {
+  width: 100%;
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+}
+
+// Common section spacing
+.section {
+  padding-top: var(--space-section-md);
+  padding-bottom: var(--space-section-md);
+  
+  &.section-sm {
+    padding-top: var(--space-section-sm);
+    padding-bottom: var(--space-section-sm);
+  }
+  
+  &.section-lg {
+    padding-top: var(--space-section-lg);
+    padding-bottom: var(--space-section-lg);
+  }
+  
+  &.section-xl {
+    padding-top: var(--space-section-xl);
+    padding-bottom: var(--space-section-xl);
+  }
+}
+
+// Common content spacing
+.content {
+  > * + * {
+    margin-top: var(--space-4);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    + * {
+      margin-top: var(--space-2);
+    }
+  }
+  
+  p + h1,
+  p + h2,
+  p + h3,
+  p + h4,
+  p + h5,
+  p + h6 {
+    margin-top: var(--space-8);
+  }
+}
+
+// Common card pattern
+.card {
+  background-color: var(--color-background-primary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-card);
+  box-shadow: var(--elevation-card);
+  padding: var(--space-card-padding-md);
+  
+  &.card-sm {
+    padding: var(--space-card-padding-sm);
+  }
+  
+  &.card-lg {
+    padding: var(--space-card-padding-lg);
+  }
+  
+  &:hover {
+    box-shadow: var(--elevation-card-hover);
+  }
+}
+
+// Common list patterns
+.list-unstyled {
+  list-style: none;
+  padding-left: 0;
+}
+
+.list-inline {
+  list-style: none;
+  padding-left: 0;
+  
+  li {
+    display: inline-block;
+    margin-right: var(--space-4);
+    margin-bottom: 0;
+    
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+// Skip link for accessibility
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: var(--space-2);
+  z-index: var(--z-index-modal);
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  transition: top 0.2s ease-in-out;
+  
+  &:focus {
+    top: var(--space-2);
+    outline: 2px solid var(--color-text-inverse);
+    outline-offset: 2px;
+  }
+}
+
+// Loading states
+.loading {
+  position: relative;
+  overflow: hidden;
+  
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent
+    );
+    animation: loading 1.5s infinite;
+  }
+}
+
+@keyframes loading {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+// Error states
+.error-boundary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: var(--space-8);
+  background-color: var(--color-background-secondary);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  color: var(--color-text-secondary);
+}

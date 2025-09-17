@@ -33,24 +33,8 @@ function loadTemplate(templateName) {
   }
 }
 
-function loadCSS() {
-  const cssFiles = ['report.css', 'accordion.css', 'accessibility.css'];
-  let combinedCSS = '';
-  
-  cssFiles.forEach(file => {
-    const cssPath = path.join(config.STYLES_DIR, file);
-    try {
-      combinedCSS += fs.readFileSync(cssPath, 'utf8') + '\n';
-    } catch (error) {
-      console.error(`❌ Failed to load CSS file: ${file}`, error.message);
-    }
-  });
-  
-  return combinedCSS;
-}
-
 function loadJS() {
-  const jsFiles = ['utils.js', 'accordion.js'];
+  const jsFiles = ['accordion.js', 'utils.js'];
   let combinedJS = '';
   
   jsFiles.forEach(file => {
@@ -105,14 +89,16 @@ function copyAssetsToPublic() {
     fs.mkdirSync(scriptsDir, { recursive: true });
   }
   
-  // Copy CSS files
-  const cssFiles = ['report.css', 'accordion.css', 'accessibility.css'];
+  // Copy CSS files (from compiled SASS)
+  const cssFiles = ['shared.css', 'dashboard.css', 'report.css'];
   cssFiles.forEach(file => {
-    const srcPath = path.join(__dirname, 'src', 'styles', file);
+    const srcPath = path.join(__dirname, '..', '..', 'public', 'styles', file);
     const destPath = path.join(stylesDir, file);
     
     if (fs.existsSync(srcPath)) {
       fs.copyFileSync(srcPath, destPath);
+    } else {
+      console.warn(`⚠️  CSS file not found: ${srcPath}. Run 'npm run sass:build' first.`);
     }
   });
   
@@ -153,19 +139,19 @@ function generateIssuesSection(title, issues, type) {
       const w3cLinks = wcagMapper.getW3cLinksForRule(issue.tags);
       if (w3cLinks.length > 0) {
         content += `
-        <div class="w3c-links" style="margin-top: 12px; padding: 10px; background-color: #f8f9fa; border-left: 3px solid #004085; border-radius: 3px;">
-          <h5 style="margin: 0 0 8px 0; font-size: 14px;">W3C WCAG Documentation</h5>`;
+        <div class="w3c-links">
+          <h5>W3C WCAG Documentation</h5>`;
         
         w3cLinks.forEach(link => {
           content += `
-          <ul style="margin: 4px 0; padding: 0; list-style: none;">`;
+          <ul>`;
           
           if (link.references.quickref) {
-            content += `<li style="margin: 2px 0;"><a href="${link.references.quickref.url}" target="_blank" style="color: #004085;">How to Meet ${link.criterion.id} - ${escapeHtml(link.criterion.title)} (Level ${link.criterion.level})</a></li>`;
+            content += `<li><a href="${link.references.quickref.url}" target="_blank">How to Meet ${link.criterion.id} - ${escapeHtml(link.criterion.title)} (Level ${link.criterion.level})</a></li>`;
           }
           
           if (link.references.understanding) {
-            content += `<li style="margin: 2px 0;"><a href="${link.references.understanding.url}" target="_blank" style="color: #004085;">Understanding ${link.criterion.id} - ${escapeHtml(link.criterion.title)} (Level ${link.criterion.level})</a></li>`;
+            content += `<li><a href="${link.references.understanding.url}" target="_blank">Understanding ${link.criterion.id} - ${escapeHtml(link.criterion.title)} (Level ${link.criterion.level})</a></li>`;
           }
           
           content += `</ul>`;
@@ -177,7 +163,7 @@ function generateIssuesSection(title, issues, type) {
     
     if (issue.nodes && issue.nodes.length > 0) {
       const elementText = type === 'warning' ? 'Elements Needing Review' : 'Affected Elements';
-      content += `<div style="margin-top: 12px;"><strong>${elementText} (${issue.nodes.length}):</strong></div>`;
+      content += `<div class="issue-element-count"><strong>${elementText} (${issue.nodes.length}):</strong></div>`;
       
       issue.nodes.forEach((node, nodeIndex) => {
         content += `<div class="issue-node" style="margin: 8px 0; padding: 8px; border-left: 3px solid ${borderColor}; background: #f8f9fa;">`;
@@ -337,7 +323,6 @@ function generateHTMLReport(data, filename) {
   const pagesSectionTemplate = loadTemplate('pages-section');
   const pageCardTemplate = loadTemplate('page-card');
   const noIssuesTemplate = loadTemplate('no-issues');
-  const css = loadCSS();
   const js = loadJS();
 
   // Generate summary cards
@@ -459,6 +444,7 @@ function generateHTMLReport(data, filename) {
   
   const html = baseTemplate
     .replace(/{{title}}/g, `Accessibility Report: ${domain} (${reportDateTime}) - CATS`)
+    .replace(/{{pageStyle}}/g, 'report')
     .replace(/{{domain}}/g, domain)
     .replace(/{{timestamp}}/g, timestamp)
     .replace(/{{wcagInfo}}/g, wcagInfo)

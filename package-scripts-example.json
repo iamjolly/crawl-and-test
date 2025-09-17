@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "build:css": "sass src/styles/main.scss dist/css/main.css --style=compressed",
+    "watch:css": "sass src/styles/main.scss dist/css/main.css --watch",
+    "build:css:dev": "sass src/styles/main.scss dist/css/main.css --source-map",
+    "lint:css": "stylelint 'src/styles/**/*.scss'",
+    "test:css": "sass src/styles/main.scss /tmp/test.css && rm /tmp/test.css"
+  },
+  "devDependencies": {
+    "sass": "^1.69.0",
+    "stylelint": "^15.11.0",
+    "stylelint-config-standard-scss": "^11.1.0"
+  }
+}

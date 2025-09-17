@@ -1,0 +1,35 @@
+// ==========================================================================
+// Molecules Index
+// ==========================================================================
+//
+// Central index for all molecular components.
+// Import this file to access all molecular design elements.
+//
+
+// Import design tokens, foundation, and atoms
+@use "../../tokens" as tokens;
+@use "../../foundation" as foundation;
+@use "../atoms" as atoms;
+
+// Import all molecular components
+@use "card";
+@use "form";
+@use "accordion";
+
+// ==========================================================================
+// Molecules Exports
+// ==========================================================================
+//
+// This provides a single source of truth for all molecular components.
+// Layout components should import from this index.
+//
+
+// Re-export all molecular components
+@forward "card";
+@forward "form";
+@forward "accordion";
+
+// Re-export lower level modules for convenience
+@forward "../../tokens";
+@forward "../../foundation";
+@forward "../atoms";

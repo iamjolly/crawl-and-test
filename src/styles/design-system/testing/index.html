@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design System Testing Suite</title>
+  <link rel="stylesheet" href="../_index.scss">
+  <link rel="stylesheet" href="_testing.scss">
+  <style>
+    /* Inline critical styles for testing */
+    body {
+      margin: 0;
+      font-family: var(--font-family-primary);
+      background: var(--color-background-primary);
+      color: var(--color-text-primary);
+    }
+    
+    .test-section {
+      margin: var(--space-8) 0;
+      padding: var(--space-6);
+      border: 1px solid var(--color-border-light);
+      border-radius: var(--radius-lg);
+    }
+    
+    .test-header {
+      margin-bottom: var(--space-6);
+      padding-bottom: var(--space-4);
+      border-bottom: 2px solid var(--color-primary);
+    }
+    
+    .test-title {
+      color: var(--color-primary);
+      margin: 0 0 var(--space-2) 0;
+      font-size: var(--text-heading-2);
+      font-weight: var(--font-weight-semibold);
+    }
+    
+    .test-description {
+      color: var(--color-text-secondary);
+      margin: 0;
+      font-size: var(--text-body-medium);
+    }
+    
+    .toggle-controls {
+      position: fixed;
+      top: var(--space-4);
+      right: var(--space-4);
+      background: var(--color-background-secondary);
+      padding: var(--space-4);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border-light);
+      box-shadow: var(--shadow-lg);
+      z-index: 1000;
+    }
+    
+    .toggle-controls h4 {
+      margin: 0 0 var(--space-3) 0;
+      font-size: var(--text-body-medium);
+      font-weight: var(--font-weight-semibold);
+    }
+    
+    .toggle-controls label {
+      display: block;
+      margin: var(--space-2) 0;
+      font-size: var(--text-body-small);
+    }
+  </style>
+</head>
+<body>
+  <!-- Testing Controls -->
+  <div class="toggle-controls">
+    <h4>Testing Controls</h4>
+    <label>
+      <input type="checkbox" id="focusTest"> Focus Indicators
+    </label>
+    <label>
+      <input type="checkbox" id="contrastTest"> High Contrast
+    </label>
+    <label>
+      <input type="checkbox" id="screenReaderTest"> Screen Reader
+    </label>
+    <label>
+      <input type="checkbox" id="darkModeTest"> Dark Mode
+    </label>
+    <label>
+      <input type="checkbox" id="debugMode"> Debug Mode
+    </label>
+  </div>
+
+  <div class="container">
+    <header class="page-header">
+      <h1>Design System Testing Suite</h1>
+      <p>Comprehensive testing environment for the A11y Crawl & Test design system</p>
+    </header>
+
+    <main class="page-main">
+      
+      <!-- Color Palette Testing -->
+      <section class="test-section">
+        <div class="test-header">
+          <h2 class="test-title">Color Palette</h2>
+          <p class="test-description">Testing color consistency and accessibility compliance</p>
+        </div>
+        
+        <div class="test-color-palette">
+          <div class="color-swatch swatch-primary" data-color="Primary"></div>
+          <div class="color-swatch swatch-secondary" data-color="Secondary"></div>
+          <div class="color-swatch swatch-success" data-color="Success"></div>
+          <div class="color-swatch swatch-warning" data-color="Warning"></div>
+          <div class="color-swatch swatch-danger" data-color="Danger"></div>
+          <div class="color-swatch swatch-info" data-color="Info"></div>
+          <div class="color-swatch swatch-light" data-color="Light"></div>
+          <div class="color-swatch swatch-dark" data-color="Dark"></div>
+        </div>
+      </section>
+
+      <!-- Typography Testing -->
+      <section class="test-section">
+        <div class="test-header">
+          <h2 class="test-title">Typography</h2>
+          <p class="test-description">Testing typography scale, hierarchy, and readability</p>
+        </div>
+        
+        <div class="test-typography">
+          <h1 class="heading-test">Heading 1 - Main Page Title</h1>
+          <h2 class="heading-test">Heading 2 - Section Title</h2>
+          <h3 class="heading-test">Heading 3 - Subsection Title</h3>
+          <h4 class="heading-test">Heading 4 - Component Title</h4>
+          <h5 class="heading-test">Heading 5 - Small Title</h5>
+          <h6 class="heading-test">Heading 6 - Caption Title</h6>
+          
+          <p class="text-test text-large">Large text for emphasis and callouts</p>
+          <p class="text-test text-medium">Medium text for body content and descriptions</p>
+          <p class="text-test text-small">Small text for captions and secondary information</p>
+          <p class="text-test text-caption">Caption text for minimal information</p>
+        </div>
+      </section>
+
+      <!-- Button Component Testing -->
+      <section class="test-section">
+        <div class="test-header">
+          <h2 class="test-title">Button Components</h2>
+          <p class="test-description">Testing all button variants, sizes, and states</p>
+        </div>
+        
+        <div class="test-component-variants">
+          <!-- Primary Buttons -->
+          <div class="test-component-item" data-component="Primary">
+            <button class="btn btn-primary">Primary</button>
+            <button class="btn btn-primary btn-sm">Small</button>
+            <button class="btn btn-primary btn-lg">Large</button>
+            <button class="btn btn-primary" disabled>Disabled</button>
+          </div>
+          
+          <!-- Secondary Buttons -->
+          <div class="test-component-item" data-component="Secondary">
+            <button class="btn btn-secondary">Secondary</button>
+            <button class="btn btn-secondary btn-sm">Small</button>
+            <button class="btn btn-secondary btn-lg">Large</button>
+            <button class="btn btn-secondary" disabled>Disabled</button>
+          </div>
+          
+          <!-- Success Buttons -->
+          <div class="test-component-item" data-component="Success">
+            <button class="btn btn-success">Success</button>
+            <button class="btn btn-success btn-sm">Small</button>
+            <button class="btn btn-success btn-lg">Large</button>
+            <button class="btn btn-success" disabled>Disabled</button>
+          </div>
+          
+          <!-- Warning Buttons -->
+          <div class="test-component-item" data-component="Warning">
+            <button class="btn btn-warning">Warning</button>
+            <button class="btn btn-warning btn-sm">Small</button>
+            <button class="btn btn-warning btn-lg">Large</button>
+            <button class="btn btn-warning" disabled>Disabled</button>
+          </div>
+          
+          <!-- Danger Buttons -->
+          <div class="test-component-item" data-component="Danger">
+            <button class="btn btn-danger">Danger</button>
+            <button class="btn btn-danger btn-sm">Small</button>
+            <button class="btn btn-danger btn-lg">Large</button>
+            <button class="btn btn-danger" disabled>Disabled</button>
+          </div>
+          
+          <!-- Outline Buttons -->
+          <div class="test-component-item" data-component="Outline">
+            <button class="btn btn-outline-primary">Primary</button>
+            <button class="btn btn-outline-secondary">Secondary</button>
+            <button class="btn btn-outline-success">Success</button>
+            <button class="btn btn-outline-danger">Danger</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Form Components Testing -->
+      <section class="test-section">
+        <div class="test-header">
+          <h2 class="test-title">Form Components</h2>
+          <p class="test-description">Testing form inputs, labels, and validation states</p>
+        </div>
+        
+        <form class="form">
+          <div class="form-section">
+            <h3 class="form-section-title">Input Variants</h3>
+            
+            <div class="grid grid-cols-1 grid-md-2 gap-4">
+              <div class="form-group">
+                <label class="form-label required" for="text-input">Text Input</label>
+                <input type="text" class="form-control" id="text-input" placeholder="Enter text">
+                <div class="form-text">Helper text for guidance</div>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label" for="email-input">Email Input</label>
+                <input type="email" class="form-control" id="email-input" placeholder="Enter email">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label" for="password-input">Password Input</label>
+                <input type="password" class="form-control" id="password-input" placeholder="Enter password">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label" for="select-input">Select Input</label>
+                <select class="form-control" id="select-input">
+                  <option>Choose an option</option>
+                  <option>Option 1</option>
+                  <option>Option 2</option>
+                  <option>Option 3</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label" for="textarea-input">Textarea</label>
+                <textarea class="form-control" id="textarea-input" rows="3" placeholder="Enter description"></textarea>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label" for="file-input">File Input</label>
+                <input type="file" class="form-control" id="file-input">
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-section">
+            <h3 class="form-section-title">Input States</h3>
+            
+            <div class="grid grid-cols-1 grid-md-3 gap-4">
+              <div class="form-group">
+                <label class="form-label" for="valid-input">Valid Input</label>
+                <input type="text" class="form-control is-valid" id="valid-input" value="Valid content">
+                <div class="form-feedback form-feedback-valid">Looks good!</div>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label" for="invalid-input">Invalid Input</label>
+                <input type="text" class="form-control is-invalid" id="invalid-input" value="Invalid content">
+                <div class="form-feedback form-feedback-invalid">Please provide valid input.</div>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label" for="disabled-input">Disabled Input</label>
+                <input type="text" class="form-control" id="disabled-input" value="Disabled content" disabled>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Submit Form</button>
+            <button type="button" class="btn btn-secondary">Cancel</button>
+            <button type="reset" class="btn btn-outline-secondary">Reset</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Card Components Testing -->
+      <section class="test-section">
+        <div class="test-header">
+          <h2 class="test-title">Card Components</h2>
+          <p class="test-description">Testing card layouts and content organization</p>
+        </div>
+        
+        <div class="grid grid-cols-1 grid-md-2 grid-lg-3 gap-4">
+          <!-- Basic Card -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Basic Card</h3>
+              <p class="card-subtitle">Simple card example</p>
+            </div>
+            <div class="card-body">
+              <p class="card-text">This is a basic card with header, body, and footer sections.</p>
+            </div>
+            <div class="card-footer">
+              <div class="card-actions">
+                <button class="btn btn-primary btn-sm">Action</button>
+                <button class="btn btn-secondary btn-sm">More</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Success Card -->
+          <div class="card card-success">
+            <div class="card-header">
+              <h3 class="card-title">Success Card</h3>
+            </div>
+            <div class="card-body">
+              <p class="card-text">This card indicates successful completion or positive status.</p>
+            </div>
+          </div>
+          
+          <!-- Warning Card -->
+          <div class="card card-warning">
+            <div class="card-header">
+              <h3 class="card-title">Warning Card</h3>
+            </div>
+            <div class="card-body">
+              <p class="card-text">This card indicates caution or important information.</p>
+            </div>
+          </div>
+          
+          <!-- Interactive Card -->
+          <div class="card card-interactive">
+            <div class="card-body">
+              <h3 class="card-title">Interactive Card</h3>
+              <p class="card-text">This card can be clicked or focused for interaction.</p>
+            </div>
+          </div>
+          
+          <!-- Large Card -->
+          <div class="card card-lg">
+            <div class="card-header">
+              <h3 class="card-title">Large Card</h3>
+              <p class="card-subtitle">Extended content area</p>
+            </div>
+            <div class="card-body">
+              <p class="card-text">This is a larger card with more padding and content space.</p>
+              <p class="card-text">It can accommodate more detailed information and longer descriptions.</p>
+            </div>
+            <div class="card-footer">
+              <div class="card-actions">
+                <button class="btn btn-primary">Primary Action</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Report Card -->
+          <div class="card card-report">
+            <div class="card-header">
+              <h3 class="card-title">Accessibility Report</h3>
+              <p class="card-subtitle">example.com</p>
+            </div>
+            <div class="card-body">
+              <div class="report-stats">
+                <div class="stat-item">
+                  <span class="stat-value">23</span>
+                  <span class="stat-label">Issues</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-value">95%</span>
+                  <span class="stat-label">Score</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="card-actions">
+                <button class="btn btn-primary btn-sm">View Report</button>
+                <button class="btn btn-secondary btn-sm">Download</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Layout Testing -->
+      <section class="test-section">
+        <div class="test-header">
+          <h2 class="test-title">Layout System</h2>
+          <p class="test-description">Testing grid, flexbox, and responsive layouts</p>
+        </div>
+        
+        <!-- Grid Testing -->
+        <div class="test-layout">
+          <h3>CSS Grid Testing</h3>
+          <div class="grid grid-cols-1 grid-md-2 grid-lg-4 gap-4 grid-test">
+            <div class="grid-item">1</div>
+            <div class="grid-item">2</div>
+            <div class="grid-item">3</div>
+            <div class="grid-item">4</div>
+            <div class="grid-item col-span-2">5 (span 2)</div>
+            <div class="grid-item">6</div>
+            <div class="grid-item">7</div>
+          </div>
+          
+          <h3>Flexbox Testing</h3>
+          <div class="flex justify-between items-center gap-4 flex-test">
+            <div class="flex-item">Left</div>
+            <div class="flex-item">Center</div>
+            <div class="flex-item">Right</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Responsive Testing -->
+      <section class="test-section">
+        <div class="test-header">
+          <h2 class="test-title">Responsive Design</h2>
+          <p class="test-description">Testing responsive utilities and breakpoint behavior</p>
+        </div>
+        
+        <div class="test-responsive-grid">
+          <div class="test-responsive-item d-block">Always visible</div>
+          <div class="test-responsive-item d-none d-sm-block">Visible SM+</div>
+          <div class="test-responsive-item d-none d-md-block">Visible MD+</div>
+          <div class="test-responsive-item d-none d-lg-block">Visible LG+</div>
+          <div class="test-responsive-item d-none d-xl-block">Visible XL+</div>
+        </div>
+      </section>
+
+      <!-- Accessibility Testing -->
+      <section class="test-section">
+        <div class="test-header">
+          <h2 class="test-title">Accessibility Features</h2>
+          <p class="test-description">Testing keyboard navigation, screen reader support, and ARIA attributes</p>
+        </div>
+        
+        <div class="grid grid-cols-1 grid-md-2 gap-6">
+          <!-- Focus Testing -->
+          <div>
+            <h4>Focus Navigation</h4>
+            <p>Use Tab key to navigate through these elements:</p>
+            <button class="btn btn-primary">Button 1</button>
+            <button class="btn btn-secondary">Button 2</button>
+            <input type="text" class="form-control" placeholder="Input field">
+            <select class="form-control">
+              <option>Select option</option>
+              <option>Option 1</option>
+              <option>Option 2</option>
+            </select>
+            <a href="#" class="link">Text link</a>
+          </div>
+          
+          <!-- Screen Reader Testing -->
+          <div>
+            <h4>Screen Reader Support</h4>
+            <button aria-label="Close dialog" class="btn btn-outline-secondary">×</button>
+            <span class="sr-only">This text is only visible to screen readers</span>
+            <input type="search" placeholder="Search" aria-describedby="search-help">
+            <div id="search-help" class="form-text">Enter keywords to search the site</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Testing JavaScript -->
+  <script>
+    // Toggle testing modes
+    document.getElementById('focusTest').addEventListener('change', function(e) {
+      document.body.classList.toggle('test-focus-indicators', e.target.checked);
+    });
+    
+    document.getElementById('contrastTest').addEventListener('change', function(e) {
+      document.body.classList.toggle('test-contrast', e.target.checked);
+      if (e.target.checked) {
+        document.body.classList.add('contrast-high');
+      } else {
+        document.body.classList.remove('contrast-high');
+      }
+    });
+    
+    document.getElementById('screenReaderTest').addEventListener('change', function(e) {
+      document.body.classList.toggle('test-screen-reader', e.target.checked);
+    });
+    
+    document.getElementById('darkModeTest').addEventListener('change', function(e) {
+      document.body.classList.toggle('test-dark-mode', e.target.checked);
+    });
+    
+    document.getElementById('debugMode').addEventListener('change', function(e) {
+      document.body.classList.toggle('debug-mode', e.target.checked);
+    });
+    
+    // Keyboard navigation testing
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Tab') {
+        console.log('Tab navigation:', document.activeElement);
+      }
+    });
+    
+    // Log focus events for testing
+    document.addEventListener('focusin', function(e) {
+      console.log('Focus in:', e.target);
+    });
+    
+    document.addEventListener('focusout', function(e) {
+      console.log('Focus out:', e.target);
+    });
+  </script>
+</body>
+</html>

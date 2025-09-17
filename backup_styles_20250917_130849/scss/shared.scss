@@ -1,0 +1,158 @@
+// ==========================================================================
+// Shared Styles
+// ==========================================================================
+//
+// Common styles shared across all pages in the CATS application.
+// This file includes base styles, components used globally, and utilities.
+//
+
+// ==========================================================================
+// Abstracts
+// ==========================================================================
+@import 'abstracts/variables';
+@import 'abstracts/mixins';
+
+// ==========================================================================
+// Base
+// ==========================================================================
+@import 'base/reset';
+@import 'base/typography';
+
+// ==========================================================================
+// Components (Shared)
+// ==========================================================================
+@import 'components/navigation';
+@import 'components/buttons';
+
+// ==========================================================================
+// Utilities
+// ==========================================================================
+
+// Container utility
+.container {
+  @include container();
+}
+
+// Card utility
+.card {
+  @include card();
+}
+
+// Button utilities
+.btn {
+  @include button-base();
+}
+
+.btn-primary {
+  @include button-primary();
+}
+
+// Spacing utilities
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: $spacing-xs; }
+.mb-2 { margin-bottom: $spacing-sm; }
+.mb-3 { margin-bottom: $spacing-md; }
+.mb-4 { margin-bottom: $spacing-lg; }
+.mb-5 { margin-bottom: $spacing-xl; }
+
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: $spacing-xs; }
+.mt-2 { margin-top: $spacing-sm; }
+.mt-3 { margin-top: $spacing-md; }
+.mt-4 { margin-top: $spacing-lg; }
+.mt-5 { margin-top: $spacing-xl; }
+
+.p-0 { padding: 0; }
+.p-1 { padding: $spacing-xs; }
+.p-2 { padding: $spacing-sm; }
+.p-3 { padding: $spacing-md; }
+.p-4 { padding: $spacing-lg; }
+.p-5 { padding: $spacing-xl; }
+
+// Display utilities
+.d-none { display: none; }
+.d-block { display: block; }
+.d-inline { display: inline; }
+.d-inline-block { display: inline-block; }
+.d-flex { display: flex; }
+.d-grid { display: grid; }
+
+// Accessibility utilities
+.sr-only {
+  @include sr-only();
+}
+
+// Skip link
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: $color-text;
+  color: $color-white;
+  padding: $spacing-sm;
+  text-decoration: none;
+  z-index: 1000;
+  
+  &:focus {
+    top: 6px;
+  }
+}
+
+// High contrast support
+@media (prefers-contrast: high) {
+  .summary-card,
+  .page-card,
+  .issue {
+    border: 2px solid;
+  }
+  
+  .accordion-header:focus {
+    outline: 4px solid;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .accordion-toggle {
+    transition: none;
+  }
+}
+
+// Print styles
+@media print {
+  .accordion-controls,
+  .accordion-toggle {
+    display: none;
+  }
+  
+  .accordion-content {
+    display: block !important;
+  }
+  
+  .summary-card,
+  .page-card {
+    break-inside: avoid;
+  }
+  
+  .container {
+    box-shadow: none;
+    max-width: none;
+  }
+  
+  body {
+    background: $color-white;
+  }
+}
+
+// High contrast support for body
+body {
+  @include high-contrast-mode();
+}

@@ -1,0 +1,536 @@
+// ==========================================================================
+// Dashboard Page Styles
+// ==========================================================================
+//
+// Styles specific to the dashboard and index pages.
+//
+
+@import '../abstracts/variables';
+@import '../abstracts/mixins';
+
+// ==========================================================================
+// Dashboard Container
+// ==========================================================================
+
+.dashboard-container {
+  @include container();
+  padding-top: $spacing-xl;
+  padding-bottom: $spacing-xl;
+}
+
+// ==========================================================================
+// Dashboard Header
+// ==========================================================================
+
+.dashboard-header {
+  text-align: center;
+  margin-bottom: $spacing-3xl;
+  
+  h1 {
+    font-size: $font-size-h1;
+    font-weight: $font-weight-bold;
+    color: white;
+    margin-bottom: $spacing-md;
+  }
+  
+  .subtitle {
+    font-size: $font-size-large;
+    color: $color-text-muted;
+    margin-bottom: $spacing-xl;
+  }
+  
+  .description {
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: $line-height-loose;
+    color: $color-text-light;
+  }
+}
+
+// ==========================================================================
+// Scan Form
+// ==========================================================================
+
+.scan-form {
+  @include card();
+  max-width: 600px;
+  margin: 0 auto $spacing-3xl auto;
+  
+  h2 {
+    margin-bottom: $spacing-xl;
+    text-align: center;
+    color: $color-text;
+  }
+  
+  .form-group {
+    margin-bottom: $spacing-lg;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: $spacing-xs;
+    font-weight: $font-weight-medium;
+    color: $color-text;
+  }
+  
+  input,
+  select {
+    width: 100%;
+    padding: $spacing-md;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-base;
+    font-size: $font-size-base;
+    font-family: $font-family-base;
+    background-color: $color-background-white;
+    transition: border-color $transition-base;
+    
+    &:focus {
+      @include focus-visible();
+      border-color: $color-primary;
+    }
+    
+    &:invalid {
+      border-color: $color-danger;
+    }
+  }
+  
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-lg;
+    
+    @media (max-width: $breakpoint-mobile) {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .submit-button {
+    @include button-primary();
+    width: 100%;
+    padding: $spacing-lg;
+    font-size: $font-size-large;
+    margin-top: $spacing-lg;
+  }
+}
+
+.form-help {
+  font-size: $font-size-small;
+  color: $color-text-muted;
+  margin-top: $spacing-xs;
+}
+
+// ==========================================================================
+// Standalone Form Groups (for use outside scan-form)
+// ==========================================================================
+
+.form-group {
+  margin-bottom: $spacing-lg;
+  
+  label {
+    display: block;
+    margin-bottom: $spacing-xs;
+    font-weight: $font-weight-medium;
+    color: $color-text;
+  }
+  
+  input,
+  select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: $font-size-small;
+    transition: border-color 0.2s ease;
+    
+    &:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+    }
+  }
+}
+
+// ==========================================================================
+// Reports List
+// ==========================================================================
+
+.reports-section {
+  margin-top: $spacing-3xl;
+  
+  h2 {
+    margin-bottom: $spacing-xl;
+    text-align: center;
+  }
+}
+
+.reports-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 32px;
+  margin-bottom: $spacing-xl;
+}
+
+.report-card {
+  @include card();
+  padding: $spacing-lg;
+  transition: transform $transition-base, box-shadow $transition-base;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $box-shadow-large;
+  }
+  
+  .report-title {
+    font-size: $font-size-h4;
+    font-weight: $font-weight-semibold;
+    margin-bottom: $spacing-sm;
+    color: $color-text;
+    
+    a {
+      @include link();
+      text-decoration: none;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+  
+  .report-meta {
+    font-size: $font-size-small;
+    color: $color-text-muted;
+    margin-bottom: $spacing-md;
+  }
+  
+  .report-stats {
+    display: flex;
+    justify-content: space-between;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-md;
+  }
+  
+  .stat {
+    text-align: center;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $border-radius-small;
+    font-size: $font-size-small;
+    
+    &.violations {
+      background-color: lighten($color-danger, 45%);
+      color: $color-danger;
+    }
+    
+    &.warnings {
+      background-color: lighten($color-warning, 40%);
+      color: darken($color-warning, 15%);
+    }
+    
+    &.passes {
+      background-color: lighten($color-success, 45%);
+      color: $color-success;
+    }
+  }
+  
+  .report-actions {
+    display: flex;
+    gap: $spacing-sm;
+    
+    a {
+      flex: 1;
+      text-align: center;
+      padding: $spacing-sm;
+      border: 1px solid $color-primary;
+      border-radius: $border-radius-base;
+      color: $color-primary;
+      text-decoration: none;
+      font-size: $font-size-small;
+      transition: all $transition-base;
+      
+      &:hover {
+        background-color: $color-primary;
+        color: $color-white;
+      }
+      
+      &.primary {
+        background-color: $color-primary;
+        color: $color-white;
+        
+        &:hover {
+          background-color: $color-primary-dark;
+        }
+      }
+    }
+  }
+}
+
+// ==========================================================================
+// Empty State
+// ==========================================================================
+
+.empty-state {
+  text-align: center;
+  padding: $spacing-3xl;
+  color: $color-text-muted;
+  
+  .empty-icon {
+    font-size: 48px;
+    margin-bottom: $spacing-lg;
+    opacity: 0.5;
+  }
+  
+  h3 {
+    margin-bottom: $spacing-md;
+    color: $color-text-light;
+  }
+  
+  p {
+    max-width: 400px;
+    margin: 0 auto;
+    line-height: $line-height-loose;
+  }
+}
+
+// ==========================================================================
+// Loading States
+// ==========================================================================
+
+.loading {
+  text-align: center;
+  padding: $spacing-xl;
+  
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid $color-border-light;
+    border-top: 4px solid $color-primary;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto $spacing-md auto;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// ==========================================================================
+// Responsive Design
+// ==========================================================================
+
+@media (max-width: $breakpoint-tablet) {
+  .dashboard-header {
+    margin-bottom: $spacing-xl;
+    
+    h1 {
+      font-size: $font-size-h2;
+    }
+    
+    .subtitle {
+      font-size: $font-size-base;
+    }
+  }
+  
+  .scan-form {
+    margin-left: $spacing-lg;
+    margin-right: $spacing-lg;
+  }
+  
+  .reports-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ==========================================================================
+// Dashboard Server Generated Styles (extracted from inline styles)
+// ==========================================================================
+
+// Main container for dashboard server pages
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: $spacing-md;
+}
+
+// Dashboard header with gradient
+.header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: $color-white;
+  padding: $spacing-xl;
+  border-radius: $border-radius-large;
+  margin-bottom: $spacing-xl;
+  text-align: center;
+  
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: $spacing-sm;
+    font-weight: $font-weight-bold;
+    color: white;
+  }
+  
+  p {
+    font-size: $font-size-large;
+    opacity: 0.9;
+  }
+}
+
+// Domain section styling
+.domain-section {
+  background: $color-background-light;
+  padding: $spacing-lg;
+  border-radius: $border-radius-base;
+  margin-bottom: $spacing-xl;
+  border-left: 4px solid #667eea;
+  
+  h3 {
+    margin-bottom: $spacing-sm;
+    color: $color-text;
+    font-size: $font-size-h3;
+  }
+  
+  p {
+    margin-bottom: $spacing-md;
+    color: $color-text-muted;
+  }
+}
+
+// Reports table styling
+.reports-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: $color-white;
+  border-radius: $border-radius-small;
+  overflow: hidden;
+  box-shadow: $box-shadow-small;
+  
+  th {
+    background: #495057;
+    color: $color-white;
+    padding: $spacing-sm;
+    text-align: left;
+    font-weight: $font-weight-semibold;
+  }
+  
+  td {
+    padding: $spacing-sm;
+    border-bottom: 1px solid $color-border;
+  }
+  
+  tr:last-child td {
+    border-bottom: none;
+  }
+  
+  tr:hover {
+    background-color: $color-background-light;
+  }
+}
+
+// Report link styling
+.report-link {
+  color: $color-primary-light;
+  text-decoration: none;
+  font-weight: $font-weight-medium;
+  
+  &:hover {
+    color: $color-primary-darker;
+    text-decoration: underline;
+  }
+}
+
+// No reports message
+.no-reports {
+  text-align: center;
+  color: $color-text-muted;
+  font-style: italic;
+  padding: $spacing-xl;
+}
+
+// ==========================================================================
+// Report Items (Individual Report Cards)
+// ==========================================================================
+
+.report-item {
+  background: $color-background-light;
+  padding: $spacing-2xl;
+  border-radius: $border-radius-base;
+  margin-bottom: $spacing-lg;
+  border-left: 4px solid #667eea;
+  
+  h3 {
+    margin-bottom: $spacing-sm;
+    color: $color-text;
+  }
+  
+  p {
+    margin-bottom: $spacing-lg;
+    color: $color-text-muted;
+  }
+}
+
+// ==========================================================================
+// Grid Layout System
+// ==========================================================================
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-3xl;
+  
+  @media (max-width: #{$breakpoint-tablet}) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ==========================================================================
+// Jobs Section
+// ==========================================================================
+
+.jobs-section {
+  margin-top: $spacing-lg;
+}
+
+.job-item {
+  background: #fff3cd;
+  padding: $spacing-lg;
+  border-radius: 5px;
+  margin-bottom: $spacing-sm;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 4px solid $color-warning;
+}
+
+.job-status {
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: $font-size-smaller;
+  font-weight: $font-weight-semibold;
+  
+  &.running {
+    background: $color-warning;
+    color: $color-text;
+  }
+  
+  &.completed {
+    background: $color-success;
+    color: $color-white;
+  }
+  
+  &.error {
+    background: $color-danger;
+    color: $color-white;
+  }
+}
+
+// ==========================================================================
+// Enhanced Form Styles
+// ==========================================================================
+
+.scan-form {
+  input:focus:focus-visible,
+  select:focus:focus-visible {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+  }
+}

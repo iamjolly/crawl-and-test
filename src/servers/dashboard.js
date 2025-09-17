@@ -107,147 +107,73 @@ function generateReportsIndexHTML() {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accessibility Reports - CATS</title>
-    <link rel="stylesheet" href="/styles/navigation.css">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 2rem;
-            border-radius: 10px;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-        
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            font-weight: 700;
-        }
-        
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-        
-        .domain-section {
-            background: #f8f9fa;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            border-left: 4px solid #667eea;
-        }
-        
-        .domain-section h3 {
-            margin-bottom: 0.5rem;
-            color: #333;
-            font-size: 1.3rem;
-        }
-        
-        .domain-section p {
-            margin-bottom: 1rem;
-            color: #666;
-        }
-        
-        .reports-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 6px;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .reports-table th {
-            background: #495057;
-            color: white;
-            padding: 12px;
-            text-align: left;
-            font-weight: 600;
-        }
-        
-        .reports-table td {
-            padding: 12px;
-            border-bottom: 1px solid #dee2e6;
-        }
-        
-        .reports-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .reports-table tr:hover {
-            background-color: #f8f9fa;
-        }
-        
-        .report-link {
-            color: #003d7a;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        .report-link:hover {
-            color: #002952;
-            text-decoration: underline;
-        }
-        
-        .no-reports {
-            text-align: center;
-            color: #666;
-            font-style: italic;
-            padding: 2rem;
-        }
-    </style>
+    <link rel="stylesheet" href="/styles/design-system.css">
+    <link rel="stylesheet" href="/styles/shared.css">
 </head>
-<body>
-    <nav class="site-nav" role="navigation" aria-label="Main navigation">
-        <div class="nav-container">
-            <a href="/" class="nav-brand" aria-label="CATS Home">
-                <span>CATS</span>
+<body class="page-container">
+    <!-- Skip Links -->
+    <div class="skip-links">
+        <a href="#main-content" class="skip-links__link">Skip to main content</a>
+    </div>
+    
+    <!-- Site Header -->
+    <header class="site-header" role="banner">
+        <div class="site-header__container">
+            <a href="/" class="site-header__brand" aria-label="CATS Home">
+                <div class="site-header__logo">
+                    <span>C</span>
+                </div>
+                <h1 class="site-header__title">
+                    CATS
+                    <span class="site-header__subtitle">Accessibility Testing</span>
+                </h1>
             </a>
-            <ul class="nav-links">
-                <li><a href="/" class="nav-link">Dashboard</a></li>
-                <li><a href="/reports/" class="nav-link active" aria-current="page">Reports</a></li>
+            
+            <nav class="site-header__nav">
+                <div id="nav-main" class="main-nav main-nav--horizontal" role="navigation" aria-label="Main navigation">
+                    <ul class="main-nav__list">
+                        <li class="main-nav__item">
+                            <a href="/" class="main-nav__link">Dashboard</a>
+                        </li>
+                        <li class="main-nav__item">
+                            <a href="/reports/" class="main-nav__link main-nav__link--active" aria-current="page">Reports</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+            <div class="site-header__utilities">
+                <!-- Future: user menu, settings, etc. -->
+            </div>
+        </div>
+    </header>
+    
+    <!-- Breadcrumb Navigation -->
+    <nav class="main-nav main-nav--breadcrumb" aria-label="Breadcrumb">
+        <div class="main-nav__container">
+            <ul class="main-nav__list">
+                <li class="main-nav__item">
+                    <a href="/" class="main-nav__link">Dashboard</a>
+                </li>
+                <li class="main-nav__item">
+                    <span class="main-nav__link main-nav__link--current">Reports</span>
+                </li>
             </ul>
         </div>
     </nav>
     
-    <nav class="breadcrumb-nav" aria-label="Breadcrumb">
-        <div class="breadcrumb-container">
-            <ol class="breadcrumb">
-                <li><a href="/">Dashboard</a></li>
-                <li><span class="current">Reports</span></li>
-            </ol>
-        </div>
-    </nav>
-    
-    <div class="container">
+    <!-- Main Content Area -->
+    <main id="main-content" class="page-main">
+        <div class="page-main__container">
         <div class="header">
             <h1>Accessibility Reports</h1>
             <p>Browse all generated accessibility reports by domain</p>
         </div>
         
-        <main>
             ${reportsList}
-        </main>
-    </div>
+        
+        </div>
+    </main>
 </body>
 </html>
     `;
@@ -297,26 +223,67 @@ function generateDomainReportsHTML(domain) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Domain Reports: ${domain} - CATS</title>
-    <link rel="stylesheet" href="/styles/report.css">
-    <link rel="stylesheet" href="/styles/navigation.css">
-    <link rel="stylesheet" href="/styles/accessibility.css">
+    <link rel="stylesheet" href="/styles/design-system.css">
+    <link rel="stylesheet" href="/styles/shared.css">
 </head>
-<body>
-    <nav class="site-nav" role="navigation" aria-label="Main navigation">
-        <div class="nav-container">
-            <a href="/" class="nav-brand" aria-label="CATS Home">
-                <span>CATS</span>
+<body class="page-container">
+    <!-- Skip Links -->
+    <div class="skip-links">
+        <a href="#main-content" class="skip-links__link">Skip to main content</a>
+    </div>
+    
+    <!-- Site Header -->
+    <header class="site-header" role="banner">
+        <div class="site-header__container">
+            <a href="/" class="site-header__brand" aria-label="CATS Home">
+                <div class="site-header__logo">
+                    <span>C</span>
+                </div>
+                <h1 class="site-header__title">
+                    CATS
+                    <span class="site-header__subtitle">Accessibility Testing</span>
+                </h1>
             </a>
-            <ul class="nav-links">
-                <li><a href="/" class="nav-link">Dashboard</a></li>
-                <li><a href="/reports/" class="nav-link active" aria-current="page">Reports</a></li>
+            
+            <nav class="site-header__nav">
+                <div id="nav-main" class="main-nav main-nav--horizontal" role="navigation" aria-label="Main navigation">
+                    <ul class="main-nav__list">
+                        <li class="main-nav__item">
+                            <a href="/" class="main-nav__link">Dashboard</a>
+                        </li>
+                        <li class="main-nav__item">
+                            <a href="/reports/" class="main-nav__link main-nav__link--active" aria-current="page">Reports</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+            <div class="site-header__utilities">
+                <!-- Future: user menu, settings, etc. -->
+            </div>
+        </div>
+    </header>
+    
+    <!-- Breadcrumb Navigation -->
+    <nav class="main-nav main-nav--breadcrumb" aria-label="Breadcrumb">
+        <div class="main-nav__container">
+            <ul class="main-nav__list">
+                <li class="main-nav__item">
+                    <a href="/" class="main-nav__link">Dashboard</a>
+                </li>
+                <li class="main-nav__item">
+                    <a href="/reports/" class="main-nav__link">Reports</a>
+                </li>
+                <li class="main-nav__item">
+                    <span class="main-nav__link main-nav__link--current">${domain}</span>
+                </li>
             </ul>
         </div>
     </nav>
-    
     <nav class="breadcrumb-nav" aria-label="Breadcrumb">
         <div class="breadcrumb-container">
-            <ol class="breadcrumb">
+        <div class="breadcrumb-nav__container">
+            <ol class="breadcrumb-nav__list">
                 <li><a href="/">Dashboard</a></li>
                 <li><a href="/reports/">Reports</a></li>
                 <li><span class="current">${domain}</span></li>
@@ -324,20 +291,27 @@ function generateDomainReportsHTML(domain) {
         </div>
     </nav>
     
-    <a href="#main-content" class="skip-link">Skip to main content</a>
-    
-    <div class="container">
-        <a href="/reports/" class="back-button">
-            <span class="icon">←</span>
-            Back to All Reports
-        </a>
+    <!-- Main Content Area -->
+    <main id="main-content" class="page-main">
+        <div class="page-main__container">
+            
+            <!-- Back Navigation -->
+            <div style="margin-bottom: var(--space-4);">
+                <a href="/reports/" class="btn btn-secondary">
+                    <span class="icon" style="margin-right: var(--space-2);">←</span>
+                    Back to All Reports
+                </a>
+            </div>
+            
+            <!-- Page Header -->
+            <header class="content-section__header">
+                <h1 class="content-section__title">Reports for ${domain}</h1>
+                <p class="content-section__description">${reports.length} report(s) available</p>
+            </header>
+            
+            <!-- Reports Content -->
+            <section class="content-section">
         
-        <div class="header">
-            <h1>Reports for ${domain}</h1>
-            <p>${reports.length} report(s) available</p>
-        </div>
-        
-        <main id="main-content">
             <table class="reports-table">
                 <thead>
                     <tr>
@@ -349,8 +323,10 @@ function generateDomainReportsHTML(domain) {
                     ${reportsList}
                 </tbody>
             </table>
-        </main>
-    </div>
+            
+            </section>
+        </div>
+    </main>
 </body>
 </html>
     `;

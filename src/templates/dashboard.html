@@ -4,50 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}}</title>
-    <link rel="stylesheet" href="/styles/navigation.css">
-    <link rel="stylesheet" href="/styles/dashboard.css">
+    <link rel="stylesheet" href="/styles/design-system.css">
+    <link rel="stylesheet" href="/styles/shared.css">
 </head>
-<body>
-    <nav class="site-nav" role="navigation" aria-label="Main navigation">
-        <div class="nav-container">
-            <a href="/" class="nav-brand" aria-label="CATS Home">
-                <span>CATS</span>
-            </a>
-            <ul class="nav-links">
-                <li><a href="/" class="nav-link active" aria-current="page">Dashboard</a></li>
-                <li><a href="/reports/" class="nav-link">Reports</a></li>
-            </ul>
-        </div>
-    </nav>
+<body class="page-container">
+    <!-- Skip Links -->
+    <div class="skip-links">
+        <a href="#main-content" class="skip-links__link">Skip to main content</a>
+    </div>
     
-    <div class="container">
-        <div class="header">
-            <h1>{{pageTitle}}</h1>
-            <p>{{pageDescription}}</p>
+    <!-- Site Header -->
+    <header class="site-header" role="banner">
+        <div class="site-header__container">
+            <a href="/" class="site-header__brand" aria-label="CATS Home">
+                <div class="site-header__logo">
+                    <span>C</span>
+                </div>
+                <h1 class="site-header__title">
+                    CATS
+                    <span class="site-header__subtitle">Accessibility Testing</span>
+                </h1>
+            </a>
+            
+            <nav class="site-header__nav">
+                <div id="nav-main" class="main-nav main-nav--horizontal" role="navigation" aria-label="Main navigation">
+                    <ul class="main-nav__list">
+                        <li class="main-nav__item">
+                            <a href="/" class="main-nav__link main-nav__link--active" aria-current="page">Dashboard</a>
+                        </li>
+                        <li class="main-nav__item">
+                            <a href="/reports/" class="main-nav__link">Reports</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+            <div class="site-header__utilities">
+                <!-- Future: user menu, settings, etc. -->
+            </div>
         </div>
-        
-        <main>
-            <div class="grid">
+    </header>
+    
+    <!-- Main Content Area -->
+    <main id="main-content" class="page-main">
+        <div class="page-main__container">
+            
+            <!-- Page Header -->
+            <header class="content-section__header">
+                <h1 class="content-section__title">{{pageTitle}}</h1>
+                <p class="content-section__description">{{pageDescription}}</p>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="grid" style="grid-template-columns: 1fr 1fr; gap: var(--space-6);">
+                
+                <!-- Start New Crawl Card -->
                 <div class="card">
-                    <h2>Start New Crawl</h2>
-                    <form id="crawlForm" action="/crawl" method="POST">
-                        <div class="form-group">
-                            <label for="url">Website URL:</label>
-                            <input type="url" id="url" name="url" required placeholder="https://example.com">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="wcagVersion">WCAG Version:</label>
-                            <select id="wcagVersion" name="wcagVersion">
-                                <option value="2.1" selected>WCAG 2.1 (Default)</option>
-                                <option value="2.0">WCAG 2.0</option>
-                                <option value="2.2">WCAG 2.2 (Latest)</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="wcagLevel">WCAG Level:</label>
-                            <select id="wcagLevel" name="wcagLevel">
+                    <div class="card-header">
+                        <h2 class="card-title">Start New Crawl</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="crawl-form" action="/crawl" method="POST">
+                            <div class="form-group">
+                                <label for="url" class="form-label">Website URL:</label>
+                                <input type="url" id="url" name="url" class="form-control" required placeholder="https://example.com">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="wcagVersion" class="form-label">WCAG Version:</label>
+                                <select id="wcagVersion" name="wcagVersion" class="form-control">
+                                    <option value="2.1" selected>WCAG 2.1 (Default)</option>
+                                    <option value="2.0">WCAG 2.0</option>
+                                    <option value="2.2">WCAG 2.2 (Latest)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="wcagLevel" class="form-label">WCAG Level:</label>
+                                <select id="wcagLevel" name="wcagLevel" class="form-control">
                                 <option value="A">Level A (Basic)</option>
                                 <option value="AA" selected>Level AA (Standard)</option>
                                 <option value="AAA">Level AAA (Enhanced)</option>

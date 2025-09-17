@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design System Integration Example</title>
+  <!-- Include compiled CSS -->
+  <link rel="stylesheet" href="path/to/compiled/styles.css">
+</head>
+<body>
+  <!-- Use design system classes directly -->
+  <div class="container">
+    <header class="page-header">
+      <h1>My Application</h1>
+      <p class="text-secondary">Using the design system</p>
+    </header>
+    
+    <main class="page-main">
+      <!-- Cards using design system -->
+      <div class="grid grid-cols-1 grid-md-2 gap-4">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Feature 1</h3>
+          </div>
+          <div class="card-body">
+            <p class="card-text">Description of feature 1</p>
+          </div>
+          <div class="card-footer">
+            <div class="card-actions">
+              <button class="btn btn-primary">Learn More</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card card-success">
+          <div class="card-header">
+            <h3 class="card-title">Success Story</h3>
+          </div>
+          <div class="card-body">
+            <p class="card-text">Something went well!</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Form using design system -->
+      <form class="form">
+        <div class="form-section">
+          <h3 class="form-section-title">Contact Information</h3>
+          
+          <div class="form-group">
+            <label class="form-label required" for="name">Name</label>
+            <input type="text" class="form-control" id="name" required>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="email">Email</label>
+            <input type="email" class="form-control" id="email">
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="button" class="btn btn-secondary">Cancel</button>
+        </div>
+      </form>
+    </main>
+  </div>
+</body>
+</html>
