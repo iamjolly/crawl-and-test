@@ -69,27 +69,27 @@
     cursor: default;
   }
   
-  // Invalid state
-  &:invalid,
-  &.is-invalid {
-    border-color: var(--color-danger);
-    
-    &:focus {
-      border-color: var(--color-danger);
-      box-shadow: 0 0 0 2px var(--color-danger);
-    }
-  }
+  // Invalid state - DISABLED for custom validation
+  // &:invalid,
+  // &.is-invalid {
+  //   border-color: var(--color-danger);
+  //   
+  //   &:focus {
+  //     border-color: var(--color-danger);
+  //     box-shadow: 0 0 0 2px var(--color-danger);
+  //   }
+  // }
   
-  // Valid state
-  &:valid:not(:placeholder-shown),
-  &.is-valid {
-    border-color: var(--color-success);
-    
-    &:focus {
-      border-color: var(--color-success);
-      box-shadow: 0 0 0 2px var(--color-success);
-    }
-  }
+  // Valid state - DISABLED for custom validation
+  // &:valid:not(:placeholder-shown),
+  // &.is-valid {
+  //   border-color: var(--color-success);
+  //   
+  //   &:focus {
+  //     border-color: var(--color-success);
+  //     box-shadow: 0 0 0 2px var(--color-success);
+  //   }
+  // }
 }
 
 // ==========================================================================

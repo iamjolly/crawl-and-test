@@ -56,83 +56,105 @@
             </header>
 
             <!-- Dashboard Content -->
-            <div class="grid" style="grid-template-columns: 1fr 1fr; gap: var(--space-6);">
+            <div class="dashboard-layout">
                 
-                <!-- Start New Crawl Card -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Start New Crawl</h2>
-                    </div>
-                    <div class="card-body">
-                        <form id="crawl-form" action="/crawl" method="POST">
-                            <div class="form-group">
-                                <label for="url" class="form-label">Website URL:</label>
-                                <input type="url" id="url" name="url" class="form-control" required placeholder="https://example.com">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="wcagVersion" class="form-label">WCAG Version:</label>
-                                <select id="wcagVersion" name="wcagVersion" class="form-control">
-                                    <option value="2.1" selected>WCAG 2.1 (Default)</option>
-                                    <option value="2.0">WCAG 2.0</option>
-                                    <option value="2.2">WCAG 2.2 (Latest)</option>
+                <!-- Start New Crawl Section -->
+                <section class="dashboard-layout__form" aria-labelledby="crawl-form-title">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 id="crawl-form-title" class="card-title">Start New Crawl</h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="crawl-form" action="/crawl" method="POST">
+                                <div class="form-group">
+                                    <label for="url" class="form-label">Website URL (required)</label>
+                                    <input type="text" id="url" name="url" class="form-control" required placeholder="https://example.com" aria-describedby="url-help">
+                                    <small id="url-help" class="form-text">Enter the full URL of the website you want to test for accessibility</small>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="wcagVersion" class="form-label">WCAG Version</label>
+                                    <select id="wcagVersion" name="wcagVersion" class="form-control" aria-describedby="wcag-version-help">
+                                        <option value="2.1" selected>WCAG 2.1 (Default)</option>
+                                        <option value="2.0">WCAG 2.0</option>
+                                        <option value="2.2">WCAG 2.2 (Latest)</option>
+                                    </select>
+                                    <small id="wcag-version-help" class="form-text">Choose the WCAG version for accessibility evaluation</small>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="wcagLevel" class="form-label">WCAG Level</label>
+                                    <select id="wcagLevel" name="wcagLevel" class="form-control" aria-describedby="wcag-level-help">
+                                    <option value="A">Level A (Basic)</option>
+                                    <option value="AA" selected>Level AA (Standard)</option>
+                                    <option value="AAA">Level AAA (Enhanced)</option>
                                 </select>
+                                <small id="wcag-level-help" class="form-text">AA is recommended for most websites</small>
                             </div>
                             
                             <div class="form-group">
-                                <label for="wcagLevel" class="form-label">WCAG Level:</label>
-                                <select id="wcagLevel" name="wcagLevel" class="form-control">
-                                <option value="A">Level A (Basic)</option>
-                                <option value="AA" selected>Level AA (Standard)</option>
-                                <option value="AAA">Level AAA (Enhanced)</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="maxDepth">Crawl Depth:</label>
-                            <select id="maxDepth" name="maxDepth">
-                                <option value="1">1 - Homepage only</option>
-                                <option value="2" selected>2 - Homepage + linked pages</option>
-                                <option value="3">3 - Deep crawl (recommended)</option>
-                                <option value="4">4 - Very deep crawl</option>
-                                <option value="5">5 - Maximum depth</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="maxPages">Max Pages to Scan:</label>
-                            <select id="maxPages" name="maxPages">
-                                <option value="5">5 - Quick test</option>
-                                <option value="10">10 - Small site</option>
-                                <option value="25">25 - Medium site</option>
-                                <option value="50" selected>50 - Default</option>
-                                <option value="100">100 - Large site</option>
-                                <option value="250">250 - Very large site</option>
-                                <option value="0">Unlimited - Scan all pages</option>
-                            </select>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary">Start Crawl</button>
-                    </form>
-                </div>
-                
-                <div class="card">
-                    <h2>Active Jobs</h2>
-                    <div id="jobsSection" class="jobs-section">
-                        <div id="jobsList"></div>
-                        <p id="noJobsMessage" class="no-reports">No active crawls</p>
+                                <label for="maxDepth" class="form-label">Crawl Depth</label>
+                                <select id="maxDepth" name="maxDepth" class="form-control" aria-describedby="depth-help">
+                                    <option value="1">1 - Homepage only</option>
+                                    <option value="2" selected>2 - Homepage + linked pages</option>
+                                    <option value="3">3 - Deep crawl (recommended)</option>
+                                    <option value="4">4 - Very deep crawl</option>
+                                    <option value="5">5 - Maximum depth</option>
+                                </select>
+                                <small id="depth-help" class="form-text">How many levels deep to follow links</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="maxPages" class="form-label">Max Pages to Scan</label>
+                                <select id="maxPages" name="maxPages" class="form-control" aria-describedby="pages-help">
+                                    <option value="5">5 - Quick test</option>
+                                    <option value="10">10 - Small site</option>
+                                    <option value="25">25 - Medium site</option>
+                                    <option value="50" selected>50 - Default</option>
+                                    <option value="100">100 - Large site</option>
+                                    <option value="250">250 - Very large site</option>
+                                    <option value="0">Unlimited - Scan all pages</option>
+                                </select>
+                                <small id="pages-help" class="form-text">Limit the number of pages to scan</small>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Start Crawl</button>
+                        </form>
                     </div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <h2>Generated Reports 
-                    <button onclick="updateReports()" class="btn btn-refresh" title="Refresh reports list">↻</button>
-                </h2>
-                <div id="reportsSection" class="reports-section">
-                    <div id="reportsList"></div>
-                    <p id="noReportsMessage" class="no-reports">No reports generated yet. Start a crawl to create your first report!</p>
-                </div>
+                </section>
+                
+                <!-- Active Jobs Section -->
+                <section class="dashboard-layout__jobs" aria-labelledby="jobs-title">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 id="jobs-title" class="card-title">Active Jobs</h2>
+                        </div>
+                        <div class="card-body">
+                            <div id="jobsSection" class="jobs-section" role="region" aria-live="polite" aria-label="Active crawling jobs">
+                                <div id="jobsList"></div>
+                                <p id="noJobsMessage" class="no-reports">No active crawls</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Generated Reports Section -->
+                <section class="dashboard-layout__reports" aria-labelledby="reports-title">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 id="reports-title" class="card-title">
+                                Generated Reports 
+                                <button onclick="updateReports()" class="btn-refresh" title="Refresh reports list" aria-label="Refresh reports list">↻</button>
+                            </h2>
+                        </div>
+                        <div class="card-body">
+                            <div id="reportsSection" class="reports-section" role="region" aria-live="polite" aria-label="Generated accessibility reports">
+                                <div id="reportsList"></div>
+                                <p id="noReportsMessage" class="no-reports">No reports generated yet. Start a crawl to create your first report!</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
         </main>
     </div>
@@ -151,8 +173,8 @@
                         noJobsMessage.style.display = 'block';
                     } else {
                         noJobsMessage.style.display = 'none';
-                        jobsList.innerHTML = jobs.map(job => `
-                            <div class="job-item">
+                        jobsList.innerHTML = jobs.map((job, index) => `
+                            <div class="job-item" id="job-${job.id || Date.now() + index}" tabindex="-1">
                                 <div>
                                     <strong>${job.url}</strong>
                                     <br>
@@ -165,6 +187,57 @@
                 })
                 .catch(err => console.error('Error fetching jobs:', err));
         }
+        
+        // URL validation and formatting
+        function normalizeUrl(url) {
+            if (!url) return '';
+            
+            // Remove whitespace
+            url = url.trim();
+            
+            // If no protocol, add https://
+            if (url && !url.match(/^https?:\/\//i)) {
+                url = 'https://' + url;
+            }
+            
+            return url;
+        }
+        
+        // Validate URL format
+        function isValidUrl(url) {
+            if (!url) return false;
+            
+            try {
+                const normalizedUrl = normalizeUrl(url);
+                const urlObj = new URL(normalizedUrl);
+                return ['http:', 'https:'].includes(urlObj.protocol);
+            } catch (e) {
+                return false;
+            }
+        }
+        
+        // Handle URL field blur event
+        const urlField = document.getElementById('url');
+        urlField.addEventListener('blur', function() {
+            const normalizedUrl = normalizeUrl(this.value);
+            if (normalizedUrl !== this.value) {
+                this.value = normalizedUrl;
+            }
+        });
+        
+        // Add real-time validation feedback
+        urlField.addEventListener('input', function() {
+            const isValid = isValidUrl(this.value);
+            const submitBtn = document.querySelector('#crawl-form button[type="submit"]');
+            
+            if (this.value && !isValid) {
+                this.style.borderColor = 'var(--color-danger)';
+                submitBtn.disabled = true;
+            } else {
+                this.style.borderColor = 'var(--color-gray-600)';
+                submitBtn.disabled = false;
+            }
+        });
         
         // Update reports display
         function updateReports() {
@@ -208,11 +281,24 @@
         updateReports(); // Initial load
         
         // Handle form submission
-        document.getElementById('crawlForm').addEventListener('submit', function(e) {
+        document.getElementById('crawl-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const formData = new FormData(this);
             const submitBtn = this.querySelector('button[type="submit"]');
+            
+            // Normalize and validate URL before submitting
+            const urlField = document.getElementById('url');
+            const normalizedUrl = normalizeUrl(urlField.value);
+            
+            if (!isValidUrl(normalizedUrl)) {
+                alert('Please enter a valid website URL (e.g., example.com or https://example.com)');
+                urlField.focus();
+                return;
+            }
+            
+            urlField.value = normalizedUrl;
+            formData.set('url', normalizedUrl);
             
             submitBtn.disabled = true;
             submitBtn.textContent = 'Starting...';
@@ -235,7 +321,26 @@
                 if (data.success) {
                     alert('Crawl started successfully! Job ID: ' + data.jobId);
                     this.reset();
-                    updateJobs(); // Refresh job list
+                    
+                    // Update jobs list and focus on new job
+                    setTimeout(() => {
+                        updateJobs();
+                        // Focus on the newly created job after a short delay to ensure it's rendered
+                        setTimeout(() => {
+                            const newJobElement = document.querySelector('#jobsList .job-item:first-child');
+                            if (newJobElement) {
+                                newJobElement.focus();
+                                // Announce to screen readers
+                                const announcement = document.createElement('div');
+                                announcement.setAttribute('aria-live', 'polite');
+                                announcement.textContent = 'New crawl job has been started and is now visible in the Active Jobs section.';
+                                announcement.className = 'sr-only';
+                                document.body.appendChild(announcement);
+                                setTimeout(() => document.body.removeChild(announcement), 1000);
+                            }
+                        }, 500);
+                    }, 100);
+                    
                     // Reports will auto-update when the crawl completes
                 } else {
                     alert('Error starting crawl: ' + data.error);
