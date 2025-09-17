@@ -17,6 +17,10 @@
 const fs = require('fs');
 const path = require('path');
 const config = require('../core/config');
+const WcagLinkMapper = require('../utils/wcag-link-mapper');
+
+// Initialize WCAG Link Mapper for W3C documentation links
+const wcagMapper = new WcagLinkMapper();
 
 // Template and asset loading utilities
 function loadTemplate(templateName) {
@@ -143,6 +147,33 @@ function generateIssuesSection(title, issues, type) {
         <div class="issue-help">
           <strong>Help:</strong> <a href="${issue.helpUrl}" target="_blank">${escapeHtml(issue.help)}</a>
         </div>`;
+    
+    // Add W3C documentation links if available
+    if (wcagMapper.isAvailable() && issue.tags) {
+      const w3cLinks = wcagMapper.getW3cLinksForRule(issue.tags);
+      if (w3cLinks.length > 0) {
+        content += `
+        <div class="w3c-links" style="margin-top: 12px; padding: 10px; background-color: #f8f9fa; border-left: 3px solid #004085; border-radius: 3px;">
+          <h5 style="margin: 0 0 8px 0; font-size: 14px;">W3C WCAG Documentation</h5>`;
+        
+        w3cLinks.forEach(link => {
+          content += `
+          <ul style="margin: 4px 0; padding: 0; list-style: none;">`;
+          
+          if (link.references.quickref) {
+            content += `<li style="margin: 2px 0;"><a href="${link.references.quickref.url}" target="_blank" style="color: #004085;">How to Meet ${link.criterion.id} - ${escapeHtml(link.criterion.title)} (Level ${link.criterion.level})</a></li>`;
+          }
+          
+          if (link.references.understanding) {
+            content += `<li style="margin: 2px 0;"><a href="${link.references.understanding.url}" target="_blank" style="color: #004085;">Understanding ${link.criterion.id} - ${escapeHtml(link.criterion.title)} (Level ${link.criterion.level})</a></li>`;
+          }
+          
+          content += `</ul>`;
+        });
+        
+        content += `</div>`;
+      }
+    }
     
     if (issue.nodes && issue.nodes.length > 0) {
       const elementText = type === 'warning' ? 'Elements Needing Review' : 'Affected Elements';
