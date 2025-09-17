@@ -65,11 +65,12 @@
                             <h2 id="crawl-form-title" class="card-title">Start New Crawl</h2>
                         </div>
                         <div class="card-body">
-                            <form id="crawl-form" action="/crawl" method="POST">
+                            <form id="crawl-form" action="/crawl" method="POST" novalidate>
                                 <div class="form-group">
                                     <label for="url" class="form-label">Website URL (required)</label>
-                                    <input type="text" id="url" name="url" class="form-control" required placeholder="https://example.com" aria-describedby="url-help">
                                     <small id="url-help" class="form-text">Enter the full URL of the website you want to test for accessibility</small>
+                                    <div id="url-error" class="error-message" tabindex="-1" style="display: none;"></div>
+                                    <input type="url" id="url" name="url" class="form-control" required placeholder="https://example.com" aria-describedby="url-help url-error">
                                 </div>
                                 
                                 <div class="form-group">
@@ -188,54 +189,249 @@
                 .catch(err => console.error('Error fetching jobs:', err));
         }
         
-        // URL validation and formatting
+        // Enhanced URL validation and formatting
         function normalizeUrl(url) {
             if (!url) return '';
             
-            // Remove whitespace
-            url = url.trim();
+            // Remove whitespace and common formatting issues
+            const trimmedUrl = url.trim().replace(/\s+/g, '');
+            const lowerUrl = trimmedUrl.toLowerCase();
             
-            // If no protocol, add https://
-            if (url && !url.match(/^https?:\/\//i)) {
-                url = 'https://' + url;
+            // If no protocol, add appropriate protocol
+            if (lowerUrl && !lowerUrl.match(/^https?:\/\//i)) {
+                // Use http:// for localhost, https:// for everything else
+                if (lowerUrl.startsWith('localhost')) {
+                    return 'http://' + lowerUrl;
+                } else {
+                    return 'https://' + lowerUrl;
+                }
             }
             
-            return url;
+            return lowerUrl;
         }
         
-        // Validate URL format
+        // Enhanced URL validation with comprehensive checks
         function isValidUrl(url) {
             if (!url) return false;
             
             try {
                 const normalizedUrl = normalizeUrl(url);
                 const urlObj = new URL(normalizedUrl);
-                return ['http:', 'https:'].includes(urlObj.protocol);
+                
+                // Check protocol
+                if (!['http:', 'https:'].includes(urlObj.protocol)) {
+                    return false;
+                }
+                
+                // Check hostname exists and is valid
+                // Note: urlObj.hostname excludes port number, so localhost:3000 becomes just "localhost"
+                if (!urlObj.hostname || urlObj.hostname.length === 0) {
+                    return false;
+                }
+                
+                const hostname = urlObj.hostname;
+                
+                // Special case: localhost is always valid (ports are automatically handled)
+                if (hostname === 'localhost') {
+                    return true;
+                }
+                
+                // Check if it's a valid IP address
+                const ipPattern = /^(\d{1,3}\.){3}\d{1,3}$/;
+                if (ipPattern.test(hostname)) {
+                    // Validate IP address ranges
+                    const parts = hostname.split('.').map(Number);
+                    return parts.every(part => part >= 0 && part <= 255);
+                }
+                
+                // For domain names, must contain at least one dot
+                if (!hostname.includes('.')) {
+                    return false;
+                }
+                
+                // Check for valid domain characters (letters, numbers, hyphens, dots only)
+                const domainPattern = /^[a-zA-Z0-9.-]+$/;
+                if (!domainPattern.test(hostname)) {
+                    return false;
+                }
+                
+                // Check for valid domain structure
+                const parts = hostname.split('.');
+                
+                // Must have at least 2 parts (domain + TLD)
+                if (parts.length < 2) {
+                    return false;
+                }
+                
+                // Each part must be valid
+                for (let part of parts) {
+                    // No empty parts
+                    if (part.length === 0) {
+                        return false;
+                    }
+                    
+                    // Can't start or end with hyphen
+                    if (part.startsWith('-') || part.endsWith('-')) {
+                        return false;
+                    }
+                    
+                    // Must contain at least one character
+                    if (part.length === 0) {
+                        return false;
+                    }
+                }
+                
+                // TLD (last part) must be at least 2 characters and contain only letters
+                const tld = parts[parts.length - 1];
+                if (tld.length < 2 || !/^[a-zA-Z]+$/.test(tld)) {
+                    return false;
+                }
+                
+                // Domain name (second to last part) must be valid
+                const domain = parts[parts.length - 2];
+                if (domain.length === 0) {
+                    return false;
+                }
+                
+                return true;
             } catch (e) {
                 return false;
             }
         }
         
-        // Handle URL field blur event
+        // Get detailed validation feedback for user
+        function getUrlValidationMessage(url) {
+            if (!url || url.trim() === '') {
+                return { isValid: false, message: 'Website URL is required' };
+            }
+            
+            const normalizedUrl = normalizeUrl(url);
+            
+            try {
+                const urlObj = new URL(normalizedUrl);
+                
+                if (!['http:', 'https:'].includes(urlObj.protocol)) {
+                    return { isValid: false, message: 'URL must use http:// or https:// protocol' };
+                }
+                
+                if (!urlObj.hostname) {
+                    return { isValid: false, message: 'URL must include a valid domain name' };
+                }
+                
+                const hostname = urlObj.hostname;
+                
+                // Special case: localhost
+                if (hostname === 'localhost') {
+                    return { isValid: true, message: 'Valid URL' };
+                }
+                
+                // Check if it's an IP address
+                const ipPattern = /^(\d{1,3}\.){3}\d{1,3}$/;
+                if (ipPattern.test(hostname)) {
+                    const parts = hostname.split('.').map(Number);
+                    if (parts.every(part => part >= 0 && part <= 255)) {
+                        return { isValid: true, message: 'Valid URL' };
+                    } else {
+                        return { isValid: false, message: 'Invalid IP address format' };
+                    }
+                }
+                
+                // Domain validation
+                if (!hostname.includes('.')) {
+                    return { isValid: false, message: 'Domain must include a top-level domain (e.g., .com, .org)' };
+                }
+                
+                // Check for invalid characters
+                const domainPattern = /^[a-zA-Z0-9.-]+$/;
+                if (!domainPattern.test(hostname)) {
+                    return { isValid: false, message: 'Domain contains invalid characters. Use only letters, numbers, hyphens, and dots.' };
+                }
+                
+                const parts = hostname.split('.');
+                
+                if (parts.length < 2) {
+                    return { isValid: false, message: 'Please enter a complete domain name (e.g., example.com)' };
+                }
+                
+                // Check for empty parts or invalid structure
+                for (let part of parts) {
+                    if (part.length === 0) {
+                        return { isValid: false, message: 'Invalid domain format - check for double dots or missing parts' };
+                    }
+                    if (part.startsWith('-') || part.endsWith('-')) {
+                        return { isValid: false, message: 'Domain parts cannot start or end with hyphens' };
+                    }
+                }
+                
+                // Check TLD
+                const tld = parts[parts.length - 1];
+                if (tld.length < 2) {
+                    return { isValid: false, message: 'Top-level domain must be at least 2 characters long' };
+                }
+                
+                if (!/^[a-zA-Z]+$/.test(tld)) {
+                    return { isValid: false, message: 'Top-level domain must contain only letters' };
+                }
+                
+                return { isValid: true, message: 'Valid URL' };
+                
+            } catch (e) {
+                return { isValid: false, message: 'Please enter a valid URL format (e.g., example.com)' };
+            }
+        }
+        
+        // Enhanced accessible URL validation
+        function validateUrlField() {
+            const urlField = document.getElementById('url');
+            const errorElement = document.getElementById('url-error');
+            const validation = getUrlValidationMessage(urlField.value);
+            
+            if (!validation.isValid && urlField.value.trim()) {
+                // Show error state
+                errorElement.textContent = validation.message;
+                errorElement.style.display = 'block';
+                urlField.setAttribute('aria-invalid', 'true');
+                urlField.classList.add('is-invalid');
+                errorElement.focus(); // Focus the error for screen readers
+                return false;
+            } else {
+                // Clear error state
+                errorElement.style.display = 'none';
+                urlField.removeAttribute('aria-invalid');
+                urlField.classList.remove('is-invalid');
+                return true;
+            }
+        }
+
+        // Initialize form validation
         const urlField = document.getElementById('url');
+        const crawlForm = document.getElementById('crawl-form');
+        
+        // Validate on blur (when user leaves field)
         urlField.addEventListener('blur', function() {
-            const normalizedUrl = normalizeUrl(this.value);
-            if (normalizedUrl !== this.value) {
-                this.value = normalizedUrl;
+            if (this.value.trim()) {
+                const normalizedUrl = normalizeUrl(this.value);
+                if (normalizedUrl !== this.value) {
+                    this.value = normalizedUrl;
+                }
+                validateUrlField();
             }
         });
         
-        // Add real-time validation feedback
-        urlField.addEventListener('input', function() {
-            const isValid = isValidUrl(this.value);
-            const submitBtn = document.querySelector('#crawl-form button[type="submit"]');
-            
-            if (this.value && !isValid) {
-                this.style.borderColor = 'var(--color-danger)';
-                submitBtn.disabled = true;
-            } else {
-                this.style.borderColor = 'var(--color-gray-600)';
-                submitBtn.disabled = false;
+        // Validate on form submission
+        crawlForm.addEventListener('submit', function(e) {
+            const isValid = validateUrlField();
+            if (!isValid || !urlField.value.trim()) {
+                e.preventDefault();
+                if (!urlField.value.trim()) {
+                    const errorElement = document.getElementById('url-error');
+                    errorElement.textContent = 'Please enter a website URL';
+                    errorElement.style.display = 'block';
+                    urlField.setAttribute('aria-invalid', 'true');
+                    urlField.classList.add('is-invalid');
+                    errorElement.focus();
+                }
+                return false;
             }
         });
         
@@ -280,28 +476,46 @@
         setInterval(updateReports, 30000);
         updateReports(); // Initial load
         
-        // Handle form submission
+        // Enhanced form submission with comprehensive validation
         document.getElementById('crawl-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const formData = new FormData(this);
             const submitBtn = this.querySelector('button[type="submit"]');
-            
-            // Normalize and validate URL before submitting
             const urlField = document.getElementById('url');
-            const normalizedUrl = normalizeUrl(urlField.value);
             
-            if (!isValidUrl(normalizedUrl)) {
-                alert('Please enter a valid website URL (e.g., example.com or https://example.com)');
+            // Perform comprehensive validation before submission
+            const validation = getUrlValidationMessage(urlField.value);
+            
+            if (!validation.isValid) {
+                // Show validation error and focus the field
+                validateUrlField(); // Update UI to show error
                 urlField.focus();
+                
+                // Announce error for screen readers
+                const errorElement = document.getElementById('url-error');
+                if (errorElement) {
+                    errorElement.setAttribute('aria-live', 'assertive');
+                    setTimeout(() => {
+                        errorElement.setAttribute('aria-live', 'polite');
+                    }, 1000);
+                }
                 return;
             }
             
+            // Normalize URL and proceed with submission
+            const normalizedUrl = normalizeUrl(urlField.value);
             urlField.value = normalizedUrl;
             formData.set('url', normalizedUrl);
             
+            // Disable form and show loading state
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Starting...';
+            submitBtn.textContent = 'Starting Crawl...';
+            urlField.disabled = true;
+            
+            // Disable all form inputs during submission
+            const allInputs = this.querySelectorAll('input, select, button');
+            allInputs.forEach(input => input.disabled = true);
             
             // Convert FormData to URLSearchParams for proper server parsing
             const params = new URLSearchParams();
@@ -319,8 +533,15 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Crawl started successfully! Job ID: ' + data.jobId);
+                    // Success: show success message and reset form
+                    const successMessage = `Crawl started successfully! Job ID: ${data.jobId}`;
+                    
+                    // Show success notification
+                    showNotification(successMessage, 'success');
+                    
+                    // Reset form to clean state
                     this.reset();
+                    validateUrlField(); // Clear any validation messages
                     
                     // Update jobs list and focus on new job
                     setTimeout(() => {
@@ -331,29 +552,120 @@
                             if (newJobElement) {
                                 newJobElement.focus();
                                 // Announce to screen readers
-                                const announcement = document.createElement('div');
-                                announcement.setAttribute('aria-live', 'polite');
-                                announcement.textContent = 'New crawl job has been started and is now visible in the Active Jobs section.';
-                                announcement.className = 'sr-only';
-                                document.body.appendChild(announcement);
-                                setTimeout(() => document.body.removeChild(announcement), 1000);
+                                announceToScreenReader('New crawl job has been started and is now visible in the Active Jobs section.');
                             }
                         }, 500);
                     }, 100);
                     
                     // Reports will auto-update when the crawl completes
                 } else {
-                    alert('Error starting crawl: ' + data.error);
+                    // Error: show error message and keep form data
+                    const errorMessage = `Error starting crawl: ${data.error || 'Unknown error'}`;
+                    showNotification(errorMessage, 'error');
                 }
             })
             .catch(err => {
-                alert('Error starting crawl: ' + err.message);
+                // Network or other error
+                const errorMessage = `Failed to start crawl: ${err.message || 'Network error'}`;
+                showNotification(errorMessage, 'error');
+                console.error('Crawl submission error:', err);
             })
             .finally(() => {
-                submitBtn.disabled = false;
+                // Re-enable form regardless of success or failure
+                const allInputs = this.querySelectorAll('input, select, button');
+                allInputs.forEach(input => input.disabled = false);
+                
                 submitBtn.textContent = 'Start Crawl';
+                urlField.disabled = false;
             });
         });
+        
+        // Utility function to show notifications
+        function showNotification(message, type = 'info') {
+            // Remove any existing notification
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification notification--${type}`;
+            notification.setAttribute('role', 'alert');
+            notification.setAttribute('aria-live', 'assertive');
+            notification.innerHTML = `
+                <span class="notification__message">${message}</span>
+                <button class="notification__close" type="button" aria-label="Close notification">&times;</button>
+            `;
+            
+            // Add notification styles
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'error' ? 'var(--color-danger)' : 'var(--color-success)'};
+                color: white;
+                padding: var(--space-3) var(--space-4);
+                border-radius: var(--radius-md);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 1000;
+                max-width: 400px;
+                display: flex;
+                align-items: center;
+                gap: var(--space-2);
+            `;
+            
+            // Style the close button
+            const closeBtn = notification.querySelector('.notification__close');
+            closeBtn.style.cssText = `
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5em;
+                cursor: pointer;
+                padding: 0;
+                margin-left: auto;
+            `;
+            
+            // Add close functionality
+            closeBtn.addEventListener('click', () => notification.remove());
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+            
+            // Add to page
+            document.body.appendChild(notification);
+        }
+        
+        // Utility function for screen reader announcements
+        function announceToScreenReader(message) {
+            const announcement = document.createElement('div');
+            announcement.setAttribute('aria-live', 'polite');
+            announcement.textContent = message;
+            announcement.className = 'sr-only';
+            announcement.style.cssText = `
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border: 0;
+            `;
+            
+            document.body.appendChild(announcement);
+            setTimeout(() => {
+                if (announcement.parentElement) {
+                    document.body.removeChild(announcement);
+                }
+            }, 1000);
+        }
     </script>
 </body>
 </html>
