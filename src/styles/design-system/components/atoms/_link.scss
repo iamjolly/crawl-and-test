@@ -38,11 +38,6 @@
     color: var(--color-primary-light);
   }
   
-  // Visited state
-  &:visited {
-    color: var(--color-primary);
-  }
-  
   // Disabled state
   &:disabled,
   &.disabled {

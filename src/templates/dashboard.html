@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}}</title>
     <link rel="stylesheet" href="/styles/design-system.css">
-    <link rel="stylesheet" href="/styles/shared.css">
 </head>
 <body class="page-container">
     <!-- Skip Links -->
@@ -119,7 +118,7 @@
                                 <small id="pages-help" class="form-text">Limit the number of pages to scan</small>
                             </div>
                             
-                            <button type="submit" class="btn btn-primary">Start Crawl</button>
+                            <button type="submit" class="btn-primary">Start Crawl</button>
                         </form>
                     </div>
                 </section>
@@ -510,8 +509,8 @@
                                     <h3>${dir.domain}</h3>
                                     <p>${dir.reportCount} report(s) available</p>
                                     ${dir.lastReport ? `
-                                        <a href="${lastReportUrl}" class="btn btn-view">View Latest Report</a>
-                                        <a href="/browse/${dir.domain}" class="btn btn-browse">Browse All</a>
+                                        <a href="${lastReportUrl}" class="btn-view">View Latest Report</a>
+                                        <a href="/browse/${dir.domain}" class="btn-browse">Browse All</a>
                                     ` : '<p class="no-reports">No reports yet</p>'}
                                 </div>
                             `;

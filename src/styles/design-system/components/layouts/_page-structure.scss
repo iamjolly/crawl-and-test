@@ -567,6 +567,11 @@
     transition: top 0.2s ease-in-out;
     box-shadow: var(--shadow-lg);
     
+    &:visited {
+      background-color: var(--color-primary);
+      color: var(--color-text-inverse);
+    }
+    
     &:focus {
       position: static;
       top: 0;

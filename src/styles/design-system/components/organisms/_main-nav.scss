@@ -154,21 +154,10 @@
     color: var(--color-primary) !important; // Override visited state
   }
   
-  // Visited state - maintain readability
+  // Visited state - maintain navigation styling
   &:visited {
     color: var(--color-text-inverse);
-    
-    // Ensure visited hovered links have proper contrast
-    &:hover {
-      background: var(--color-blue-50);
-      color: var(--color-primary) !important;
-    }
-    
-    // Ensure visited focused links have proper contrast
-    &:focus-visible {
-      color: var(--color-primary) !important;
-      background: var(--color-white);
-    }
+    text-decoration: none;
   }
   
   // Active state - ensure high contrast
@@ -188,20 +177,6 @@
       background: var(--color-warning);
     }
     
-    // Ensure visited active links remain readable
-    &:visited {
-      background: var(--color-white);
-      color: var(--color-primary);
-      
-      // Ensure visited active focused links have proper contrast
-      &:focus-visible {
-        outline: 3px solid var(--color-focus);
-        outline-offset: -3px;
-        background: var(--color-blue-50);
-        color: var(--color-primary) !important;
-      }
-    }
-    
     // Ensure hover on active links maintains contrast
     &:hover {
       background: var(--color-blue-50);
@@ -213,6 +188,12 @@
       outline: 3px solid var(--color-focus);
       outline-offset: -3px;
       background: var(--color-blue-50);
+      color: var(--color-primary);
+    }
+    
+    // Ensure visited active links maintain proper styling
+    &:visited {
+      background: var(--color-white);
       color: var(--color-primary);
     }
   }
