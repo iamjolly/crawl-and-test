@@ -45,8 +45,8 @@ npm start -- -s https://example.com --html
 # Or use the crawler directly
 node src/core/crawler.js -s https://example.com --html
 
-# View reports at http://localhost:3001
-npm run serve:reports
+# View reports at http://localhost:3000
+npm run serve
 ```
 
 ## Prerequisites
@@ -91,7 +91,7 @@ The web dashboard provides a user-friendly interface for managing accessibility 
 ```bash
 npm run dev
 # or
-npm run serve:dashboard
+npm run serve
 ```
 
 **URL**: http://localhost:3000
@@ -157,11 +157,13 @@ node src/core/crawler.js -s https://example.com --wcag-version 2.2 --wcag-level 
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start web dashboard and report server (port 3000) |
-| `npm run serve` | Alternative command to start dashboard |
-| `npm run build` | Generate HTML reports from JSON data |
+| `npm run dev` | Start development workflow: watch SASS + serve dashboard (port 3000) |
+| `npm run serve` | Start dashboard server only (port 3000) |
+| `npm run build` | Generate HTML reports from JSON data (development) |
+| `npm run build:prod` | Production build: compile SASS + optimize CSS + generate HTML |
+| `npm run build:domain` | Generate reports for specific domain |
 | `npm run regenerate-html` | Regenerate missing HTML reports |
-| `npm run clean` | Remove all generated reports |
+| `npm run clean` | Remove all generated reports and CSS files |
 | `npm run install-browsers` | Install Playwright browsers |
 
 ## Configuration
@@ -306,6 +308,12 @@ Build all HTML reports from existing JSON data:
 npm run build
 ```
 
+**Production build** (optimized CSS + HTML generation):
+
+```bash
+npm run build:prod
+```
+
 Generate reports for a specific domain:
 
 ```bash
@@ -328,10 +336,11 @@ npm run dev
 
 This starts the complete CATS system at `http://localhost:3000` with integrated report browsing, crawling interface, and report generation.
 
-### Development Scripts
+### Quick Start Commands
 
 - `npm run dev` (or `npm run serve`) - Start the complete CATS dashboard and report system (port 3000)
 - `npm run build` - Generate all HTML reports from existing JSON data
+- `npm run build:prod` - Production build with optimized CSS and HTML generation  
 - `npm run clean` - Clean generated reports
 - `npm run cleanup-old-html` - Remove old HTML files from /reports/, preserving JSON data
 
