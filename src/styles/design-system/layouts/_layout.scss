@@ -373,6 +373,34 @@
 }
 
 // ==========================================================================
+// Page Summary Layout
+// ==========================================================================
+
+.page-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  gap: var(--space-2);
+}
+
+.page-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  margin-top: var(--space-1);
+}
+
+.page-url {
+  font-size: var(--text-body-small);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-1);
+  word-break: break-all;
+  line-height: 1.3;
+}
+
+// ==========================================================================
 // Sidebar Layout
 // ==========================================================================
 

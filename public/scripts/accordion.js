@@ -7,14 +7,17 @@
 function toggleAccordion(contentId, headerId) {
     const content = document.getElementById(contentId);
     const header = document.getElementById(headerId);
+    const accordionItem = header.closest('.accordion-item');
     const isExpanded = header.getAttribute('aria-expanded') === 'true';
     
     // Toggle the content visibility
     if (isExpanded) {
         content.classList.remove('expanded');
+        accordionItem.classList.remove('expanded');
         header.setAttribute('aria-expanded', 'false');
     } else {
         content.classList.add('expanded');
+        accordionItem.classList.add('expanded');
         header.setAttribute('aria-expanded', 'true');
     }
 }
@@ -25,10 +28,12 @@ function expandAll() {
     headers.forEach(header => {
         const contentId = header.getAttribute('aria-controls');
         const content = document.getElementById(contentId);
+        const accordionItem = header.closest('.accordion-item');
         const isExpanded = header.getAttribute('aria-expanded') === 'true';
         
         if (!isExpanded) {
             content.classList.add('expanded');
+            accordionItem.classList.add('expanded');
             header.setAttribute('aria-expanded', 'true');
         }
     });
@@ -40,10 +45,12 @@ function collapseAll() {
     headers.forEach(header => {
         const contentId = header.getAttribute('aria-controls');
         const content = document.getElementById(contentId);
+        const accordionItem = header.closest('.accordion-item');
         const isExpanded = header.getAttribute('aria-expanded') === 'true';
         
         if (isExpanded) {
             content.classList.remove('expanded');
+            accordionItem.classList.remove('expanded');
             header.setAttribute('aria-expanded', 'false');
         }
     });

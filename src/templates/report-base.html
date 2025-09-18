@@ -5,14 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}}</title>
     <link rel="stylesheet" href="/styles/design-system.css">
+    <link rel="stylesheet" href="/styles/report.css">
 </head>
-<body class="page-container">
-    <!-- Skip Links -->
-    <div class="skip-links">
-        <a href="#main-content" class="skip-links__link">Skip to main content</a>
-    </div>
-    
-    <!-- Site Header -->
+<body>
+    <!-- Site Header/Navigation -->
     <header class="site-header" role="banner">
         <div class="site-header__container">
             <a href="/" class="site-header__brand" aria-label="CATS Home">
@@ -26,7 +22,7 @@
             </a>
             
             <nav class="site-header__nav">
-                <div id="nav-main" class="main-nav main-nav--horizontal" role="navigation" aria-label="Main navigation">
+                <div class="main-nav main-nav--horizontal" role="navigation" aria-label="Main navigation">
                     <ul class="main-nav__list">
                         <li class="main-nav__item">
                             <a href="/" class="main-nav__link">Dashboard</a>
@@ -37,38 +33,29 @@
                     </ul>
                 </div>
             </nav>
-            
-            <div class="site-header__utilities">
-                <!-- Future: user menu, settings, etc. -->
-            </div>
         </div>
     </header>
     
     <!-- Breadcrumb Navigation -->
-    <nav id="breadcrumb-nav" class="main-nav main-nav--breadcrumb" aria-label="Breadcrumb">
-        <div class="main-nav__container">
-            <ul class="main-nav__list">
-                <li class="main-nav__item">
-                    <a href="/" class="main-nav__link">Dashboard</a>
-                </li>
-                <li class="main-nav__item">
-                    <a href="/reports/" class="main-nav__link">Reports</a>
-                </li>
-                <li class="main-nav__item">
-                    <span class="main-nav__link main-nav__link--current">{{domain}} Report</span>
-                </li>
-            </ul>
+    <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+        <div class="breadcrumb-nav__container">
+            <ol class="breadcrumb-nav__list">
+                <li><a href="/">Dashboard</a></li>
+                <li><a href="/reports/">Reports</a></li>
+                <li><span class="current">{{domain}} Report</span></li>
+            </ol>
         </div>
     </nav>
     
-    <!-- Main Content Area -->
-    <main id="main-content" class="page-main">
+    <!-- Skip to main content -->
+    <a href="#main-content" class="skip-links__link">Skip to main content</a>
+    
+    <div class="page-main">
         <div class="page-main__container">
-            
-            <!-- Back Navigation -->
+            <!-- Back Button -->
             <div style="margin-bottom: var(--space-4);">
                 <a href="/reports/" class="btn btn-secondary">
-                    <span class="icon" style="margin-right: var(--space-2);">←</span>
+                    <span style="margin-right: var(--space-2);">←</span>
                     Back to Reports
                 </a>
             </div>
@@ -90,19 +77,22 @@
                 </div>
             </header>
 
-            <!-- Report Summary -->
-            <section class="content-section" aria-labelledby="summary-heading">
-                <h2 id="summary-heading" class="sr-only">Report Summary</h2>
-                {{summaryCards}}
-            </section>
+            <main id="main-content">
+                <!-- Summary Section -->
+                <section class="content-section" aria-labelledby="summary-heading">
+                    <h2 id="summary-heading" class="sr-only">Report Summary</h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+                        {{summaryCards}}
+                    </div>
+                </section>
 
-            <!-- Report Content -->
-            <section class="content-section">
-                {{content}}
-            </section>
-            
+                <!-- Report Content -->
+                <section class="content-section">
+                    {{content}}
+                </section>
+            </main>
         </div>
-    </main>
+    </div>
     
     <script src="/scripts/utils.js"></script>
     <script src="/scripts/accordion.js"></script>

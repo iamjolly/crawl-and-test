@@ -50,6 +50,10 @@
           transform: rotate(180deg);
         }
       }
+      
+      .accordion-toggle {
+        transform: rotate(90deg);
+      }
     }
     
     .accordion-content {
@@ -69,6 +73,33 @@
   
   &:hover {
     background-color: var(--color-background-secondary);
+  }
+  
+  // When accordion-header is used as a button (for violations)
+  &[type="button"] {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: var(--space-4) var(--space-5);
+    background: none;
+    border: none;
+    font-family: var(--font-family-primary);
+    font-size: var(--text-ui-large);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-normal);
+    text-align: left;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    
+    &:hover {
+      background-color: var(--color-background-secondary);
+    }
+    
+    &:focus-visible {
+      outline: 2px solid var(--color-primary-focus);
+      outline-offset: -2px;
+    }
   }
 }
 
@@ -144,6 +175,28 @@
     transition: transform 0.2s ease-in-out;
     color: var(--color-text-secondary);
     flex-shrink: 0;
+  }
+  
+  // Toggle arrow (for text-based arrows like ▶)
+  .accordion-toggle {
+    margin-left: var(--space-3);
+    transition: transform 0.2s ease-in-out;
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+    font-size: var(--text-body-large);
+    line-height: 1;
+  }
+}
+
+// Direct child selectors for accordion-header
+.accordion-header {
+  .accordion-toggle {
+    margin-left: var(--space-3);
+    transition: transform 0.2s ease-in-out;
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+    font-size: var(--text-body-large);
+    line-height: 1;
   }
 }
 
@@ -367,6 +420,10 @@
       .violation-title {
         @extend .accordion-title;
         font-weight: var(--font-weight-semibold);
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        flex: none; // Override the flex: 1 from accordion-title
       }
       
       .violation-description {
@@ -396,19 +453,8 @@
       }
     }
     
-    .impact-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: var(--space-1) var(--space-2);
-      border-radius: var(--radius-sm);
-      font-size: var(--text-body-xs);
-      font-weight: var(--font-weight-medium);
-      text-transform: uppercase;
-      letter-spacing: var(--letter-spacing-wide);
-      margin-right: var(--space-3);
-      flex-shrink: 0;
-    }
+    // Impact badges are defined in atoms/badge
+    // This ensures consistency across the design system
   }
   
   .report-accordion-content {

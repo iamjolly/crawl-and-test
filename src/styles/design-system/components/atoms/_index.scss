@@ -11,6 +11,7 @@
 @use "../../foundation" as foundation;
 
 // Import all atomic components
+@use "badge";
 @use "button";
 @use "input";
 @use "link";
@@ -24,6 +25,7 @@
 //
 
 // Re-export all atomic components
+@forward "badge";
 @forward "button";
 @forward "input";  
 @forward "link";

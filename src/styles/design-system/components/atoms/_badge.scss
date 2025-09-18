@@ -1,0 +1,116 @@
+// ==========================================================================
+// Badge Atom Component
+// ==========================================================================
+//
+// Flexible badge component for status indicators, metrics, and labels.
+// Supports multiple variants and semantic color schemes.
+//
+
+// ==========================================================================
+// Base Badge Styles
+// ==========================================================================
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-body-xs);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  gap: var(--space-1);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid transparent;
+}
+
+// ==========================================================================
+// Impact Badge Variants
+// ==========================================================================
+
+.impact-badge {
+  @extend .badge;
+  
+  &.impact-critical {
+    background-color: #ffebee;
+    color: #000;
+    border-color: #ef9a9a;
+    font-weight: 700;
+  }
+  
+  &.impact-serious {
+    background-color: #fff3e0;
+    color: #000;
+    border-color: #ffb74d;
+    font-weight: 700;
+  }
+  
+  &.impact-moderate {
+    background-color: #fff8e1;
+    color: #000;
+    border-color: #ffcc02;
+    font-weight: 600;
+  }
+  
+  &.impact-minor {
+    background-color: #f5f5f5;
+    color: #000;
+    border-color: #bdbdbd;
+    font-weight: 600;
+  }
+}
+
+// ==========================================================================
+// Stat Badge Variants
+// ==========================================================================
+
+.stat-badge {
+  @extend .badge;
+  
+  &.stat-violations {
+    background-color: #ffebee;
+    color: #000;
+    border-color: #ef9a9a;
+    font-weight: 700;
+  }
+  
+  &.stat-warnings {
+    background-color: #fff8e1;
+    color: #000;
+    border-color: #ffcc02;
+    font-weight: 600;
+  }
+  
+  &.stat-passed {
+    background-color: #e8f5e8;
+    color: #000;
+    border-color: #81c784;
+    font-weight: 600;
+  }
+}
+
+// ==========================================================================
+// Badge Size Variants
+// ==========================================================================
+
+.badge--small {
+  padding: calc(var(--space-1) * 0.5) var(--space-1);
+  font-size: var(--text-body-2xs);
+}
+
+.badge--large {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-body-small);
+}
+
+// ==========================================================================
+// Badge Accessibility
+// ==========================================================================
+
+// Ensure adequate contrast for all badge variants
+.badge {
+  // Icons within badges should be hidden from screen readers
+  [aria-hidden="true"] {
+    pointer-events: none;
+  }
+}
