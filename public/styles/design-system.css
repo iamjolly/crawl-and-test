@@ -2240,7 +2240,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   pointer-events: none;
 }
 
-.btn, .btn-fab, .btn-download, .btn-browse, .btn-view, .btn-dark, .btn-light, .btn-info, .btn-danger, .btn-warning, .btn-success, .btn-secondary, .btn-primary {
+.btn, .btn-fab, .btn-collapse-all, .btn-expand-all, .btn-download, .btn-browse, .btn-view, .btn-dark, .btn-light, .btn-info, .btn-danger, .btn-warning, .btn-success, .btn-secondary, .btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2263,28 +2263,28 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   user-select: none;
   transition: all 0.2s ease-in-out;
 }
-.btn:hover:not(:disabled), .btn-fab:hover:not(:disabled), .btn-download:hover:not(:disabled), .btn-browse:hover:not(:disabled), .btn-view:hover:not(:disabled), .btn-dark:hover:not(:disabled), .btn-light:hover:not(:disabled), .btn-info:hover:not(:disabled), .btn-danger:hover:not(:disabled), .btn-warning:hover:not(:disabled), .btn-success:hover:not(:disabled), .btn-secondary:hover:not(:disabled), .btn-primary:hover:not(:disabled) {
+.btn:hover:not(:disabled), .btn-fab:hover:not(:disabled), .btn-collapse-all:hover:not(:disabled), .btn-expand-all:hover:not(:disabled), .btn-download:hover:not(:disabled), .btn-browse:hover:not(:disabled), .btn-view:hover:not(:disabled), .btn-dark:hover:not(:disabled), .btn-light:hover:not(:disabled), .btn-info:hover:not(:disabled), .btn-danger:hover:not(:disabled), .btn-warning:hover:not(:disabled), .btn-success:hover:not(:disabled), .btn-secondary:hover:not(:disabled), .btn-primary:hover:not(:disabled) {
   background-color: var(--color-background-tertiary);
   border-color: var(--color-border-secondary);
   box-shadow: var(--elevation-button-hover);
   transform: translateY(-1px);
 }
-.btn:focus-visible, .btn-fab:focus-visible, .btn-download:focus-visible, .btn-browse:focus-visible, .btn-view:focus-visible, .btn-dark:focus-visible, .btn-light:focus-visible, .btn-info:focus-visible, .btn-danger:focus-visible, .btn-warning:focus-visible, .btn-success:focus-visible, .btn-secondary:focus-visible, .btn-primary:focus-visible {
+.btn:focus-visible, .btn-fab:focus-visible, .btn-collapse-all:focus-visible, .btn-expand-all:focus-visible, .btn-download:focus-visible, .btn-browse:focus-visible, .btn-view:focus-visible, .btn-dark:focus-visible, .btn-light:focus-visible, .btn-info:focus-visible, .btn-danger:focus-visible, .btn-warning:focus-visible, .btn-success:focus-visible, .btn-secondary:focus-visible, .btn-primary:focus-visible {
   outline: 3px solid var(--color-primary-focus);
   outline-offset: 3px;
   box-shadow: var(--elevation-button-hover);
   z-index: 1;
 }
-.btn:active:not(:disabled), .btn-fab:active:not(:disabled), .btn-download:active:not(:disabled), .btn-browse:active:not(:disabled), .btn-view:active:not(:disabled), .btn-dark:active:not(:disabled), .btn-light:active:not(:disabled), .btn-info:active:not(:disabled), .btn-danger:active:not(:disabled), .btn-warning:active:not(:disabled), .btn-success:active:not(:disabled), .btn-secondary:active:not(:disabled), .btn-primary:active:not(:disabled) {
+.btn:active:not(:disabled), .btn-fab:active:not(:disabled), .btn-collapse-all:active:not(:disabled), .btn-expand-all:active:not(:disabled), .btn-download:active:not(:disabled), .btn-browse:active:not(:disabled), .btn-view:active:not(:disabled), .btn-dark:active:not(:disabled), .btn-light:active:not(:disabled), .btn-info:active:not(:disabled), .btn-danger:active:not(:disabled), .btn-warning:active:not(:disabled), .btn-success:active:not(:disabled), .btn-secondary:active:not(:disabled), .btn-primary:active:not(:disabled) {
   transform: translateY(0);
   box-shadow: var(--elevation-button);
 }
-.btn:disabled, .btn-fab:disabled, .btn-download:disabled, .btn-browse:disabled, .btn-view:disabled, .btn-dark:disabled, .btn-light:disabled, .btn-info:disabled, .btn-danger:disabled, .btn-warning:disabled, .btn-success:disabled, .btn-secondary:disabled, .btn-primary:disabled {
+.btn:disabled, .btn-fab:disabled, .btn-collapse-all:disabled, .btn-expand-all:disabled, .btn-download:disabled, .btn-browse:disabled, .btn-view:disabled, .btn-dark:disabled, .btn-light:disabled, .btn-info:disabled, .btn-danger:disabled, .btn-warning:disabled, .btn-success:disabled, .btn-secondary:disabled, .btn-primary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
 }
-.btn:visited, .btn-fab:visited, .btn-download:visited, .btn-browse:visited, .btn-view:visited, .btn-dark:visited, .btn-light:visited, .btn-info:visited, .btn-danger:visited, .btn-warning:visited, .btn-success:visited, .btn-secondary:visited, .btn-primary:visited {
+.btn:visited, .btn-fab:visited, .btn-collapse-all:visited, .btn-expand-all:visited, .btn-download:visited, .btn-browse:visited, .btn-view:visited, .btn-dark:visited, .btn-light:visited, .btn-info:visited, .btn-danger:visited, .btn-warning:visited, .btn-success:visited, .btn-secondary:visited, .btn-primary:visited {
   color: inherit;
   background-color: inherit;
   border-color: inherit;
@@ -2513,21 +2513,21 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   border-radius: var(--radius-button);
   box-shadow: var(--elevation-button);
 }
-.btn-group .btn, .btn-group .btn-fab, .btn-group .btn-download, .btn-group .btn-browse, .btn-group .btn-view, .btn-group .btn-primary, .btn-group .btn-secondary, .btn-group .btn-success, .btn-group .btn-warning, .btn-group .btn-danger, .btn-group .btn-info, .btn-group .btn-light, .btn-group .btn-dark {
+.btn-group .btn, .btn-group .btn-fab, .btn-group .btn-collapse-all, .btn-group .btn-expand-all, .btn-group .btn-download, .btn-group .btn-browse, .btn-group .btn-view, .btn-group .btn-primary, .btn-group .btn-secondary, .btn-group .btn-success, .btn-group .btn-warning, .btn-group .btn-danger, .btn-group .btn-info, .btn-group .btn-light, .btn-group .btn-dark {
   border-radius: 0;
   border-right-width: 0;
   box-shadow: none;
 }
-.btn-group .btn:first-child, .btn-group .btn-fab:first-child, .btn-group .btn-download:first-child, .btn-group .btn-browse:first-child, .btn-group .btn-view:first-child, .btn-group .btn-primary:first-child, .btn-group .btn-secondary:first-child, .btn-group .btn-success:first-child, .btn-group .btn-warning:first-child, .btn-group .btn-danger:first-child, .btn-group .btn-info:first-child, .btn-group .btn-light:first-child, .btn-group .btn-dark:first-child {
+.btn-group .btn:first-child, .btn-group .btn-fab:first-child, .btn-group .btn-collapse-all:first-child, .btn-group .btn-expand-all:first-child, .btn-group .btn-download:first-child, .btn-group .btn-browse:first-child, .btn-group .btn-view:first-child, .btn-group .btn-primary:first-child, .btn-group .btn-secondary:first-child, .btn-group .btn-success:first-child, .btn-group .btn-warning:first-child, .btn-group .btn-danger:first-child, .btn-group .btn-info:first-child, .btn-group .btn-light:first-child, .btn-group .btn-dark:first-child {
   border-top-left-radius: var(--radius-button);
   border-bottom-left-radius: var(--radius-button);
 }
-.btn-group .btn:last-child, .btn-group .btn-fab:last-child, .btn-group .btn-download:last-child, .btn-group .btn-browse:last-child, .btn-group .btn-view:last-child, .btn-group .btn-primary:last-child, .btn-group .btn-secondary:last-child, .btn-group .btn-success:last-child, .btn-group .btn-warning:last-child, .btn-group .btn-danger:last-child, .btn-group .btn-info:last-child, .btn-group .btn-light:last-child, .btn-group .btn-dark:last-child {
+.btn-group .btn:last-child, .btn-group .btn-fab:last-child, .btn-group .btn-collapse-all:last-child, .btn-group .btn-expand-all:last-child, .btn-group .btn-download:last-child, .btn-group .btn-browse:last-child, .btn-group .btn-view:last-child, .btn-group .btn-primary:last-child, .btn-group .btn-secondary:last-child, .btn-group .btn-success:last-child, .btn-group .btn-warning:last-child, .btn-group .btn-danger:last-child, .btn-group .btn-info:last-child, .btn-group .btn-light:last-child, .btn-group .btn-dark:last-child {
   border-top-right-radius: var(--radius-button);
   border-bottom-right-radius: var(--radius-button);
   border-right-width: 1px;
 }
-.btn-group .btn:hover, .btn-group .btn-fab:hover, .btn-group .btn-download:hover, .btn-group .btn-browse:hover, .btn-group .btn-view:hover, .btn-group .btn-primary:hover, .btn-group .btn-secondary:hover, .btn-group .btn-success:hover, .btn-group .btn-warning:hover, .btn-group .btn-danger:hover, .btn-group .btn-info:hover, .btn-group .btn-light:hover, .btn-group .btn-dark:hover, .btn-group .btn:focus, .btn-group .btn-fab:focus, .btn-group .btn-download:focus, .btn-group .btn-browse:focus, .btn-group .btn-view:focus, .btn-group .btn-primary:focus, .btn-group .btn-secondary:focus, .btn-group .btn-success:focus, .btn-group .btn-warning:focus, .btn-group .btn-danger:focus, .btn-group .btn-info:focus, .btn-group .btn-light:focus, .btn-group .btn-dark:focus {
+.btn-group .btn:hover, .btn-group .btn-fab:hover, .btn-group .btn-collapse-all:hover, .btn-group .btn-expand-all:hover, .btn-group .btn-download:hover, .btn-group .btn-browse:hover, .btn-group .btn-view:hover, .btn-group .btn-primary:hover, .btn-group .btn-secondary:hover, .btn-group .btn-success:hover, .btn-group .btn-warning:hover, .btn-group .btn-danger:hover, .btn-group .btn-info:hover, .btn-group .btn-light:hover, .btn-group .btn-dark:hover, .btn-group .btn:focus, .btn-group .btn-fab:focus, .btn-group .btn-collapse-all:focus, .btn-group .btn-expand-all:focus, .btn-group .btn-download:focus, .btn-group .btn-browse:focus, .btn-group .btn-view:focus, .btn-group .btn-primary:focus, .btn-group .btn-secondary:focus, .btn-group .btn-success:focus, .btn-group .btn-warning:focus, .btn-group .btn-danger:focus, .btn-group .btn-info:focus, .btn-group .btn-light:focus, .btn-group .btn-dark:focus {
   z-index: 1;
   border-right-width: 1px;
 }
@@ -2538,16 +2538,16 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   align-items: flex-start;
   border-radius: var(--radius-button);
 }
-.btn-group-vertical .btn, .btn-group-vertical .btn-fab, .btn-group-vertical .btn-download, .btn-group-vertical .btn-browse, .btn-group-vertical .btn-view, .btn-group-vertical .btn-primary, .btn-group-vertical .btn-secondary, .btn-group-vertical .btn-success, .btn-group-vertical .btn-warning, .btn-group-vertical .btn-danger, .btn-group-vertical .btn-info, .btn-group-vertical .btn-light, .btn-group-vertical .btn-dark {
+.btn-group-vertical .btn, .btn-group-vertical .btn-fab, .btn-group-vertical .btn-collapse-all, .btn-group-vertical .btn-expand-all, .btn-group-vertical .btn-download, .btn-group-vertical .btn-browse, .btn-group-vertical .btn-view, .btn-group-vertical .btn-primary, .btn-group-vertical .btn-secondary, .btn-group-vertical .btn-success, .btn-group-vertical .btn-warning, .btn-group-vertical .btn-danger, .btn-group-vertical .btn-info, .btn-group-vertical .btn-light, .btn-group-vertical .btn-dark {
   width: 100%;
   border-radius: 0;
   border-bottom-width: 0;
 }
-.btn-group-vertical .btn:first-child, .btn-group-vertical .btn-fab:first-child, .btn-group-vertical .btn-download:first-child, .btn-group-vertical .btn-browse:first-child, .btn-group-vertical .btn-view:first-child, .btn-group-vertical .btn-primary:first-child, .btn-group-vertical .btn-secondary:first-child, .btn-group-vertical .btn-success:first-child, .btn-group-vertical .btn-warning:first-child, .btn-group-vertical .btn-danger:first-child, .btn-group-vertical .btn-info:first-child, .btn-group-vertical .btn-light:first-child, .btn-group-vertical .btn-dark:first-child {
+.btn-group-vertical .btn:first-child, .btn-group-vertical .btn-fab:first-child, .btn-group-vertical .btn-collapse-all:first-child, .btn-group-vertical .btn-expand-all:first-child, .btn-group-vertical .btn-download:first-child, .btn-group-vertical .btn-browse:first-child, .btn-group-vertical .btn-view:first-child, .btn-group-vertical .btn-primary:first-child, .btn-group-vertical .btn-secondary:first-child, .btn-group-vertical .btn-success:first-child, .btn-group-vertical .btn-warning:first-child, .btn-group-vertical .btn-danger:first-child, .btn-group-vertical .btn-info:first-child, .btn-group-vertical .btn-light:first-child, .btn-group-vertical .btn-dark:first-child {
   border-top-left-radius: var(--radius-button);
   border-top-right-radius: var(--radius-button);
 }
-.btn-group-vertical .btn:last-child, .btn-group-vertical .btn-fab:last-child, .btn-group-vertical .btn-download:last-child, .btn-group-vertical .btn-browse:last-child, .btn-group-vertical .btn-view:last-child, .btn-group-vertical .btn-primary:last-child, .btn-group-vertical .btn-secondary:last-child, .btn-group-vertical .btn-success:last-child, .btn-group-vertical .btn-warning:last-child, .btn-group-vertical .btn-danger:last-child, .btn-group-vertical .btn-info:last-child, .btn-group-vertical .btn-light:last-child, .btn-group-vertical .btn-dark:last-child {
+.btn-group-vertical .btn:last-child, .btn-group-vertical .btn-fab:last-child, .btn-group-vertical .btn-collapse-all:last-child, .btn-group-vertical .btn-expand-all:last-child, .btn-group-vertical .btn-download:last-child, .btn-group-vertical .btn-browse:last-child, .btn-group-vertical .btn-view:last-child, .btn-group-vertical .btn-primary:last-child, .btn-group-vertical .btn-secondary:last-child, .btn-group-vertical .btn-success:last-child, .btn-group-vertical .btn-warning:last-child, .btn-group-vertical .btn-danger:last-child, .btn-group-vertical .btn-info:last-child, .btn-group-vertical .btn-light:last-child, .btn-group-vertical .btn-dark:last-child {
   border-bottom-left-radius: var(--radius-button);
   border-bottom-right-radius: var(--radius-button);
   border-bottom-width: 1px;
@@ -2583,6 +2583,36 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     transform: rotate(360deg);
   }
 }
+.btn-expand-all {
+  background-color: #1e7e34;
+  border-color: #1e7e34;
+  color: var(--color-text-inverse);
+}
+.btn-expand-all:hover:not(:disabled) {
+  background-color: #155724;
+  border-color: #155724;
+  color: var(--color-text-inverse);
+}
+.btn-expand-all:focus-visible {
+  outline: 3px solid #1e7e34;
+  outline-offset: 3px;
+}
+
+.btn-collapse-all {
+  background-color: #545b62;
+  border-color: #545b62;
+  color: var(--color-text-inverse);
+}
+.btn-collapse-all:hover:not(:disabled) {
+  background-color: #3d4349;
+  border-color: #3d4349;
+  color: var(--color-text-inverse);
+}
+.btn-collapse-all:focus-visible {
+  outline: 3px solid #545b62;
+  outline-offset: 3px;
+}
+
 .btn-fab {
   width: 56px;
   height: 56px;
@@ -3795,36 +3825,42 @@ a:not([href]):hover {
 }
 
 .summary-card {
-  background: rgba(0, 123, 255, 0.1);
-  padding: 15px;
-  border-radius: 6px;
-  border-left: 4px solid #007bff;
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  border-left: 4px solid var(--color-primary);
+  background: rgba(var(--color-primary-rgb), 0.05);
   margin-bottom: var(--space-4);
 }
 .summary-card h3 {
-  margin: 0 0 10px 0;
+  margin: 0 0 var(--space-2) 0;
   color: var(--color-text-primary);
-  font-size: 16px;
+  font-size: var(--text-body-large);
+  font-weight: var(--font-weight-semibold);
   display: flex;
   align-items: center;
   gap: var(--space-1);
 }
 .summary-card .value {
-  font-size: 24px;
+  font-size: var(--text-heading-2);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
+  line-height: 1.2;
 }
 .summary-card.summary-card-error {
-  border-left-color: var(--color-danger);
-  background: rgba(var(--color-danger-rgb), 0.1);
+  border-left-color: #dc3545;
+  background: rgba(220, 53, 69, 0.08);
 }
 .summary-card.summary-card-warning {
-  border-left-color: var(--color-warning);
-  background: rgba(var(--color-warning-rgb), 0.1);
+  border-left-color: #ffc107;
+  background: rgba(255, 193, 7, 0.08);
 }
 .summary-card.summary-card-success {
-  border-left-color: var(--color-success);
-  background: rgba(var(--color-success-rgb), 0.1);
+  border-left-color: #28a745;
+  background: rgba(40, 167, 69, 0.08);
+}
+.summary-card.summary-card-info {
+  border-left-color: #007bff;
+  background: rgba(0, 123, 255, 0.08);
 }
 
 @keyframes card-loading {
@@ -6554,6 +6590,44 @@ a:not([href]):hover {
   line-height: 1.3;
 }
 
+.page-title {
+  margin: 0;
+  font-size: var(--text-heading-4);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.report-back-nav {
+  margin-bottom: var(--space-4);
+}
+.report-back-nav .btn .icon-left {
+  margin-right: var(--space-2);
+}
+
+.report-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-6);
+  align-items: start;
+}
+.report-header .report-meta {
+  font-size: var(--text-body-small);
+  line-height: 1.6;
+}
+.report-header .report-meta p {
+  margin: 0 0 var(--space-1) 0;
+}
+.report-header .report-meta p:last-child {
+  margin-bottom: 0;
+}
+
+.summary-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
 .layout-sidebar {
   display: flex;
   min-height: 100vh;
@@ -6763,6 +6837,44 @@ a:not([href]):hover {
   color: var(--color-text-secondary);
   max-width: 600px;
   margin: 0 auto;
+}
+
+.report-layout h1, .report-layout h2, .report-layout h3, .report-layout h4, .report-layout h5, .report-layout h6 {
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-3);
+}
+.report-layout h1:first-child, .report-layout h2:first-child, .report-layout h3:first-child, .report-layout h4:first-child, .report-layout h5:first-child, .report-layout h6:first-child {
+  margin-top: 0;
+}
+.report-layout h2 {
+  margin-top: var(--space-8);
+}
+.report-layout h3, .report-layout h4, .report-layout h5, .report-layout h6 {
+  margin-top: var(--space-6);
+}
+.report-layout .issue-section {
+  margin-bottom: var(--space-6);
+}
+.report-layout .issue-section:not(:last-child) {
+  margin-bottom: var(--space-8);
+}
+.report-layout .page-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-8);
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border-secondary);
+}
+.report-layout .page-details-header h2 {
+  margin: 0;
+  font-size: var(--text-heading-3);
+  color: var(--color-text-primary);
+}
+.report-layout .accordion-controls {
+  display: flex;
+  gap: var(--space-2);
 }
 
 @media (min-width: 576px) {

@@ -400,6 +400,54 @@
   line-height: 1.3;
 }
 
+.page-title {
+  margin: 0;
+  font-size: var(--text-heading-4);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+// ==========================================================================
+// Report Template Classes
+// ==========================================================================
+
+.report-back-nav {
+  margin-bottom: var(--space-4);
+  
+  .btn {
+    .icon-left {
+      margin-right: var(--space-2);
+    }
+  }
+}
+
+.report-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-6);
+  align-items: start;
+  
+  .report-meta {
+    font-size: var(--text-body-small);
+    line-height: 1.6;
+    
+    p {
+      margin: 0 0 var(--space-1) 0;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+.summary-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
 // ==========================================================================
 // Sidebar Layout
 // ==========================================================================
@@ -658,4 +706,63 @@
       margin: 0 auto;
     }
   }
+}
+
+// ==========================================================================
+// Report Layout with Enhanced Spacing
+// ==========================================================================
+
+.report-layout {
+  // Enhanced heading spacing for report sections
+  h1, h2, h3, h4, h5, h6 {
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-3);
+    
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+  
+  h2 {
+    margin-top: var(--space-8);
+  }
+  
+  h3, h4, h5, h6 {
+    margin-top: var(--space-6);
+  }
+  
+  // Section spacing
+  .issue-section {
+    margin-bottom: var(--space-6);
+    
+    &:not(:last-child) {
+      margin-bottom: var(--space-8);
+    }
+  }
+  
+}
+
+// ==========================================================================
+// Page Details Header (used in page sections)
+// ==========================================================================
+
+.page-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-8);
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border-secondary);
+  
+  h2 {
+    margin: 0;
+    font-size: var(--text-heading-3);
+    color: var(--color-text-primary);
+  }
+}
+
+.accordion-controls {
+  display: flex;
+  gap: var(--space-2);
 }

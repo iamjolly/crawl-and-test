@@ -369,10 +369,10 @@ function generateHTMLReport(data, filename) {
 
   // Generate summary cards
   const summaryCards = [
-    { title: '<span aria-hidden="true">📄</span> Total Pages', value: summary.totalPages || 0, type: '' },
+    { title: '<span aria-hidden="true">📄</span> Total Pages', value: summary.totalPages || 0, type: 'info' },
     { title: '<span aria-hidden="true">❌</span> Total Violations', value: summary.totalViolations || 0, type: 'error' },
     { title: '<span aria-hidden="true">⚠️</span> Total Warnings', value: summary.totalIncomplete || 0, type: 'warning' },
-    { title: '<span aria-hidden="true">✅</span> Pages Passed', value: summary.pagesPassed || 0, type: '' }
+    { title: '<span aria-hidden="true">✅</span> Pages Passed', value: summary.pagesPassed || 0, type: 'success' }
   ].map(card => 
     summaryCardTemplate
       .replace(/{{title}}/g, card.title)

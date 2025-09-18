@@ -53,9 +53,9 @@
     <div class="page-main">
         <div class="page-main__container">
             <!-- Back Button -->
-            <div style="margin-bottom: var(--space-4);">
+            <div class="report-back-nav">
                 <a href="/reports/" class="btn btn-secondary">
-                    <span style="margin-right: var(--space-2);">←</span>
+                    <span class="icon-left">←</span>
                     Back to Reports
                 </a>
             </div>
@@ -63,11 +63,11 @@
             <!-- Report Header -->
             <header class="content-section__header">
                 <h1 class="content-section__title">CATS Accessibility Report</h1>
-                <div class="content-section__description" style="display: grid; grid-template-columns: 1fr auto; gap: var(--space-6); align-items: start;">
-                    <div class="report-meta" style="font-size: var(--text-body-small); line-height: 1.6;">
-                        <p style="margin: 0 0 var(--space-1) 0;"><strong>Domain:</strong> {{domain}}</p>
-                        <p style="margin: 0 0 var(--space-1) 0;"><strong>Generated:</strong> {{timestamp}}</p>
-                        <p style="margin: 0;"><strong>Standards:</strong> {{wcagInfo}}</p>
+                <div class="content-section__description report-header">
+                    <div class="report-meta">
+                        <p><strong>Domain:</strong> {{domain}}</p>
+                        <p><strong>Generated:</strong> {{timestamp}}</p>
+                        <p><strong>Standards:</strong> {{wcagInfo}}</p>
                     </div>
                     <div class="download-section">
                         <a href="{{jsonFilename}}" class="btn btn-primary" download title="Download raw JSON data for analysis">
@@ -81,7 +81,7 @@
                 <!-- Summary Section -->
                 <section class="content-section" aria-labelledby="summary-heading">
                     <h2 id="summary-heading" class="sr-only">Report Summary</h2>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+                    <div class="summary-cards-grid">
                         {{summaryCards}}
                     </div>
                 </section>

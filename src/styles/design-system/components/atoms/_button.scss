@@ -478,6 +478,48 @@
   }
 }
 
+// ==========================================================================
+// Accordion Control Buttons
+// ==========================================================================
+
+// Expand All button - green variant
+.btn-expand-all {
+  @extend .btn;
+  background-color: #1e7e34;
+  border-color: #1e7e34;
+  color: var(--color-text-inverse);
+  
+  &:hover:not(:disabled) {
+    background-color: #155724;
+    border-color: #155724;
+    color: var(--color-text-inverse);
+  }
+  
+  &:focus-visible {
+    outline: 3px solid #1e7e34;
+    outline-offset: 3px;
+  }
+}
+
+// Collapse All button - gray variant  
+.btn-collapse-all {
+  @extend .btn;
+  background-color: #545b62;
+  border-color: #545b62;
+  color: var(--color-text-inverse);
+  
+  &:hover:not(:disabled) {
+    background-color: #3d4349;
+    border-color: #3d4349;
+    color: var(--color-text-inverse);
+  }
+  
+  &:focus-visible {
+    outline: 3px solid #545b62;
+    outline-offset: 3px;
+  }
+}
+
 // Floating action button
 .btn-fab {
   @extend .btn;
