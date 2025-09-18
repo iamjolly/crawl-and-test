@@ -46,7 +46,7 @@ try {
   // Step 3: Read the showcase HTML template
   console.log('📄 Processing HTML template...');
   
-  const showcaseHTML = fs.readFileSync('design-system-showcase.html', 'utf8');
+  const showcaseHTML = fs.readFileSync('tools/design-system/design-system-showcase.html', 'utf8');
   
   // Step 4: Replace the inline styles with compiled CSS
   const updatedHTML = showcaseHTML.replace(

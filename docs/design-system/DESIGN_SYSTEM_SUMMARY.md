@@ -63,8 +63,8 @@ src/styles/design-system/
 
 Additional Files:
 ├── integrate-design-system.sh     # Integration script (200+ lines)
-├── integration-example.scss       # Usage examples
-├── integration-example.html       # HTML examples
+├── tools/design-system/examples/integration-example.scss       # Usage examples
+├── tools/design-system/examples/integration-example.html       # HTML examples
 └── package-scripts-example.json   # Build scripts
 ```
 

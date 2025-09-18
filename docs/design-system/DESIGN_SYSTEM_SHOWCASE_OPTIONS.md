@@ -5,7 +5,7 @@
 We now have **three different approaches** for showcasing the design system:
 
 ### 1. **Static Showcase Site** (Recommended) 
-**File**: `design-system-showcase.html`
+**File**: `tools/design-system/design-system-showcase.html`
 
 **✅ Pros:**
 - **Easy to host** - Single HTML file with embedded CSS

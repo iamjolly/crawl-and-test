@@ -171,7 +171,7 @@ echo ""
 echo "Generating integration examples..."
 
 # Create main integration file
-cat > "integration-example.scss" << 'EOF'
+cat > "tools/design-system/examples/integration-example.scss" << 'EOF'
 // Example: How to integrate the design system into your application
 
 // 1. Import the complete design system
@@ -243,10 +243,10 @@ cat > "integration-example.scss" << 'EOF'
 }
 EOF
 
-print_status "Created integration-example.scss"
+print_status "Created tools/design-system/examples/integration-example.scss"
 
 # Create HTML integration example
-cat > "integration-example.html" << 'EOF'
+cat > "tools/design-system/examples/integration-example.html" << 'EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -318,7 +318,7 @@ cat > "integration-example.html" << 'EOF'
 </html>
 EOF
 
-print_status "Created integration-example.html"
+print_status "Created tools/design-system/examples/integration-example.html"
 
 # Create package.json scripts example
 cat > "package-scripts-example.json" << 'EOF'
@@ -387,8 +387,8 @@ print_info "□ Document custom components"
 echo ""
 print_status "Integration setup complete!"
 print_info "Review the generated example files:"
-print_info "  - integration-example.scss"
-print_info "  - integration-example.html"
+print_info "  - tools/design-system/examples/integration-example.scss"
+print_info "  - tools/design-system/examples/integration-example.html"
 print_info "  - package-scripts-example.json"
 
 echo ""

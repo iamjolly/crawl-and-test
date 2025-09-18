@@ -11,6 +11,8 @@ A modern web accessibility testing platform that crawls websites and generates b
 - **High Performance**: Concurrent crawling with configurable limits and delays
 - **Flexible Configuration**: Support for WCAG 2.0/2.1/2.2 and A/AA/AAA compliance levels
 - **Modern UI**: Responsive design with navigation, breadcrumbs, and accessibility features
+- **Organized Structure**: Clean separation of application code, documentation, and development tools
+- **Optimized Build System**: Streamlined SASS compilation and CSS optimization with PostCSS
 
 ## Quick Start
 
@@ -55,6 +57,15 @@ npm run serve
 - **npm** or yarn package manager
 - **Internet connection** for crawling websites
 
+## Documentation
+
+This project includes comprehensive documentation organized in the `/docs/` directory:
+
+- **`/docs/development/`** - Development guides, architecture documentation, and SASS audits
+- **`/docs/design-system/`** - Design system documentation, summaries, and showcase options  
+
+Additional development tools and examples are available in the `/tools/` directory for design system integration and workflow examples.
+
 ## Project Structure
 
 ```
@@ -67,17 +78,25 @@ npm run serve
 │   ├── generators/                 # Report generation utilities
 │   │   ├── html.js                 # HTML report generator
 │   │   └── index.js                # Dashboard index generator
-│   ├── styles/                     # CSS stylesheets
+│   ├── styles/                     # CSS stylesheets and design system
 │   ├── scripts/                    # JavaScript utilities
 │   ├── templates/                  # HTML templates
 │   └── utils/                      # Utility scripts
 │       └── cleanup.js              # Cleanup utilities
 ├── public/                         # Generated output (served by dashboard)
 │   ├── reports/                    # Generated accessibility reports
-│   ├── styles/                     # Copied CSS files
+│   ├── styles/                     # Compiled CSS files
 │   └── scripts/                    # Copied JavaScript files
+├── docs/                           # Project documentation
+│   ├── development/                # Development guides and architecture docs
+│   └── design-system/              # Design system documentation
+├── tools/                          # Development tools and utilities
+│   ├── design-system/              # Design system development tools
+│   └── examples/                   # Integration examples and templates
 ├── _serverless-examples/            # Cloud deployment examples
+├── data/                           # Reference data (WCAG guidelines)
 ├── package.json                     # Node.js dependencies and scripts
+├── postcss.config.js                # PostCSS optimization configuration
 ├── .env.example                     # Environment configuration template
 └── .gitignore                       # Git ignore rules
 ```
@@ -159,12 +178,36 @@ node src/core/crawler.js -s https://example.com --wcag-version 2.2 --wcag-level 
 |---------|-------------|
 | `npm run dev` | Start development workflow: watch SASS + serve dashboard (port 3000) |
 | `npm run serve` | Start dashboard server only (port 3000) |
-| `npm run build` | Generate HTML reports from JSON data (development) |
+| `npm run serve:reports` | Alternative alias for dashboard server (compatibility) |
+| `npm run serve:dashboard` | Alternative alias for dashboard server (compatibility) |
+| `npm run build` | Complete build: compile SASS + generate HTML reports |
 | `npm run build:prod` | Production build: compile SASS + optimize CSS + generate HTML |
 | `npm run build:domain` | Generate reports for specific domain |
-| `npm run regenerate-html` | Regenerate missing HTML reports |
+| `npm run sass:build` | Compile all SASS files (design system + legacy + report styles) |
+| `npm run sass:watch` | Watch and compile SASS files during development |
+| `npm run css:optimize` | Optimize all CSS files using PostCSS/cssnano |
+| `npm run html:build` | Generate HTML reports from existing JSON data |
 | `npm run clean` | Remove all generated reports and CSS files |
 | `npm run install-browsers` | Install Playwright browsers |
+
+### SASS Build Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run sass:design-system` | Compile design system SASS to compressed CSS |
+| `npm run sass:legacy-compat` | Compile legacy compatibility styles |
+| `npm run sass:report` | Compile report-specific styles |
+| `npm run sass:design-system:watch` | Watch design system SASS files |
+| `npm run sass:legacy-compat:watch` | Watch legacy compatibility SASS files |
+| `npm run sass:report:watch` | Watch report SASS files |
+
+### CSS Optimization Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run css:optimize:design-system` | Optimize design system CSS with PostCSS |
+| `npm run css:optimize:report` | Optimize report CSS with PostCSS |
+| `npm run css:optimize:legacy` | Optimize legacy CSS with PostCSS |
 
 ## Configuration
 
