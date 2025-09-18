@@ -500,7 +500,7 @@
   padding: var(--space-4);
   border-radius: var(--radius-md);
   border-left: 4px solid var(--color-primary);
-  background: rgba(var(--color-primary-rgb), 0.05);
+  background: rgba(var(--color-primary-rgb), 0.08);
   margin-bottom: var(--space-4);
   
   h3 {
@@ -522,23 +522,23 @@
   
   // Summary card variants with proper colors and backgrounds
   &.summary-card-error {
-    border-left-color: #dc3545; // Red
-    background: rgba(220, 53, 69, 0.08); // Light red background
+    border-left-color: var(--color-danger);
+    background: rgba(var(--color-danger-rgb), 0.08);
   }
   
   &.summary-card-warning {
-    border-left-color: #ffc107; // Orange/Yellow
-    background: rgba(255, 193, 7, 0.08); // Light orange background
+    border-left-color: var(--color-warning);
+    background: rgba(var(--color-warning-rgb), 0.08);
   }
   
   &.summary-card-success {
-    border-left-color: #28a745; // Green
-    background: rgba(40, 167, 69, 0.08); // Light green background
+    border-left-color: var(--color-success);
+    background: rgba(var(--color-success-rgb), 0.08);
   }
   
   &.summary-card-info {
-    border-left-color: #007bff; // Blue
-    background: rgba(0, 123, 255, 0.08); // Light blue background
+    border-left-color: var(--color-info);
+    background: rgba(var(--color-info-rgb), 0.08);
   }
 }
 
