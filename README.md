@@ -28,15 +28,6 @@ npm install
 npm run install-browsers
 ```
 
-### First Scan
-
-```bash
-npm run dev
-
-# Visit <http://localhost:3000> to start a scan
-
-```
-
 ## 💻 Usage
 
 ### Running the Dashboard
