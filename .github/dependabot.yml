@@ -1,0 +1,24 @@
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    open-pull-requests-limit: 10
+    reviewers:
+      - 'iamjolly'
+    assignees:
+      - 'iamjolly'
+    commit-message:
+      prefix: 'deps'
+      include: 'scope'
+
+  # Enable security updates for GitHub Actions
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    commit-message:
+      prefix: 'ci'
+      include: 'scope'

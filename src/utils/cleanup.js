@@ -10,16 +10,18 @@ const path = require('path');
 
 function cleanupOldHtmlFiles(reportsDir) {
   let removedCount = 0;
-  
+
   function scanDirectory(dir) {
-    if (!fs.existsSync(dir)) return;
-    
+    if (!fs.existsSync(dir)) {
+      return;
+    }
+
     const items = fs.readdirSync(dir);
-    
+
     for (const item of items) {
       const fullPath = path.join(dir, item);
       const stat = fs.statSync(fullPath);
-      
+
       if (stat.isDirectory()) {
         scanDirectory(fullPath);
       } else if (item.endsWith('.html')) {
@@ -29,7 +31,7 @@ function cleanupOldHtmlFiles(reportsDir) {
       }
     }
   }
-  
+
   scanDirectory(reportsDir);
   return removedCount;
 }
@@ -37,18 +39,18 @@ function cleanupOldHtmlFiles(reportsDir) {
 function main() {
   // Look for reports directory in project root, not relative to this script
   const reportsDir = path.join(process.cwd(), 'public', 'reports');
-  
+
   console.log('🧹 Cleaning up old HTML files from /public/reports/ directory');
   console.log('📂 Preserving JSON source data files');
   console.log('=====================================\n');
-  
+
   if (!fs.existsSync(reportsDir)) {
     console.log('❌ No /reports/ directory found');
     process.exit(1);
   }
-  
+
   const removedCount = cleanupOldHtmlFiles(reportsDir);
-  
+
   console.log('\n=====================================');
   console.log(`✅ Cleanup complete! Removed ${removedCount} old HTML files`);
   console.log('💾 JSON source data preserved');

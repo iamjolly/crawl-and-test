@@ -7,22 +7,21 @@ const { chromium } = require('playwright');
 const { Command } = require('commander');
 const pLimit = require('p-limit');
 const robotsParser = require('robots-txt-parse');
-const url = require('url');
 const config = require('./config');
 const axe = require('axe-core');
 const xml2js = require('xml2js');
 const { generateHTMLReport } = require('../generators/html');
 
-// Helper function to escape HTML
-function escapeHtml(text) {
-  if (!text) return '';
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
+// Helper function to escape HTML (currently unused but kept for future use)
+// function escapeHtml(text) {
+//   if (!text) {return '';}
+//   return text
+//     .replace(/&/g, '&amp;')
+//     .replace(/</g, '&lt;')
+//     .replace(/>/g, '&gt;')
+//     .replace(/"/g, '&quot;')
+//     .replace(/'/g, '&#39;');
+// }
 
 // ------------------------------------------------------------------
 // CLI
@@ -30,13 +29,27 @@ function escapeHtml(text) {
 const program = new Command();
 program
   .requiredOption('-s, --seed <url>', 'Seed URL (must be HTTPS)')
-  .option('-d, --depth <num>', 'Maximum crawl depth', (val) => parseInt(val, 10), 2)
-  .option('-c, --concurrency <num>', 'Number of parallel browsers', (val) => parseInt(val, 10), 4)
+  .option('-d, --depth <num>', 'Maximum crawl depth', val => parseInt(val, 10), 2)
+  .option('-c, --concurrency <num>', 'Number of parallel browsers', val => parseInt(val, 10), 4)
   .option('-o, --output <file>', 'Output JSON file', 'report.json')
-  .option('-t, --delay <ms>', 'Delay between requests per domain (ms)', (val) => parseInt(val, 10), 1000)
-  .option('-p, --max-pages <num>', 'Maximum number of pages to scan (use 0 for unlimited)', (val) => parseInt(val, 10), config.MAX_PAGES)
+  .option(
+    '-t, --delay <ms>',
+    'Delay between requests per domain (ms)',
+    val => parseInt(val, 10),
+    1000
+  )
+  .option(
+    '-p, --max-pages <num>',
+    'Maximum number of pages to scan (use 0 for unlimited)',
+    val => parseInt(val, 10),
+    config.MAX_PAGES
+  )
   .option('--no-sitemap', 'Skip sitemap discovery and use only link crawling')
-  .option('--wcag-version <version>', 'WCAG version to test (2.0, 2.1, 2.2)', config.DEFAULT_WCAG_VERSION)
+  .option(
+    '--wcag-version <version>',
+    'WCAG version to test (2.0, 2.1, 2.2)',
+    config.DEFAULT_WCAG_VERSION
+  )
   .option('--wcag-level <level>', 'WCAG compliance level (A, AA, AAA)', config.DEFAULT_WCAG_LEVEL)
   .option('--custom-tags <tags>', 'Custom axe tags (comma-separated, overrides WCAG options)')
   .option('--html', 'Generate HTML report in addition to JSON')
@@ -61,9 +74,11 @@ const {
 // ------------------------------------------------------------------
 function normalizeUrl(u) {
   const parsed = new URL(u);
-  parsed.hash = '';                 // ignore fragments
+  parsed.hash = ''; // ignore fragments
   // drop default index pages
-  if (parsed.pathname.endsWith('/')) parsed.pathname = parsed.pathname.slice(0, -1);
+  if (parsed.pathname.endsWith('/')) {
+    parsed.pathname = parsed.pathname.slice(0, -1);
+  }
   return parsed.toString();
 }
 
@@ -82,7 +97,7 @@ function buildAxeTags(wcagVersion, wcagLevel, customTags) {
   }
 
   const tags = [];
-  
+
   // Add WCAG version tags
   switch (wcagVersion) {
     case '2.0':
@@ -96,7 +111,7 @@ function buildAxeTags(wcagVersion, wcagLevel, customTags) {
         tags.push('wcag2aaa');
       }
       break;
-      
+
     case '2.1':
       if (wcagLevel === 'A' || wcagLevel === 'AA' || wcagLevel === 'AAA') {
         tags.push('wcag2a', 'wcag21a');
@@ -108,7 +123,7 @@ function buildAxeTags(wcagVersion, wcagLevel, customTags) {
         tags.push('wcag2aaa', 'wcag21aaa');
       }
       break;
-      
+
     case '2.2':
       if (wcagLevel === 'A' || wcagLevel === 'AA' || wcagLevel === 'AAA') {
         tags.push('wcag2a', 'wcag21a', 'wcag22a');
@@ -120,7 +135,7 @@ function buildAxeTags(wcagVersion, wcagLevel, customTags) {
         tags.push('wcag2aaa', 'wcag21aaa', 'wcag22aaa');
       }
       break;
-      
+
     default:
       console.warn(`⚠️ Unknown WCAG version: ${wcagVersion}, defaulting to 2.0 AA`);
       tags.push('wcag2a', 'wcag2aa');
@@ -150,7 +165,7 @@ function generateHtmlFilename(domain, wcagVersion, wcagLevel) {
 async function ensureReportsDirectory(domain) {
   const reportsDir = config.REPORTS_DIR;
   const domainDir = config.getDomainReportsDir(domain);
-  
+
   try {
     await fs.mkdir(reportsDir, { recursive: true });
     await fs.mkdir(domainDir, { recursive: true });
@@ -181,10 +196,10 @@ function generateHtmlReport(results, domain, wcagVersion, wcagLevel) {
 async function fetchSitemap(sitemapUrl) {
   try {
     console.log(`  Fetching: ${sitemapUrl}`);
-    
+
     // Use Node.js fetch (available in Node 18+) or fallback to page evaluation
     let content;
-    
+
     try {
       // Try using global fetch first (Node.js 18+)
       const response = await fetch(sitemapUrl);
@@ -198,7 +213,7 @@ async function fetchSitemap(sitemapUrl) {
       const browser = await chromium.launch({ headless: true });
       const context = await browser.newContext();
       const page = await context.newPage();
-      
+
       try {
         const response = await page.goto(sitemapUrl, { timeout: 10000 });
         if (!response || !response.ok()) {
@@ -206,7 +221,7 @@ async function fetchSitemap(sitemapUrl) {
           await browser.close();
           return null;
         }
-        
+
         // For XML files, get the raw content
         content = await page.evaluate(() => document.documentElement.outerHTML);
         // Clean up HTML wrapper that browsers add to XML
@@ -215,14 +230,14 @@ async function fetchSitemap(sitemapUrl) {
         await browser.close();
       }
     }
-    
+
     console.log(`  Content length: ${content.length} bytes`);
-    
+
     const parser = new xml2js.Parser();
     const result = await parser.parseStringPromise(content);
-    
+
     const urls = [];
-    
+
     // Handle regular sitemap
     if (result.urlset && result.urlset.url) {
       for (const urlEntry of result.urlset.url) {
@@ -231,7 +246,7 @@ async function fetchSitemap(sitemapUrl) {
         }
       }
     }
-    
+
     // Handle sitemap index
     if (result.sitemapindex && result.sitemapindex.sitemap) {
       for (const sitemapEntry of result.sitemapindex.sitemap) {
@@ -243,7 +258,7 @@ async function fetchSitemap(sitemapUrl) {
         }
       }
     }
-    
+
     console.log(`  Found ${urls.length} URLs in sitemap`);
     return urls;
   } catch (error) {
@@ -257,9 +272,9 @@ async function tryLoadSitemap(seedUrl) {
   const sitemapUrls = [
     `${parsed.origin}/sitemap.xml`,
     `${parsed.origin}/sitemap_index.xml`,
-    `${parsed.origin}/sitemaps.xml`
+    `${parsed.origin}/sitemaps.xml`,
   ];
-  
+
   for (const sitemapUrl of sitemapUrls) {
     console.log(`Trying to load sitemap: ${sitemapUrl}`);
     const urls = await fetchSitemap(sitemapUrl);
@@ -268,7 +283,7 @@ async function tryLoadSitemap(seedUrl) {
       return urls.filter(u => isSameDomain(seedUrl, u));
     }
   }
-  
+
   console.log('✗ No sitemap found, falling back to discovery crawling');
   return null;
 }
@@ -278,7 +293,7 @@ async function tryLoadSitemap(seedUrl) {
 // ------------------------------------------------------------------
 let queue = [];
 const visited = new Set();
-const results = [];      // array of { url, pageUrl, errors, ... }
+const results = []; // array of { url, pageUrl, errors, ... }
 let usingSitemap = false; // track if we're using sitemap mode
 
 // Build axe configuration
@@ -299,7 +314,9 @@ async function politePause(domain) {
   const last = domainDelays[domain] || 0;
   const now = Date.now();
   const wait = perDomainDelay - (now - last);
-  if (wait > 0) await new Promise(r => setTimeout(r, wait));
+  if (wait > 0) {
+    await new Promise(r => setTimeout(r, wait));
+  }
   domainDelays[domain] = Date.now();
 }
 
@@ -320,8 +337,11 @@ async function crawlPage(pageUrl, currentDepth) {
   const robotsTxtUrl = `${parsed.origin}/robots.txt`;
   let robotsTxt = '';
   try {
-    robotsTxt = await page.evaluate((url) => fetch(url).then(r => r.text()), robotsTxtUrl);
-  } catch (_) {} // ignore errors
+    robotsTxt = await page.evaluate(url => fetch(url).then(r => r.text()), robotsTxtUrl);
+  } catch (error) {
+    // Ignore robots.txt fetch errors - continue with crawling
+    console.warn(`Could not fetch robots.txt: ${error.message}`);
+  }
 
   try {
     const r = robotsParser(robotsTxt);
@@ -330,8 +350,9 @@ async function crawlPage(pageUrl, currentDepth) {
       await browser.close();
       return;
     }
-  } catch (_) {
+  } catch (error) {
     // If robots.txt parsing fails, proceed with crawling
+    console.warn(`Failed to parse robots.txt: ${error.message}`);
   }
 
   try {
@@ -343,10 +364,7 @@ async function crawlPage(pageUrl, currentDepth) {
     // Get page title
     const pageTitle = await page.title();
 
-    const axeResult = await page.evaluate(
-      (options) => axe.run(document, options),
-      axeConfig
-    );
+    const axeResult = await page.evaluate(options => axe.run(document, options), axeConfig);
 
     results.push({
       pageUrl,
@@ -357,9 +375,7 @@ async function crawlPage(pageUrl, currentDepth) {
 
     // Extract and enqueue new links (only in discovery mode)
     if (!usingSitemap) {
-      const links = await page.$$eval('a[href]', nodes =>
-        nodes.map(n => n.href)
-      );
+      const links = await page.$$eval('a[href]', nodes => nodes.map(n => n.href));
 
       for (const link of links) {
         const norm = normalizeUrl(link);
@@ -386,18 +402,20 @@ async function main() {
   if (useSitemap) {
     console.log('🗺️  Mixed mode: Attempting to load sitemap...');
     const sitemapUrls = await tryLoadSitemap(seed);
-    
+
     if (sitemapUrls && sitemapUrls.length > 0) {
       // Sitemap found - use sitemap URLs (limit to maxPages unless unlimited)
       usingSitemap = true;
       const isUnlimited = maxPages === 0;
       const limitedUrls = isUnlimited ? sitemapUrls : sitemapUrls.slice(0, maxPages);
       queue = limitedUrls.map(url => ({ url, depth: 0 }));
-      
+
       if (isUnlimited) {
         console.log(`📋 Using sitemap with ${sitemapUrls.length} URLs (unlimited mode)`);
       } else {
-        console.log(`📋 Using sitemap with ${limitedUrls.length} URLs (limited from ${sitemapUrls.length} total)`);
+        console.log(
+          `📋 Using sitemap with ${limitedUrls.length} URLs (limited from ${sitemapUrls.length} total)`
+        );
       }
     } else {
       // No sitemap - fall back to discovery crawling
@@ -416,7 +434,11 @@ async function main() {
   const isUnlimited = maxPages === 0;
   while (queue.length > 0 && (isUnlimited || results.length < maxPages)) {
     const batch = [];
-    while (queue.length > 0 && batch.length < concurrency && (isUnlimited || results.length < maxPages)) {
+    while (
+      queue.length > 0 &&
+      batch.length < concurrency &&
+      (isUnlimited || results.length < maxPages)
+    ) {
       const { url, depth } = queue.shift();
       if (!visited.has(url) && (isUnlimited || results.length < maxPages)) {
         visited.add(url);
@@ -426,11 +448,11 @@ async function main() {
 
     if (batch.length > 0) {
       await Promise.all(batch);
-      const progressMsg = isUnlimited 
+      const progressMsg = isUnlimited
         ? `📊 Progress: ${results.length} pages scanned, ${queue.length} remaining`
         : `📊 Progress: ${results.length} pages scanned, ${queue.length} remaining (max: ${maxPages})`;
       console.log(progressMsg);
-      
+
       // Break if we've reached the max pages limit (but not if unlimited)
       if (!isUnlimited && results.length >= maxPages) {
         console.log(`🛑 Reached maximum page limit (${maxPages}), stopping crawl`);
@@ -442,7 +464,7 @@ async function main() {
   // Generate reports with proper directory structure
   const domain = new URL(seed).hostname;
   const reportsDir = await ensureReportsDirectory(domain);
-  
+
   // Determine output filename
   let jsonOutput;
   if (output === 'report.json') {
@@ -452,10 +474,10 @@ async function main() {
     // Use user-specified output in reports directory
     jsonOutput = path.join(reportsDir, output);
   }
-  
+
   // Write JSON report
   await fs.writeFile(jsonOutput, JSON.stringify(results, null, 2), 'utf-8');
-  
+
   // Generate HTML report if requested
   let htmlOutput = null;
   if (generateHtml) {
@@ -465,7 +487,7 @@ async function main() {
     const htmlContent = generateHTMLReport(results, htmlFilename);
     await fs.writeFile(htmlOutput, htmlContent, 'utf-8');
   }
-  
+
   const mode = usingSitemap ? 'sitemap' : 'discovery';
   console.log(`✅ Crawled ${results.length} pages using ${mode} mode`);
   console.log(`📄 JSON report: ${jsonOutput}`);
@@ -475,4 +497,7 @@ async function main() {
   console.log(`📁 Reports directory: ${reportsDir}`);
 }
 
-main().catch(err => { console.error(err); process.exit(1); });
+main().catch(err => {
+  console.error(err);
+  process.exit(1);
+});
