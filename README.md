@@ -33,7 +33,7 @@ npm run install-browsers
 ```bash
 npm run dev
 
-# Visit [http://localhost:3000](http://localhost:3000) to start a scan
+# Visit <http://localhost:3000> to start a scan
 
 ```
 
