@@ -173,5 +173,5 @@ const server = http.createServer((req, res) => {
 server.listen(PORT, () => {
   console.log(`🌐 Static server running at http://localhost:${PORT}`);
   console.log(`📂 Serving: ${PUBLIC_DIR}`);
-  console.log('� Browse your CATS accessibility reports!');
+  console.log('📑 Browse your CATS accessibility reports!');
 });
