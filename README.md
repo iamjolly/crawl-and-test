@@ -63,7 +63,7 @@ npm start -- -s https://example.com --html
 
 ## Documentation & Details
 
-See [docs/](./docs/), [EXAMPLES.md](./EXAMPLES.md), and [DEVELOPMENT.md](./DEVELOPMENT.md) for:
+See [EXAMPLES.md](./EXAMPLES.md), and [DEVELOPMENT.md](./DEVELOPMENT.md) for:
 
 - Full folder structure
 - Dashboard features & template system
