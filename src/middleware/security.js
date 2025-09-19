@@ -127,13 +127,10 @@ const handleValidationErrors = (req, res, next) => {
  */
 const securityLogger = (req, res, next) => {
   // Log security-relevant requests
-  const securityEvents = ['POST /api/crawl', 'DELETE', 'PUT', 'PATCH'];
+  const isCrawlPost = req.method === 'POST' && req.path === '/api/crawl';
+  const isSensitiveMethod = ['DELETE', 'PUT', 'PATCH'].includes(req.method);
 
-  const shouldLog = securityEvents.some(
-    event => req.method === event || req.originalUrl.includes(event)
-  );
-
-  if (shouldLog) {
+  if (isCrawlPost || isSensitiveMethod) {
     console.log(
       `[SECURITY] ${req.method} ${req.originalUrl} - IP: ${req.ip} - UA: ${req.get('User-Agent')}`
     );
