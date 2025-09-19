@@ -130,6 +130,29 @@ function setButtonLoading(button, loading = true) {
     }
 }
 
+// Parse timestamp from report filename and format for display
+function parseTimestampFromFilename(filename) {
+    // Handle multiple timestamp formats in filenames
+    const reportDate = filename.match(/(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}(?:-\d{3}Z|-\d{3})?)/);
+    
+    if (!reportDate) {
+        return 'Unknown';
+    }
+    
+    // Convert filename timestamp format to ISO format
+    let isoTimestamp = reportDate[1];
+    
+    // Handle format with milliseconds: 2025-09-16T18-42-30-245Z or similar
+    if (isoTimestamp.match(/-\d{3}Z?$/)) {
+        isoTimestamp = isoTimestamp.replace(/T(\d{2})-(\d{2})-(\d{2})-(\d{3})(Z?)/, 'T$1:$2:$3.$4$5');
+    } else {
+        // Handle standard format: 2025-09-14T11-35-12
+        isoTimestamp = isoTimestamp.replace(/T(\d{2})-(\d{2})-(\d{2})/, 'T$1:$2:$3');
+    }
+    
+    return formatTimestamp(isoTimestamp);
+}
+
 // Export functions for potential module use
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
@@ -140,6 +163,7 @@ if (typeof module !== 'undefined' && module.exports) {
         debounce,
         copyToClipboard,
         showNotification,
-        setButtonLoading
+        setButtonLoading,
+        parseTimestampFromFilename
     };
 }
