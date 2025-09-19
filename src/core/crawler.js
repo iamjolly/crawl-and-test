@@ -6,7 +6,7 @@ const path = require('path');
 const { chromium } = require('playwright');
 const { Command } = require('commander');
 const pLimit = require('p-limit');
-const robotsParser = require('robots-txt-parse');
+const robotsParser = require('robots-parser');
 const config = require('./config');
 const axe = require('axe-core');
 const xml2js = require('xml2js');
@@ -280,12 +280,48 @@ async function tryLoadSitemap(seedUrl) {
     const urls = await fetchSitemap(sitemapUrl);
     if (urls && urls.length > 0) {
       console.log(`✓ Found sitemap with ${urls.length} URLs`);
-      return urls.filter(u => isSameDomain(seedUrl, u));
+      const filteredUrls = urls.filter(u => isSameDomain(seedUrl, u));
+      return filteredUrls;
     }
   }
 
   console.log('✗ No sitemap found, falling back to discovery crawling');
   return null;
+}
+
+// ------------------------------------------------------------------
+// Domain resolution (follow redirects to get canonical domain)
+// ------------------------------------------------------------------
+async function getCanonicalDomain(url) {
+  try {
+    // First try with fetch for HTTP-level redirects (faster)
+    const response = await fetch(url, { method: 'HEAD', redirect: 'follow' });
+    const fetchFinalUrl = response.url;
+
+    // Use Playwright to handle meta refresh and JavaScript redirects
+    const browser = await chromium.launch({ headless: true });
+    const context = await browser.newContext();
+    const page = await context.newPage();
+
+    try {
+      await page.goto(fetchFinalUrl, { waitUntil: 'networkidle', timeout: 10000 });
+      const playwrightFinalUrl = page.url();
+      await browser.close();
+
+      return new URL(playwrightFinalUrl).hostname;
+    } catch (playwrightError) {
+      await browser.close();
+      // Fall back to fetch result if Playwright fails
+      console.warn(
+        `Playwright redirect check failed, using fetch result: ${playwrightError.message}`
+      );
+      return new URL(fetchFinalUrl).hostname;
+    }
+  } catch (error) {
+    // Fallback to original URL if all redirect checks fail
+    console.warn(`Could not check redirects for ${url}: ${error.message}`);
+    return new URL(url).hostname;
+  }
 }
 
 // ------------------------------------------------------------------
@@ -295,6 +331,7 @@ let queue = [];
 const visited = new Set();
 const results = []; // array of { url, pageUrl, errors, ... }
 let usingSitemap = false; // track if we're using sitemap mode
+let canonicalSeed = null; // canonical seed URL after following redirects
 
 // Build axe configuration
 const axeTags = buildAxeTags(wcagVersion, wcagLevel, customTags);
@@ -304,6 +341,9 @@ const axeConfig = {
     values: axeTags,
   },
 };
+
+// Ensure maxPages is a number (can come as string from dashboard)
+const maxPagesNum = typeof maxPages === 'string' ? parseInt(maxPages, 10) : maxPages;
 
 const domainDelays = {}; // domain => last request timestamp
 
@@ -335,24 +375,17 @@ async function crawlPage(pageUrl, currentDepth) {
 
   // Respect robots.txt
   const robotsTxtUrl = `${parsed.origin}/robots.txt`;
-  let robotsTxt = '';
   try {
-    robotsTxt = await page.evaluate(url => fetch(url).then(r => r.text()), robotsTxtUrl);
-  } catch (error) {
-    // Ignore robots.txt fetch errors - continue with crawling
-    console.warn(`Could not fetch robots.txt: ${error.message}`);
-  }
-
-  try {
-    const r = robotsParser(robotsTxt);
-    if (!r.isAllowed('MyCrawler', pageUrl)) {
+    const robotsTxt = await page.evaluate(url => fetch(url).then(r => r.text()), robotsTxtUrl);
+    const r = robotsParser(robotsTxtUrl, robotsTxt);
+    if (!r.isAllowed(pageUrl, 'MyCrawler')) {
       console.warn(`Disallowed by robots.txt: ${pageUrl}`);
       await browser.close();
       return;
     }
   } catch (error) {
     // If robots.txt parsing fails, proceed with crawling
-    console.warn(`Failed to parse robots.txt: ${error.message}`);
+    console.warn(`Could not fetch robots.txt: ${error.message}`);
   }
 
   try {
@@ -379,7 +412,7 @@ async function crawlPage(pageUrl, currentDepth) {
 
       for (const link of links) {
         const norm = normalizeUrl(link);
-        if (!visited.has(norm) && isSameDomain(seed, norm) && currentDepth < maxDepth) {
+        if (!visited.has(norm) && isSameDomain(canonicalSeed, norm) && currentDepth < maxDepth) {
           queue.push({ url: norm, depth: currentDepth + 1 });
           visited.add(norm);
         }
@@ -398,16 +431,22 @@ async function crawlPage(pageUrl, currentDepth) {
 async function main() {
   const limit = pLimit(concurrency);
 
+  // Get canonical domain for proper sitemap filtering
+  console.log(`🔍 Checking canonical domain for ${seed}...`);
+  const canonicalDomain = await getCanonicalDomain(seed);
+  canonicalSeed = `https://${canonicalDomain}`;
+  console.log(`✅ Canonical domain: ${canonicalDomain}`);
+
   // Initialize queue based on mode
   if (useSitemap) {
     console.log('🗺️  Mixed mode: Attempting to load sitemap...');
-    const sitemapUrls = await tryLoadSitemap(seed);
+    const sitemapUrls = await tryLoadSitemap(canonicalSeed);
 
     if (sitemapUrls && sitemapUrls.length > 0) {
       // Sitemap found - use sitemap URLs (limit to maxPages unless unlimited)
       usingSitemap = true;
-      const isUnlimited = maxPages === 0;
-      const limitedUrls = isUnlimited ? sitemapUrls : sitemapUrls.slice(0, maxPages);
+      const isUnlimited = maxPagesNum === 0;
+      const limitedUrls = isUnlimited ? sitemapUrls : sitemapUrls.slice(0, maxPagesNum);
       queue = limitedUrls.map(url => ({ url, depth: 0 }));
 
       if (isUnlimited) {
@@ -431,16 +470,16 @@ async function main() {
   }
 
   // Process the queue
-  const isUnlimited = maxPages === 0;
-  while (queue.length > 0 && (isUnlimited || results.length < maxPages)) {
+  const isUnlimited = maxPagesNum === 0;
+  while (queue.length > 0 && (isUnlimited || results.length < maxPagesNum)) {
     const batch = [];
     while (
       queue.length > 0 &&
       batch.length < concurrency &&
-      (isUnlimited || results.length < maxPages)
+      (isUnlimited || results.length < maxPagesNum)
     ) {
       const { url, depth } = queue.shift();
-      if (!visited.has(url) && (isUnlimited || results.length < maxPages)) {
+      if (!visited.has(url) && (isUnlimited || results.length < maxPagesNum)) {
         visited.add(url);
         batch.push(limit(() => crawlPage(url, depth)));
       }
@@ -450,12 +489,12 @@ async function main() {
       await Promise.all(batch);
       const progressMsg = isUnlimited
         ? `📊 Progress: ${results.length} pages scanned, ${queue.length} remaining`
-        : `📊 Progress: ${results.length} pages scanned, ${queue.length} remaining (max: ${maxPages})`;
+        : `📊 Progress: ${results.length} pages scanned, ${queue.length} remaining (max: ${maxPagesNum})`;
       console.log(progressMsg);
 
       // Break if we've reached the max pages limit (but not if unlimited)
-      if (!isUnlimited && results.length >= maxPages) {
-        console.log(`🛑 Reached maximum page limit (${maxPages}), stopping crawl`);
+      if (!isUnlimited && results.length >= maxPagesNum) {
+        console.log(`🛑 Reached maximum page limit (${maxPagesNum}), stopping crawl`);
         break;
       }
     }
