@@ -26,7 +26,7 @@ git clone https://github.com/iamjolly/crawl-and-test.git
 cd crawl-and-test
 npm install
 npm run install-browsers
-```text
+```
 
 ### First Scan
 
@@ -51,7 +51,7 @@ npm run dev
 npm start -- -s https://example.com --html
 ```
 
-Essential options:
+#### Essential options
 
 | Option | Description | Default |
 |--------|-------------|---------|
