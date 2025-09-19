@@ -151,7 +151,7 @@
   
   // Impact level colors (accessibility reports)
   --color-impact-critical: var(--color-red-500);
-  --color-impact-serious: #fd7e14;
+  --color-impact-serious: var(--color-orange-500);
   --color-impact-moderate: var(--color-yellow-500);
   --color-impact-minor: var(--color-gray-500);
 }

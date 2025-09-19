@@ -33,7 +33,7 @@
   // Desktop: optimize for larger screens
   @media (min-width: 1024px) {
     gap: var(--space-8);
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1fr 1fr;
     grid-template-areas: 
       "form jobs"
       "reports reports";
@@ -41,9 +41,10 @@
   
   // Large desktop: three-column layout option
   @media (min-width: 1440px) {
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     grid-template-areas: 
-      "form jobs reports";
+      "form jobs ."
+      "reports reports .";
   }
 }
 
@@ -364,7 +365,6 @@
 
 .content-section__header {
   margin-bottom: var(--space-8);
-  text-align: center;
   
   .content-section__title {
     margin: 0 0 var(--space-3) 0;
@@ -372,14 +372,17 @@
     font-weight: var(--font-weight-bold);
     color: var(--color-text-primary);
   }
+
+  h1.content-section__title {
+      font-size: var(--font-size-2xl);
+      margin: 0 0 var(--space-1) 0;
+    }
   
   .content-section__description {
     margin: 0;
     font-size: var(--font-size-lg);
     color: var(--color-text-secondary);
     max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
     line-height: var(--line-height-relaxed);
   }
 }

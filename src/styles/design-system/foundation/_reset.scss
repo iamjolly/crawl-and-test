@@ -55,7 +55,7 @@ body {
 // ==========================================================================
 
 // Remove default margins for common elements
-h1, h2, h3, h4, h5, h6,
+h1, h2, h3, h4, h5, h6, h7, h8,
 p, blockquote, pre,
 dl, dd, ol, ul,
 figure, hr,
@@ -64,7 +64,7 @@ fieldset, legend {
 }
 
 // Headings
-h1, h2, h3, h4, h5, h6 {
+h1, h2, h3, h4, h5, h6, h7, h8 {
   font-weight: var(--font-weight-heading);
   line-height: var(--line-height-tight);
   color: var(--color-text-primary);
@@ -75,7 +75,9 @@ h2 { font-size: var(--text-heading-2); }
 h3 { font-size: var(--text-heading-3); }
 h4 { font-size: var(--text-heading-4); }
 h5 { font-size: var(--text-heading-5); }
-h6 { font-size: var(--text-heading-6); }
+h6 { font-size: var(--text-heading-5); }
+h7 { font-size: var(--text-heading-5); }
+h8 { font-size: var(--text-heading-5); }
 
 // Paragraphs
 p {

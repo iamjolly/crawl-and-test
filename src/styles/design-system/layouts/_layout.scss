@@ -669,11 +669,11 @@
   gap: var(--space-layout-md);
   
   @media (min-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr 1fr;
   }
-  
-  @media (min-width: 1200px) {
-    grid-template-columns: repeat(3, 1fr);
+
+  @media (min-width: 1440px) {
+    grid-template-columns: 1fr 1fr 1fr;
   }
   
   .dashboard-item {
@@ -711,6 +711,12 @@
 // ==========================================================================
 // Report Layout with Enhanced Spacing
 // ==========================================================================
+.report-page {
+
+  h1.report-page__title {
+    margin-bottom: var(--space-8);
+  }
+}
 
 .report-layout {
   // Enhanced heading spacing for report sections
@@ -740,6 +746,16 @@
     }
   }
   
+}
+
+// ==========================================================================
+// Issues Container Layout
+// ==========================================================================
+
+.issues-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
 }
 
 // ==========================================================================

@@ -7,7 +7,10 @@
     <link rel="stylesheet" href="/styles/design-system.css">
     <link rel="stylesheet" href="/styles/report.css">
 </head>
-<body>
+<body class="report-page">
+    <!-- Skip to main content -->
+    <a href="#page-main" class="skip-links__link">Skip to main content</a>
+
     <!-- Site Header/Navigation -->
     <header class="site-header" role="banner">
         <div class="site-header__container">
@@ -15,10 +18,10 @@
                 <div class="site-header__logo">
                     <span>C</span>
                 </div>
-                <h1 class="site-header__title">
+                <div class="site-header__title">
                     CATS
                     <span class="site-header__subtitle">Accessibility Testing</span>
-                </h1>
+                </div>
             </a>
             
             <nav class="site-header__nav">
@@ -46,23 +49,21 @@
             </ol>
         </div>
     </nav>
-    
-    <!-- Skip to main content -->
-    <a href="#main-content" class="skip-links__link">Skip to main content</a>
-    
-    <div class="page-main">
+
+    <div class="page-main" id="page-main">
         <div class="page-main__container">
-            <!-- Back Button -->
+            <!-- Back Button // removing this for now
             <div class="report-back-nav">
                 <a href="/reports/" class="btn btn-secondary">
                     <span class="icon-left">←</span>
                     Back to Reports
                 </a>
             </div>
+            -->
             
             <!-- Report Header -->
             <header class="content-section__header">
-                <h1 class="content-section__title">CATS Accessibility Report</h1>
+                <h1 class="content-section__title report-page__title">CATS Accessibility Report for {{domain}}</h1>
                 <div class="content-section__description report-header">
                     <div class="report-meta">
                         <p><strong>Domain:</strong> {{domain}}</p>

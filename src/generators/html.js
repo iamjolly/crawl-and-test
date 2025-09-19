@@ -119,7 +119,7 @@ function generateIssuesSection(title, issues, type) {
   let content = `
     <div class="issue-section">
       <h4>${title} (${issues.length})</h4>
-      <div class="accordion">`;
+      <div class="issues-container">`;
   
   issues.forEach((issue, issueIndex) => {
     const impactClass = issue.impact ? `impact-${issue.impact}` : 'impact-minor';
@@ -129,38 +129,32 @@ function generateIssuesSection(title, issues, type) {
     const headerId = `${issueId}-header`;
     const contentId = `${issueId}-content`;
     
-    // Generate issue summary for accordion header
+    // Generate issue summary - now as a static header instead of accordion
     const elementCount = issue.nodes ? issue.nodes.length : 0;
-    const elementText = type === 'warning' ? 'elements needing review' : 'affected elements';
+    const elementText = type === 'warning' ? 'Elements needing review' : 'Affected elements';
     
     content += `
-      <div class="accordion-item ${impactClass}">
-        <button class="accordion-header ${issueClass}" 
-                type="button"
-                aria-expanded="false" 
-                aria-controls="${contentId}"
-                id="${headerId}"
-                onclick="toggleAccordion('${contentId}', '${headerId}')">
-          <div class="violation-info">
-            <div class="violation-title">
-              ${escapeHtml(issue.id)}
-              <span class="impact-badge impact-${issue.impact || 'minor'}">${escapeHtml(issue.impact || 'minor')}</span>
-            </div>
-            <div class="violation-description">${escapeHtml(issue.description)}</div>
-            <div class="violation-meta">
-              <span class="violation-count">${elementCount} ${elementText}</span>
-              <span class="violation-wcag">Impact: ${escapeHtml(issue.impact || 'unknown')}</span>
-            </div>
-          </div>
-          <span class="accordion-toggle" aria-hidden="true">▶</span>
-        </button>
-        <div class="accordion-content" id="${contentId}" aria-labelledby="${headerId}">
-          <div class="violation-details">`;
+      <div class="report-card ${impactClass}">
+      <div class="report-header">
+        <div class="violation-info">
+        <h5 class="violation-title">
+          ${escapeHtml(issue.id)}
+          <span class="impact-badge impact-${(issue.impact || 'minor')}">${escapeHtml(issue.impact || 'minor')}</span>
+        </h5>
+        <div class="violation-description">${escapeHtml(issue.description)}</div>
+        <ul class="violation-meta">
+          <li class="violation-count">${elementText}: ${elementCount}</li>
+          <li class="violation-wcag">Impact: ${escapeHtml(issue.impact || 'unknown')}</li>
+        </ul>
+        </div>
+      </div>
+      <div class="report-body">
+        <div class="violation-details">`;
 
     // Add help information
     content += `
             <div class="violation-help">
-              <h5>How to Fix</h5>
+              <h6>How to Fix</h6>
               <p><a href="${issue.helpUrl}" target="_blank">${escapeHtml(issue.help)}</a></p>
             </div>`;
     
@@ -170,7 +164,7 @@ function generateIssuesSection(title, issues, type) {
       if (w3cLinks.length > 0) {
         content += `
             <div class="violation-help">
-              <h5>W3C WCAG Documentation</h5>`;
+              <h6>W3C WCAG Documentation</h6>`;
         
         w3cLinks.forEach(link => {
           content += `<ul>`;
@@ -194,13 +188,13 @@ function generateIssuesSection(title, issues, type) {
     if (issue.nodes && issue.nodes.length > 0) {
       const elementText = type === 'warning' ? 'Elements Needing Review' : 'Affected Elements';
       content += `
-            <h5>${elementText} (${issue.nodes.length})</h5>
+            <h6>${elementText} (${issue.nodes.length})</h6>
             <div class="violation-elements">`;
       
       issue.nodes.forEach((node, nodeIndex) => {
         content += `
               <div class="element-item">
-                <h6>Element ${nodeIndex + 1}</h6>`;
+                <h7>Element ${nodeIndex + 1}</h7>`;
         
         // Add target selectors
         if (node.target && node.target.length > 0) {

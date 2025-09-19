@@ -64,15 +64,8 @@
   color: var(--color-text-primary);
 }
 
-.text-heading-5 {
+.text-heading-5, .text-heading-6, .text-heading-7, .text-heading-8 {
   font-size: var(--text-heading-5);
-  font-weight: var(--font-weight-heading);
-  line-height: var(--line-height-normal);
-  color: var(--color-text-primary);
-}
-
-.text-heading-6 {
-  font-size: var(--text-heading-6);
   font-weight: var(--font-weight-heading);
   line-height: var(--line-height-normal);
   color: var(--color-text-primary);
@@ -266,7 +259,6 @@ em, .font-italic {
 // Code elements
 code {
   font-family: var(--font-family-code);
-  font-size: 0.875em;
   background-color: var(--color-background-tertiary);
   padding: var(--space-0-5) var(--space-1);
   border-radius: var(--radius-sm);

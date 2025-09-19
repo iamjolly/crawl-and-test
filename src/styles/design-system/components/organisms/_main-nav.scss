@@ -145,6 +145,9 @@
     color: var(--color-primary);
     text-decoration: none;
   }
+  &:visited:hover {
+      color: var(--color-primary);
+    }
   
   // Focus state - ensure high contrast and accessibility
   &:focus-visible {
@@ -176,10 +179,20 @@
       height: 3px;
       background: var(--color-warning);
     }
+
+    // Ensure visited active links maintain proper styling
+    &:visited {
+      color: var(--color-primary);
+    }
     
     // Ensure hover on active links maintains contrast
     &:hover {
       background: var(--color-blue-50);
+      color: var(--color-primary);
+    }
+
+    // Ensure visited active links maintain proper styling
+    &:visited:hover {
       color: var(--color-primary);
     }
     
@@ -188,12 +201,6 @@
       outline: 3px solid var(--color-focus);
       outline-offset: -3px;
       background: var(--color-blue-50);
-      color: var(--color-primary);
-    }
-    
-    // Ensure visited active links maintain proper styling
-    &:visited {
-      background: var(--color-white);
       color: var(--color-primary);
     }
   }
