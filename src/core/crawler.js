@@ -7,7 +7,6 @@ const { chromium } = require('playwright');
 const { Command } = require('commander');
 const pLimit = require('p-limit');
 const robotsParser = require('robots-txt-parse');
-// const url = require('url'); // Unused import
 const config = require('./config');
 const axe = require('axe-core');
 const xml2js = require('xml2js');
