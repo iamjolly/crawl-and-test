@@ -21,20 +21,20 @@ const mimeTypes = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.gif': 'image/gif',
-  '.svg': 'image/svg+xml'
+  '.svg': 'image/svg+xml',
 };
 
 function serveFile(filePath, res) {
   const ext = path.extname(filePath);
   const mimeType = mimeTypes[ext] || 'text/plain';
-  
+
   fs.readFile(filePath, (err, data) => {
     if (err) {
       res.writeHead(404);
       res.end('File not found');
       return;
     }
-    
+
     res.writeHead(200, { 'Content-Type': mimeType });
     res.end(data);
   });
@@ -47,10 +47,10 @@ function serveDirectory(dirPath, res) {
       res.end('Server error');
       return;
     }
-    
+
     const relativeDir = path.relative(PUBLIC_DIR, dirPath);
     const title = relativeDir || 'CATS Reports';
-    
+
     let html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,34 +77,38 @@ function serveDirectory(dirPath, res) {
 <body>
     <div class="container">
         <h1>🔍 ${title}</h1>`;
-    
+
     if (relativeDir) {
       const parentPath = path.dirname(relativeDir);
       const backUrl = parentPath === '.' ? '/' : `/${parentPath}`;
       html += `<a href="${backUrl}" class="back-link">← Back to parent directory</a>`;
     }
-    
+
     html += `<div class="breadcrumb">Path: /${relativeDir}</div>
         <ul class="file-list">`;
-    
+
     // Sort files: directories first, then by name
     files.sort((a, b) => {
       const aPath = path.join(dirPath, a);
       const bPath = path.join(dirPath, b);
       const aIsDir = fs.statSync(aPath).isDirectory();
       const bIsDir = fs.statSync(bPath).isDirectory();
-      
-      if (aIsDir && !bIsDir) return -1;
-      if (!aIsDir && bIsDir) return 1;
+
+      if (aIsDir && !bIsDir) {
+        return -1;
+      }
+      if (!aIsDir && bIsDir) {
+        return 1;
+      }
       return a.localeCompare(b);
     });
-    
+
     files.forEach(file => {
       const filePath = path.join(dirPath, file);
       const stat = fs.statSync(filePath);
       const relativePath = path.relative(PUBLIC_DIR, filePath);
       const url = `/${relativePath}`;
-      
+
       let className = 'file-link';
       if (stat.isDirectory()) {
         className += ' folder';
@@ -113,15 +117,15 @@ function serveDirectory(dirPath, res) {
       } else if (file.endsWith('.json')) {
         className += ' json-file';
       }
-      
+
       html += `<li class="file-item"><a href="${url}" class="${className}">${file}</a></li>`;
     });
-    
+
     html += `</ul>
     </div>
 </body>
 </html>`;
-    
+
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(html);
   });
@@ -129,27 +133,27 @@ function serveDirectory(dirPath, res) {
 
 const server = http.createServer((req, res) => {
   let requestPath = decodeURIComponent(req.url);
-  
+
   // Remove query string
   const queryIndex = requestPath.indexOf('?');
   if (queryIndex !== -1) {
     requestPath = requestPath.substring(0, queryIndex);
   }
-  
+
   // Security: prevent directory traversal
   if (requestPath.includes('..')) {
     res.writeHead(400);
     res.end('Bad request');
     return;
   }
-  
+
   // Default to index
   if (requestPath === '/') {
     requestPath = '';
   }
-  
+
   const fullPath = path.join(PUBLIC_DIR, requestPath);
-  
+
   // Check if file/directory exists
   fs.stat(fullPath, (err, stat) => {
     if (err) {
@@ -157,7 +161,7 @@ const server = http.createServer((req, res) => {
       res.end('Not found');
       return;
     }
-    
+
     if (stat.isDirectory()) {
       serveDirectory(fullPath, res);
     } else {
@@ -169,5 +173,5 @@ const server = http.createServer((req, res) => {
 server.listen(PORT, () => {
   console.log(`🌐 Static server running at http://localhost:${PORT}`);
   console.log(`📂 Serving: ${PUBLIC_DIR}`);
-  console.log(`� Browse your CATS accessibility reports!`);
+  console.log('� Browse your CATS accessibility reports!');
 });

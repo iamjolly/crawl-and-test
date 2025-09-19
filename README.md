@@ -1,6 +1,9 @@
 # 🐱 CATS (Crawl and Test System)
 
-A modern accessibility testing platform for crawling websites and generating actionable, beautiful reports. Built for developers, QA, and accessibility professionals to ensure WCAG compliance with automated scanning and a web dashboard.
+A modern accessibility testing platform for crawling websites and generating
+actionable, beautiful reports. Built for developers, QA, and accessibility
+professionals to ensure WCAG compliance with automated scanning and a web
+dashboard.
 
 ## ✨ Key Features
 
@@ -44,15 +47,15 @@ npm start -- -s https://example.com --html
 
 #### Essential options
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `-s, --seed <url>` | Seed URL (HTTPS) | - |
-| `-d, --depth <num>` | Crawl depth | 2 |
-| `-c, --concurrency <num>` | Parallel browsers | 4 |
-| `-p, --max-pages <num>` | Max pages | 25 |
-| `--wcag-version <ver>` | WCAG version | 2.1 |
-| `--wcag-level <level>` | Compliance level | AA |
-| `--html` | Generate HTML report | false |
+| Option                    | Description          | Default |
+| ------------------------- | -------------------- | ------- |
+| `-s, --seed <url>`        | Seed URL (HTTPS)     | -       |
+| `-d, --depth <num>`       | Crawl depth          | 2       |
+| `-c, --concurrency <num>` | Parallel browsers    | 4       |
+| `-p, --max-pages <num>`   | Max pages            | 25      |
+| `--wcag-version <ver>`    | WCAG version         | 2.1     |
+| `--wcag-level <level>`    | Compliance level     | AA      |
+| `--html`                  | Generate HTML report | false   |
 
 ## 📊 Reports
 
@@ -72,7 +75,8 @@ See [EXAMPLES.md](./EXAMPLES.md), and [DEVELOPMENT.md](./DEVELOPMENT.md) for:
 
 ## Web Dashboard
 
-The web dashboard provides a user-friendly interface for managing accessibility scans:
+The web dashboard provides a user-friendly interface for managing accessibility
+scans:
 
 ### Start the Dashboard
 
@@ -92,11 +96,13 @@ npm run serve
 - **Monitor Progress**: Real-time job tracking with progress indicators
 - **Browse Reports**: Organized view of all reports by domain
 - **Search & Filter**: Find specific reports quickly
-- **Report Navigation**: Seamless navigation between dashboard and individual reports
+- **Report Navigation**: Seamless navigation between dashboard and individual
+  reports
 
 ### Template System
 
-The dashboard uses a modern template-based architecture for clean separation of concerns:
+The dashboard uses a modern template-based architecture for clean separation of
+concerns:
 
 **Template Features:**
 
@@ -121,11 +127,39 @@ The dashboard uses a modern template-based architecture for clean separation of 
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+We welcome contributions! Please see our
+[Contributing Guidelines](.github/CONTRIBUTING.md) for detailed information.
+
+### Quick Start for Contributors
+
+1. **Fork** the repository
+2. **Clone** your fork:
+   `git clone https://github.com/YOUR_USERNAME/crawl-and-test.git`
+3. **Install dependencies**: `npm install`
+4. **Create a feature branch**: `git checkout -b feature/your-feature-name`
+5. **Make your changes**
+6. **Run tests**: `npm test`
+7. **Run linting**: `npm run lint:fix`
+8. **Commit using conventional commits**:
+   `git commit -m "feat: add new feature"`
+9. **Push and create a PR**
+
+### Code Quality
+
+This project uses:
+
+- **ESLint** for code linting
+- **Prettier** for code formatting
+- **Jest** for testing
+- **Husky** for pre-commit hooks
+- **GitHub Actions** for CI/CD
+
+All PRs must pass:
+
+- ✅ All tests
+- ✅ Linting checks
+- ✅ Security scanning
+- ✅ Code review
 
 ## License
 
