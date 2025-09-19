@@ -7,6 +7,7 @@ A modern web accessibility testing platform that crawls websites and generates b
 - **Smart Crawling**: Automatically detects sitemaps or discovers pages through link crawling
 - **Reliable Automated Testing**: Uses axe-core for industry-standard automated accessibility scanning
 - **Beautiful Reports**: Interactive HTML reports with detailed violation breakdowns
+- **Template-Based Architecture**: Modern, maintainable template system for dashboard and reports
 - **Web Dashboard**: Browser-based interface for managing scans and browsing reports
 - **High Performance**: Concurrent crawling with configurable limits and delays
 - **Flexible Configuration**: Support for WCAG 2.0/2.1/2.2 and A/AA/AAA compliance levels
@@ -81,6 +82,17 @@ Additional development tools and examples are available in the `/tools/` directo
 │   ├── styles/                     # CSS stylesheets and design system
 │   ├── scripts/                    # JavaScript utilities
 │   ├── templates/                  # HTML templates
+│   │   ├── base.html              # Base report template
+│   │   ├── dashboard.html         # Dashboard template
+│   │   ├── domain-reports.html    # Domain-specific reports page
+│   │   ├── error-404.html         # Error page template
+│   │   ├── navigation.html        # Navigation component
+│   │   ├── no-issues.html         # No issues found template
+│   │   ├── page-card.html         # Page card component
+│   │   ├── pages-section.html     # Pages section component
+│   │   ├── report-base.html       # Report base template
+│   │   ├── reports-index.html     # Reports listing page
+│   │   └── summary-card.html      # Summary card component
 │   └── utils/                      # Utility scripts
 │       └── cleanup.js              # Cleanup utilities
 ├── public/                         # Generated output (served by dashboard)
@@ -113,7 +125,7 @@ npm run dev
 npm run serve
 ```
 
-**URL**: http://localhost:3000
+**URL**: <http://localhost:3000>
 
 ### Dashboard Features
 
@@ -122,6 +134,28 @@ npm run serve
 - **Browse Reports**: Organized view of all reports by domain
 - **Search & Filter**: Find specific reports quickly
 - **Report Navigation**: Seamless navigation between dashboard and individual reports
+
+### Template System
+
+The dashboard uses a modern template-based architecture for clean separation of concerns:
+
+**Template Features:**
+- **Modular Design**: Reusable components for consistent UI
+- **Template Engine**: Simple placeholder replacement system (`{{variable}}`)
+- **Error Handling**: Graceful fallbacks for missing templates
+- **Performance**: Templates loaded once and cached
+
+**Key Templates:**
+- `reports-index.html` - Main reports listing page
+- `domain-reports.html` - Domain-specific reports browser
+- `error-404.html` - Error pages with consistent styling
+- `base.html`, `report-base.html` - Report viewer templates
+
+**For Developers:**
+- Templates are located in `src/templates/`
+- Dashboard uses `loadTemplate()` and `renderTemplate()` utilities
+- All dashboard pages now use templates instead of inline HTML
+- Easy to customize styling and layout without touching server logic
 
 ## Command Line Usage
 
@@ -582,6 +616,20 @@ The `--detailed` flag forces regeneration of HTML reports with comprehensive vio
 - **Enhanced Details**: Upgrade existing reports to the new detailed format with `--detailed`
 - **Batch Processing**: Retroactively add HTML reports to all existing scans
 - **Debugging**: Regenerate reports with updated HTML templates
+
+### Utility Functions
+
+The system includes several utility functions for common operations:
+
+**Timestamp Parsing:**
+- `parseTimestampFromFilename()` - Extracts and formats timestamps from report filenames
+- `formatTimestamp()` - Converts timestamps to human-readable format
+- Handles multiple timestamp formats automatically
+
+**Template System:**
+- `loadTemplate()` - Loads HTML templates from the templates directory
+- `renderTemplate()` - Renders templates with data using placeholder replacement
+- Automatic error handling for missing templates
 
 The utility will:
 - ✅ Scan all report directories automatically
