@@ -1,0 +1,610 @@
+// ==========================================================================
+// Report Page Styles
+// ==========================================================================
+//
+// Styles specific to accessibility report pages.
+//
+
+@import '../abstracts/variables';
+@import '../abstracts/mixins';
+
+// ==========================================================================
+// Report Page Body Override
+// ==========================================================================
+
+body {
+  font-family: Arial, sans-serif;
+}
+
+// ==========================================================================
+// Report Container
+// ==========================================================================
+
+.report-container {
+  @include container();
+  @include card();
+  margin-top: $spacing-xl;
+  margin-bottom: $spacing-xl;
+}
+
+// ==========================================================================
+// Report Header
+// ==========================================================================
+
+.report-header {
+  border-bottom: 2px solid $color-border;
+  padding-bottom: $spacing-xl;
+  margin-bottom: $spacing-xl;
+  
+  h1 {
+    color: $color-text;
+    margin: 0 0 $spacing-md 0;
+  }
+  
+  .report-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-lg;
+    margin-top: $spacing-lg;
+    font-size: $font-size-small;
+    color: $color-text-muted;
+  }
+  
+  .report-meta-item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    
+    strong {
+      color: $color-text;
+    }
+  }
+}
+
+// ==========================================================================
+// Report Summary
+// ==========================================================================
+
+.report-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: $spacing-lg;
+  margin-bottom: $spacing-2xl;
+  
+  .summary-card {
+    @include card();
+    padding: $spacing-lg;
+    text-align: center;
+    border-left: 4px solid $color-border;
+    
+    &.violations {
+      border-left-color: $color-danger;
+    }
+    
+    &.incomplete {
+      border-left-color: $color-warning;
+    }
+    
+    &.passes {
+      border-left-color: $color-success;
+    }
+    
+    &.inapplicable {
+      border-left-color: $color-text-light;
+    }
+  }
+  
+  .summary-number {
+    font-size: $font-size-h1;
+    font-weight: $font-weight-bold;
+    margin: 0 0 $spacing-xs 0;
+    
+    &.violations { color: $color-danger; }
+    &.incomplete { color: $color-warning; }
+    &.passes { color: $color-success; }
+    &.inapplicable { color: $color-text-light; }
+  }
+  
+  .summary-label {
+    font-size: $font-size-small;
+    font-weight: $font-weight-medium;
+    color: $color-text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+// ==========================================================================
+// Issues Section
+// ==========================================================================
+
+.issue-section {
+  margin-bottom: $spacing-2xl;
+  
+  h4 {
+    margin-bottom: $spacing-lg;
+    padding-bottom: $spacing-sm;
+    border-bottom: 1px solid $color-border-light;
+  }
+}
+
+.issue {
+  background: $color-background-light;
+  border-left: 4px solid $color-danger;
+  border-radius: 0 4px 4px 0;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  
+  &.warning {
+    border-left-color: $color-warning;
+  }
+  
+  &.info {
+    border-left-color: $color-info;
+  }
+  
+  &.pass {
+    border-left-color: $color-success;
+  }
+}
+
+.issue-title {
+  font-size: $font-size-large;
+  font-weight: $font-weight-semibold;
+  margin-bottom: $spacing-sm;
+  color: $color-text;
+}
+
+.issue-impact {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  
+  &.impact-critical {
+    background: #ffebee;
+    color: #000;
+  }
+  
+  &.impact-serious {
+    background: #fff3e0;
+    color: #000;
+  }
+  
+  &.impact-moderate {
+    background: #fff8e1;
+    color: #000;
+  }
+  
+  &.impact-minor {
+    background: #e3f2fd;
+    color: #000;
+  }
+}
+
+.issue-description {
+  margin-bottom: $spacing-md;
+  line-height: $line-height-loose;
+}
+
+.issue-help {
+  margin-bottom: $spacing-md;
+  
+  a {
+    @include link();
+  }
+}
+
+// ==========================================================================
+// W3C Documentation Links
+// ==========================================================================
+
+.w3c-links {
+  margin-top: $spacing-md;
+  padding: $spacing-md;
+  background-color: $color-background-light;
+  border-left: 3px solid $color-primary;
+  border-radius: $border-radius-small;
+  
+  h5 {
+    margin: 0 0 $spacing-sm 0;
+    font-size: $font-size-small;
+    font-weight: $font-weight-semibold;
+  }
+  
+  ul {
+    margin: $spacing-xs 0 0 0;
+    padding: 0;
+    list-style: none;
+    
+    li {
+      margin: $spacing-xs 0;
+      
+      a {
+        @include link();
+      }
+    }
+  }
+}
+
+// ==========================================================================
+// Issue Nodes
+// ==========================================================================
+
+.issue-node {
+  margin: $spacing-sm 0;
+  padding: $spacing-sm;
+  background: $color-background-light;
+  border-radius: $border-radius-small;
+  border-left: 3px solid $color-border;
+}
+
+.issue-target {
+  margin: $spacing-xs 0;
+  
+  strong {
+    color: $color-text;
+  }
+}
+
+.issue-html {
+  background: $color-background-light;
+  border: 1px solid #dee2e6;
+  padding: 8px;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 12px;
+  margin: 8px 0;
+  overflow-x: auto;
+  color: $color-text;
+}
+
+.issue-failure {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  padding: 8px;
+  border-radius: 3px;
+  font-size: 13px;
+  margin: 8px 0;
+  color: $color-text;
+}
+
+// ==========================================================================
+// Responsive Design
+// ==========================================================================
+
+@media (max-width: $breakpoint-tablet) {
+  .report-summary {
+    grid-template-columns: 1fr;
+  }
+  
+  .report-meta {
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+  
+  .issue {
+    padding: $spacing-md;
+  }
+}
+
+// ==========================================================================
+// Print Styles
+// ==========================================================================
+// W3C Links Styles (extracted from inline styles)
+// ==========================================================================
+
+.w3c-links {
+  margin-top: $spacing-sm;
+  padding: $spacing-sm;
+  background-color: $color-background-light;
+  border-left: 3px solid $color-primary;
+  border-radius: $border-radius-small;
+  
+  h5 {
+    margin: 0 0 $spacing-xs 0;
+    font-size: $font-size-small;
+  }
+  
+  ul {
+    margin: 4px 0;
+    padding: 0;
+    list-style: none;
+  }
+  
+  li {
+    margin: 2px 0;
+    
+    a {
+      color: $color-primary;
+      
+      &:hover {
+        color: $color-primary-darker;
+      }
+    }
+  }
+}
+
+// Issue element count styling
+.issue-element-count {
+  margin-top: $spacing-sm;
+  
+  strong {
+    font-weight: $font-weight-medium;
+  }
+}
+
+// ==========================================================================
+// Legacy Summary Cards (from old report.css)
+// ==========================================================================
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: $spacing-xl;
+  margin-bottom: 30px;
+}
+
+.summary-card {
+  background: rgba(0, 123, 255, 0.1);
+  padding: 15px;
+  border-radius: 6px;
+  border-left: 4px solid #007bff;
+  
+  h3 {
+    margin: 0 0 10px 0;
+    color: $color-text;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+  
+  .value {
+    font-size: 24px;
+    font-weight: $font-weight-bold;
+    color: $color-text;
+  }
+}
+
+.summary-card-error {
+  border-left-color: $color-danger;
+  background: rgba($color-danger, 0.1);
+  
+  .value {
+    color: $color-text;
+  }
+}
+
+.summary-card-warning {
+  border-left-color: $color-warning;
+  background: rgba($color-warning, 0.25);
+  
+  .value {
+    color: $color-text;
+  }
+}
+
+// Legacy error and warning classes
+.error {
+  border-left-color: $color-danger;
+  background: rgba($color-danger, 0.15);
+  
+  .value {
+    color: $color-text;
+  }
+}
+
+.warning {
+  border-left-color: $color-warning;
+  background: rgba($color-warning, 0.25);
+  
+  .value {
+    color: $color-text;
+  }
+}
+
+// ==========================================================================
+// Download Button
+// ==========================================================================
+
+.download-section {
+  margin-top: 15px;
+}
+
+.download-btn {
+  display: inline-block;
+  background: #007bff;
+  color: $color-white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+  border: 2px solid #007bff;
+  
+  &:hover {
+    background: #0056b3;
+    border-color: #0056b3;
+    color: $color-white;
+    text-decoration: none;
+  }
+  
+  &:focus {
+    outline: 3px solid #007bff;
+    outline-offset: 3px;
+    color: $color-white;
+    text-decoration: none;
+  }
+}
+
+// ==========================================================================
+// Pages Section
+// ==========================================================================
+
+.pages {
+  margin-top: 30px;
+}
+
+.page-header {
+  background: $color-background-light;
+  padding: 15px;
+  border-bottom: 1px solid $color-border;
+  
+  h3 {
+    margin: 0;
+    color: $color-text;
+  }
+  
+  .url {
+    color: $color-text;
+    font-size: $font-size-small;
+    margin-top: $spacing-xs;
+    word-break: break-all;
+  }
+}
+
+// ==========================================================================
+// Impact Level Styles
+// ==========================================================================
+
+.impact-critical {
+  background: #ffebee;
+  color: $color-text;
+}
+
+.impact-serious {
+  background: #fff3e0;
+  color: $color-text;
+}
+
+.impact-moderate {
+  background: #fff8e1;
+  color: $color-text;
+}
+
+.impact-minor {
+  background: #e3f2fd;
+  color: $color-text;
+}
+
+// Alternative impact styles for legacy reports
+.violation-impact {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  font-weight: 500;
+  margin: 5px 0;
+  
+  &.impact-critical {
+    background: #ffebee;
+    color: #000;
+  }
+  
+  &.impact-serious {
+    background: #fff3e0;
+    color: #000;
+  }
+  
+  &.impact-moderate {
+    background: #fff8e1;
+    color: #000;
+  }
+  
+  &.impact-minor {
+    background: #e3f2fd;
+    color: #000;
+  }
+}
+
+// Main issue impact styles
+.issue-impact {
+  &.impact-critical {
+    background: #ffebee;
+    color: $color-text;
+  }
+  
+  &.impact-serious {
+    background: #fff3e0;
+    color: $color-text;
+  }
+  
+  &.impact-moderate {
+    background: #fff8e1;
+    color: $color-text;
+  }
+  
+  &.impact-minor {
+    background: #e3f2fd;
+    color: $color-text;
+  }
+}
+
+// ==========================================================================
+// Affected Pages
+// ==========================================================================
+
+.affected-pages {
+  summary {
+    cursor: pointer;
+    font-weight: 500;
+    color: #004085;
+    margin-bottom: 10px;
+  }
+  
+  details {
+    margin-top: 10px;
+  }
+}
+
+.page-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+  
+  li {
+    padding: 5px 0;
+    border-bottom: 1px solid #f0f0f0;
+    word-break: break-all;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+// ==========================================================================
+// No Issues State
+// ==========================================================================
+
+.no-issues {
+  text-align: center;
+  color: #155724;
+  font-size: 18px;
+  padding: 40px;
+  background: $color-background-light;
+  border-radius: 6px;
+}
+
+// ==========================================================================
+
+@media print {
+  .report-container {
+    box-shadow: none;
+    border: 1px solid $color-border;
+  }
+  
+  .issue {
+    break-inside: avoid;
+    margin-bottom: $spacing-md;
+  }
+  
+  .w3c-links {
+    break-inside: avoid;
+  }
+}

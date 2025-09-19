@@ -4,101 +4,157 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}}</title>
-    <link rel="stylesheet" href="/styles/navigation.css">
-    <link rel="stylesheet" href="/styles/dashboard.css">
+    <link rel="stylesheet" href="/styles/design-system.css">
 </head>
-<body>
-    <nav class="site-nav" role="navigation" aria-label="Main navigation">
-        <div class="nav-container">
-            <a href="/" class="nav-brand" aria-label="CATS Home">
-                <span>CATS</span>
-            </a>
-            <ul class="nav-links">
-                <li><a href="/" class="nav-link active" aria-current="page">Dashboard</a></li>
-                <li><a href="/reports/" class="nav-link">Reports</a></li>
-            </ul>
-        </div>
-    </nav>
+<body class="page-container">
+    <!-- Skip Links -->
+    <div class="skip-links">
+        <a href="#main-content" class="skip-links__link">Skip to main content</a>
+    </div>
     
-    <div class="container">
-        <div class="header">
-            <h1>{{pageTitle}}</h1>
-            <p>{{pageDescription}}</p>
-        </div>
-        
-        <main>
-            <div class="grid">
-                <div class="card">
-                    <h2>Start New Crawl</h2>
-                    <form id="crawlForm" action="/crawl" method="POST">
-                        <div class="form-group">
-                            <label for="url">Website URL:</label>
-                            <input type="url" id="url" name="url" required placeholder="https://example.com">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="wcagVersion">WCAG Version:</label>
-                            <select id="wcagVersion" name="wcagVersion">
-                                <option value="2.1" selected>WCAG 2.1 (Default)</option>
-                                <option value="2.0">WCAG 2.0</option>
-                                <option value="2.2">WCAG 2.2 (Latest)</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="wcagLevel">WCAG Level:</label>
-                            <select id="wcagLevel" name="wcagLevel">
-                                <option value="A">Level A (Basic)</option>
-                                <option value="AA" selected>Level AA (Standard)</option>
-                                <option value="AAA">Level AAA (Enhanced)</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="maxDepth">Crawl Depth:</label>
-                            <select id="maxDepth" name="maxDepth">
-                                <option value="1">1 - Homepage only</option>
-                                <option value="2" selected>2 - Homepage + linked pages</option>
-                                <option value="3">3 - Deep crawl (recommended)</option>
-                                <option value="4">4 - Very deep crawl</option>
-                                <option value="5">5 - Maximum depth</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="maxPages">Max Pages to Scan:</label>
-                            <select id="maxPages" name="maxPages">
-                                <option value="5">5 - Quick test</option>
-                                <option value="10">10 - Small site</option>
-                                <option value="25">25 - Medium site</option>
-                                <option value="50" selected>50 - Default</option>
-                                <option value="100">100 - Large site</option>
-                                <option value="250">250 - Very large site</option>
-                                <option value="0">Unlimited - Scan all pages</option>
-                            </select>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary">Start Crawl</button>
-                    </form>
+    <!-- Site Header -->
+    <header class="site-header" role="banner">
+        <div class="site-header__container">
+            <a href="/" class="site-header__brand" aria-label="CATS Home">
+                <div class="site-header__logo">
+                    <span>C</span>
                 </div>
-                
-                <div class="card">
-                    <h2>Active Jobs</h2>
-                    <div id="jobsSection" class="jobs-section">
-                        <div id="jobsList"></div>
-                        <p id="noJobsMessage" class="no-reports">No active crawls</p>
-                    </div>
+                <div class="site-header__title">
+                    CATS
+                    <span class="site-header__subtitle">Accessibility Testing</span>
                 </div>
-            </div>
+            </a>
             
-            <div class="card">
-                <h2>Generated Reports 
-                    <button onclick="updateReports()" class="btn btn-refresh" title="Refresh reports list">↻</button>
-                </h2>
-                <div id="reportsSection" class="reports-section">
-                    <div id="reportsList"></div>
-                    <p id="noReportsMessage" class="no-reports">No reports generated yet. Start a crawl to create your first report!</p>
+            <nav class="site-header__nav">
+                <div id="nav-main" class="main-nav main-nav--horizontal" role="navigation" aria-label="Main navigation">
+                    <ul class="main-nav__list">
+                        <li class="main-nav__item">
+                            <a href="/" class="main-nav__link main-nav__link--active" aria-current="page">Dashboard</a>
+                        </li>
+                        <li class="main-nav__item">
+                            <a href="/reports/" class="main-nav__link">Reports</a>
+                        </li>
+                    </ul>
                 </div>
+            </nav>
+            
+            <div class="site-header__utilities">
+                <!-- Future: user menu, settings, etc. -->
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content Area -->
+    <main id="main-content" class="page-main">
+        <div class="page-main__container">
+            
+            <!-- Page Header -->
+            <header class="content-section__header">
+                <h1 class="content-section__title">{{pageTitle}}</h1>
+                <p class="content-section__description">{{pageDescription}}</p>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-layout">
+                
+                <!-- Start New Crawl Section -->
+                <section class="dashboard-layout__form" aria-labelledby="crawl-form-title">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 id="crawl-form-title" class="card-title">Start New Crawl</h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="crawl-form" action="/crawl" method="POST" novalidate>
+                                <div class="form-group">
+                                    <label for="url" class="form-label">Website URL (required)</label>
+                                    <small id="url-help" class="form-text">Enter the full URL of the website you want to test for accessibility</small>
+                                    <div id="url-error" class="error-message" tabindex="-1" style="display: none;"></div>
+                                    <input type="url" id="url" name="url" class="form-control" required placeholder="https://example.com" aria-describedby="url-help url-error">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="wcagVersion" class="form-label">WCAG Version</label>
+                                    <select id="wcagVersion" name="wcagVersion" class="form-control" aria-describedby="wcag-version-help">
+                                        <option value="2.1" selected>WCAG 2.1 (Default)</option>
+                                        <option value="2.0">WCAG 2.0</option>
+                                        <option value="2.2">WCAG 2.2 (Latest)</option>
+                                    </select>
+                                    <small id="wcag-version-help" class="form-text">Choose the WCAG version for accessibility evaluation</small>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="wcagLevel" class="form-label">WCAG Level</label>
+                                    <select id="wcagLevel" name="wcagLevel" class="form-control" aria-describedby="wcag-level-help">
+                                    <option value="A">Level A (Basic)</option>
+                                    <option value="AA" selected>Level AA (Standard)</option>
+                                    <option value="AAA">Level AAA (Enhanced)</option>
+                                </select>
+                                <small id="wcag-level-help" class="form-text">AA is recommended for most websites</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="maxDepth" class="form-label">Crawl Depth</label>
+                                <select id="maxDepth" name="maxDepth" class="form-control" aria-describedby="depth-help">
+                                    <option value="1">1 - Homepage only</option>
+                                    <option value="2" selected>2 - Homepage + linked pages</option>
+                                    <option value="3">3 - Deep crawl (recommended)</option>
+                                    <option value="4">4 - Very deep crawl</option>
+                                    <option value="5">5 - Maximum depth</option>
+                                </select>
+                                <small id="depth-help" class="form-text">How many levels deep to follow links</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="maxPages" class="form-label">Max Pages to Scan</label>
+                                <select id="maxPages" name="maxPages" class="form-control" aria-describedby="pages-help">
+                                    <option value="5">5 - Quick test</option>
+                                    <option value="10">10 - Small site</option>
+                                    <option value="25">25 - Medium site</option>
+                                    <option value="50" selected>50 - Default</option>
+                                    <option value="100">100 - Large site</option>
+                                    <option value="250">250 - Very large site</option>
+                                    <option value="0">Unlimited - Scan all pages</option>
+                                </select>
+                                <small id="pages-help" class="form-text">Limit the number of pages to scan</small>
+                            </div>
+                            
+                            <button type="submit" class="btn-primary">Start Crawl</button>
+                        </form>
+                    </div>
+                </section>
+                
+                <!-- Active Jobs Section -->
+                <section class="dashboard-layout__jobs" aria-labelledby="jobs-title">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 id="jobs-title" class="card-title">Active Jobs</h2>
+                        </div>
+                        <div class="card-body">
+                            <div id="jobsSection" class="jobs-section" role="region" aria-live="polite" aria-label="Active crawling jobs">
+                                <div id="jobsList"></div>
+                                <p id="noJobsMessage" class="no-reports">No active crawls</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Generated Reports Section -->
+                <section class="dashboard-layout__reports" aria-labelledby="reports-title">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 id="reports-title" class="card-title">
+                                Generated Reports 
+                                <button onclick="updateReports()" class="btn-refresh" title="Refresh reports list" aria-label="Refresh reports list">↻</button>
+                            </h2>
+                        </div>
+                        <div class="card-body">
+                            <div id="reportsSection" class="reports-section" role="region" aria-live="polite" aria-label="Generated accessibility reports">
+                                <div id="reportsList"></div>
+                                <p id="noReportsMessage" class="no-reports">No reports generated yet. Start a crawl to create your first report!</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
         </main>
     </div>
@@ -106,19 +162,29 @@
     <script>
         // Update jobs display
         function updateJobs() {
-            fetch('/api/jobs')
+            return fetch('/api/jobs')
                 .then(response => response.json())
                 .then(jobs => {
                     const jobsList = document.getElementById('jobsList');
                     const noJobsMessage = document.getElementById('noJobsMessage');
+                    
+                    // Preserve current focus before updating DOM
+                    const currentlyFocused = document.activeElement;
+                    const focusedJobId = currentlyFocused && currentlyFocused.classList.contains('job-item') 
+                        ? currentlyFocused.id.replace('job-', '') 
+                        : null;
                     
                     if (jobs.length === 0) {
                         jobsList.innerHTML = '';
                         noJobsMessage.style.display = 'block';
                     } else {
                         noJobsMessage.style.display = 'none';
-                        jobsList.innerHTML = jobs.map(job => `
-                            <div class="job-item">
+                        jobsList.innerHTML = jobs.map((job, index) => `
+                            <div class="job-item" 
+                                 id="job-${job.jobId}" 
+                                 tabindex="-1" 
+                                 role="article"
+                                 aria-label="Crawl job for ${job.url}, status: ${job.status}">
                                 <div>
                                     <strong>${job.url}</strong>
                                     <br>
@@ -127,10 +193,299 @@
                                 <span class="job-status ${job.status}">${job.status}</span>
                             </div>
                         `).join('');
+                        
+                        // Restore focus if a job was previously focused and still exists
+                        if (focusedJobId) {
+                            const jobStillExists = jobs.find(job => job.jobId === focusedJobId);
+                            if (jobStillExists) {
+                                const restoredElement = document.getElementById(`job-${focusedJobId}`);
+                                if (restoredElement) {
+                                    restoredElement.focus();
+                                    console.log(`Restored focus to job: ${focusedJobId}`);
+                                }
+                            }
+                        }
                     }
+                    return jobs; // Return jobs for chaining
                 })
-                .catch(err => console.error('Error fetching jobs:', err));
+                .catch(err => {
+                    console.error('Error fetching jobs:', err);
+                    throw err; // Re-throw to allow caller to handle
+                });
         }
+        
+        // Reliable focus management for new jobs
+        function focusNewJob(jobId, maxAttempts = 5) {
+            console.log(`Attempting to focus job: ${jobId}`);
+            const attempt = (attemptsLeft) => {
+                const jobElement = document.getElementById(`job-${jobId}`);
+                console.log(`Looking for element: job-${jobId}, found:`, jobElement);
+                if (jobElement) {
+                    jobElement.focus();
+                    console.log(`Successfully focused job: ${jobId}`);
+                    return true;
+                } else if (attemptsLeft > 0) {
+                    console.log(`Job ${jobId} not found, retrying... (${attemptsLeft} attempts left)`);
+                    // Also log what job elements actually exist
+                    const allJobs = document.querySelectorAll('.job-item');
+                    console.log(`Current job elements:`, Array.from(allJobs).map(el => el.id));
+                    setTimeout(() => attempt(attemptsLeft - 1), 200);
+                } else {
+                    console.warn(`Failed to focus job ${jobId} after ${maxAttempts} attempts`);
+                    // Final check of what's actually in the DOM
+                    const allJobs = document.querySelectorAll('.job-item');
+                    console.log(`Final DOM state - job elements:`, Array.from(allJobs).map(el => el.id));
+                    return false;
+                }
+            };
+            return attempt(maxAttempts);
+        }
+        
+        // Enhanced URL validation and formatting
+        function normalizeUrl(url) {
+            if (!url) return '';
+            
+            // Remove whitespace and common formatting issues
+            const trimmedUrl = url.trim().replace(/\s+/g, '');
+            const lowerUrl = trimmedUrl.toLowerCase();
+            
+            // If no protocol, add appropriate protocol
+            if (lowerUrl && !lowerUrl.match(/^https?:\/\//i)) {
+                // Use http:// for localhost, https:// for everything else
+                if (lowerUrl.startsWith('localhost')) {
+                    return 'http://' + lowerUrl;
+                } else {
+                    return 'https://' + lowerUrl;
+                }
+            }
+            
+            return lowerUrl;
+        }
+        
+        // Enhanced URL validation with comprehensive checks
+        function isValidUrl(url) {
+            if (!url) return false;
+            
+            try {
+                const normalizedUrl = normalizeUrl(url);
+                const urlObj = new URL(normalizedUrl);
+                
+                // Check protocol
+                if (!['http:', 'https:'].includes(urlObj.protocol)) {
+                    return false;
+                }
+                
+                // Check hostname exists and is valid
+                // Note: urlObj.hostname excludes port number, so localhost:3000 becomes just "localhost"
+                if (!urlObj.hostname || urlObj.hostname.length === 0) {
+                    return false;
+                }
+                
+                const hostname = urlObj.hostname;
+                
+                // Special case: localhost is always valid (ports are automatically handled)
+                if (hostname === 'localhost') {
+                    return true;
+                }
+                
+                // Check if it's a valid IP address
+                const ipPattern = /^(\d{1,3}\.){3}\d{1,3}$/;
+                if (ipPattern.test(hostname)) {
+                    // Validate IP address ranges
+                    const parts = hostname.split('.').map(Number);
+                    return parts.every(part => part >= 0 && part <= 255);
+                }
+                
+                // For domain names, must contain at least one dot
+                if (!hostname.includes('.')) {
+                    return false;
+                }
+                
+                // Check for valid domain characters (letters, numbers, hyphens, dots only)
+                const domainPattern = /^[a-zA-Z0-9.-]+$/;
+                if (!domainPattern.test(hostname)) {
+                    return false;
+                }
+                
+                // Check for valid domain structure
+                const parts = hostname.split('.');
+                
+                // Must have at least 2 parts (domain + TLD)
+                if (parts.length < 2) {
+                    return false;
+                }
+                
+                // Each part must be valid
+                for (let part of parts) {
+                    // No empty parts
+                    if (part.length === 0) {
+                        return false;
+                    }
+                    
+                    // Can't start or end with hyphen
+                    if (part.startsWith('-') || part.endsWith('-')) {
+                        return false;
+                    }
+                    
+                    // Must contain at least one character
+                    if (part.length === 0) {
+                        return false;
+                    }
+                }
+                
+                // TLD (last part) must be at least 2 characters and contain only letters
+                const tld = parts[parts.length - 1];
+                if (tld.length < 2 || !/^[a-zA-Z]+$/.test(tld)) {
+                    return false;
+                }
+                
+                // Domain name (second to last part) must be valid
+                const domain = parts[parts.length - 2];
+                if (domain.length === 0) {
+                    return false;
+                }
+                
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+        
+        // Get detailed validation feedback for user
+        function getUrlValidationMessage(url) {
+            if (!url || url.trim() === '') {
+                return { isValid: false, message: 'Website URL is required' };
+            }
+            
+            const normalizedUrl = normalizeUrl(url);
+            
+            try {
+                const urlObj = new URL(normalizedUrl);
+                
+                if (!['http:', 'https:'].includes(urlObj.protocol)) {
+                    return { isValid: false, message: 'URL must use http:// or https:// protocol' };
+                }
+                
+                if (!urlObj.hostname) {
+                    return { isValid: false, message: 'URL must include a valid domain name' };
+                }
+                
+                const hostname = urlObj.hostname;
+                
+                // Special case: localhost
+                if (hostname === 'localhost') {
+                    return { isValid: true, message: 'Valid URL' };
+                }
+                
+                // Check if it's an IP address
+                const ipPattern = /^(\d{1,3}\.){3}\d{1,3}$/;
+                if (ipPattern.test(hostname)) {
+                    const parts = hostname.split('.').map(Number);
+                    if (parts.every(part => part >= 0 && part <= 255)) {
+                        return { isValid: true, message: 'Valid URL' };
+                    } else {
+                        return { isValid: false, message: 'Invalid IP address format' };
+                    }
+                }
+                
+                // Domain validation
+                if (!hostname.includes('.')) {
+                    return { isValid: false, message: 'Domain must include a top-level domain (e.g., .com, .org)' };
+                }
+                
+                // Check for invalid characters
+                const domainPattern = /^[a-zA-Z0-9.-]+$/;
+                if (!domainPattern.test(hostname)) {
+                    return { isValid: false, message: 'Domain contains invalid characters. Use only letters, numbers, hyphens, and dots.' };
+                }
+                
+                const parts = hostname.split('.');
+                
+                if (parts.length < 2) {
+                    return { isValid: false, message: 'Please enter a complete domain name (e.g., example.com)' };
+                }
+                
+                // Check for empty parts or invalid structure
+                for (let part of parts) {
+                    if (part.length === 0) {
+                        return { isValid: false, message: 'Invalid domain format - check for double dots or missing parts' };
+                    }
+                    if (part.startsWith('-') || part.endsWith('-')) {
+                        return { isValid: false, message: 'Domain parts cannot start or end with hyphens' };
+                    }
+                }
+                
+                // Check TLD
+                const tld = parts[parts.length - 1];
+                if (tld.length < 2) {
+                    return { isValid: false, message: 'Top-level domain must be at least 2 characters long' };
+                }
+                
+                if (!/^[a-zA-Z]+$/.test(tld)) {
+                    return { isValid: false, message: 'Top-level domain must contain only letters' };
+                }
+                
+                return { isValid: true, message: 'Valid URL' };
+                
+            } catch (e) {
+                return { isValid: false, message: 'Please enter a valid URL format (e.g., example.com)' };
+            }
+        }
+        
+        // Enhanced accessible URL validation
+        function validateUrlField() {
+            const urlField = document.getElementById('url');
+            const errorElement = document.getElementById('url-error');
+            const validation = getUrlValidationMessage(urlField.value);
+            
+            if (!validation.isValid && urlField.value.trim()) {
+                // Show error state
+                errorElement.textContent = validation.message;
+                errorElement.style.display = 'block';
+                urlField.setAttribute('aria-invalid', 'true');
+                urlField.classList.add('is-invalid');
+                errorElement.focus(); // Focus the error for screen readers
+                return false;
+            } else {
+                // Clear error state
+                errorElement.style.display = 'none';
+                urlField.removeAttribute('aria-invalid');
+                urlField.classList.remove('is-invalid');
+                return true;
+            }
+        }
+
+        // Initialize form validation
+        const urlField = document.getElementById('url');
+        const crawlForm = document.getElementById('crawl-form');
+        
+        // Validate on blur (when user leaves field)
+        urlField.addEventListener('blur', function() {
+            if (this.value.trim()) {
+                const normalizedUrl = normalizeUrl(this.value);
+                if (normalizedUrl !== this.value) {
+                    this.value = normalizedUrl;
+                }
+                validateUrlField();
+            }
+        });
+        
+        // Validate on form submission
+        crawlForm.addEventListener('submit', function(e) {
+            const isValid = validateUrlField();
+            if (!isValid || !urlField.value.trim()) {
+                e.preventDefault();
+                if (!urlField.value.trim()) {
+                    const errorElement = document.getElementById('url-error');
+                    errorElement.textContent = 'Please enter a website URL';
+                    errorElement.style.display = 'block';
+                    urlField.setAttribute('aria-invalid', 'true');
+                    urlField.classList.add('is-invalid');
+                    errorElement.focus();
+                }
+                return false;
+            }
+        });
         
         // Update reports display
         function updateReports() {
@@ -154,8 +509,8 @@
                                     <h3>${dir.domain}</h3>
                                     <p>${dir.reportCount} report(s) available</p>
                                     ${dir.lastReport ? `
-                                        <a href="${lastReportUrl}" class="btn btn-view">View Latest Report</a>
-                                        <a href="/browse/${dir.domain}" class="btn btn-browse">Browse All</a>
+                                        <a href="${lastReportUrl}" class="btn-view">View Latest Report</a>
+                                        <a href="/browse/${dir.domain}" class="btn-browse">Browse All</a>
                                     ` : '<p class="no-reports">No reports yet</p>'}
                                 </div>
                             `;
@@ -166,22 +521,57 @@
         }
         
         // Update jobs every 5 seconds
-        setInterval(updateJobs, 5000);
-        updateJobs(); // Initial load
+        setInterval(() => {
+            updateJobs().catch(err => console.error('Error in periodic job update:', err));
+        }, 5000);
+        
+        // Initial load
+        updateJobs().catch(err => console.error('Error in initial job load:', err));
         
         // Update reports every 30 seconds and on initial load
         setInterval(updateReports, 30000);
         updateReports(); // Initial load
         
-        // Handle form submission
-        document.getElementById('crawlForm').addEventListener('submit', function(e) {
+        // Enhanced form submission with comprehensive validation
+        document.getElementById('crawl-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const formData = new FormData(this);
             const submitBtn = this.querySelector('button[type="submit"]');
+            const urlField = document.getElementById('url');
             
+            // Perform comprehensive validation before submission
+            const validation = getUrlValidationMessage(urlField.value);
+            
+            if (!validation.isValid) {
+                // Show validation error and focus the field
+                validateUrlField(); // Update UI to show error
+                urlField.focus();
+                
+                // Announce error for screen readers
+                const errorElement = document.getElementById('url-error');
+                if (errorElement) {
+                    errorElement.setAttribute('aria-live', 'assertive');
+                    setTimeout(() => {
+                        errorElement.setAttribute('aria-live', 'polite');
+                    }, 1000);
+                }
+                return;
+            }
+            
+            // Normalize URL and proceed with submission
+            const normalizedUrl = normalizeUrl(urlField.value);
+            urlField.value = normalizedUrl;
+            formData.set('url', normalizedUrl);
+            
+            // Disable form and show loading state
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Starting...';
+            submitBtn.textContent = 'Starting Crawl...';
+            urlField.disabled = true;
+            
+            // Disable all form inputs during submission
+            const allInputs = this.querySelectorAll('input, select, button');
+            allInputs.forEach(input => input.disabled = true);
             
             // Convert FormData to URLSearchParams for proper server parsing
             const params = new URLSearchParams();
@@ -199,22 +589,140 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Crawl started successfully! Job ID: ' + data.jobId);
+                    // Success: show success message and reset form
+                    const successMessage = `Crawl started successfully! Job ID: ${data.jobId}`;
+                    
+                    // Show success notification
+                    showNotification(successMessage, 'success');
+                    
+                    // Reset form to clean state
                     this.reset();
-                    updateJobs(); // Refresh job list
+                    validateUrlField(); // Clear any validation messages
+                    
+                    // Update jobs list and focus on the specific new job
+                    updateJobs()
+                        .then(() => {
+                            // Focus on the newly created job using its actual ID
+                            if (data.jobId) {
+                                focusNewJob(data.jobId);
+                                announceToScreenReader(`New crawl job for ${normalizedUrl} has been started and is now active.`);
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Error updating jobs after submission:', err);
+                            // Fallback: still announce success even if focus fails
+                            announceToScreenReader(`New crawl job for ${normalizedUrl} has been started.`);
+                        });
+                    
                     // Reports will auto-update when the crawl completes
                 } else {
-                    alert('Error starting crawl: ' + data.error);
+                    // Error: show error message and keep form data
+                    const errorMessage = `Error starting crawl: ${data.error || 'Unknown error'}`;
+                    showNotification(errorMessage, 'error');
                 }
             })
             .catch(err => {
-                alert('Error starting crawl: ' + err.message);
+                // Network or other error
+                const errorMessage = `Failed to start crawl: ${err.message || 'Network error'}`;
+                showNotification(errorMessage, 'error');
+                console.error('Crawl submission error:', err);
             })
             .finally(() => {
-                submitBtn.disabled = false;
+                // Re-enable form regardless of success or failure
+                const allInputs = this.querySelectorAll('input, select, button');
+                allInputs.forEach(input => input.disabled = false);
+                
                 submitBtn.textContent = 'Start Crawl';
+                urlField.disabled = false;
             });
         });
+        
+        // Utility function to show notifications
+        function showNotification(message, type = 'info') {
+            // Remove any existing notification
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification notification--${type}`;
+            notification.setAttribute('role', 'alert');
+            notification.setAttribute('aria-live', 'assertive');
+            notification.innerHTML = `
+                <span class="notification__message">${message}</span>
+                <button class="notification__close" type="button" aria-label="Close notification">&times;</button>
+            `;
+            
+            // Add notification styles
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'error' ? 'var(--color-danger)' : 'var(--color-success)'};
+                color: white;
+                padding: var(--space-3) var(--space-4);
+                border-radius: var(--radius-md);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 1000;
+                max-width: 400px;
+                display: flex;
+                align-items: center;
+                gap: var(--space-2);
+            `;
+            
+            // Style the close button
+            const closeBtn = notification.querySelector('.notification__close');
+            closeBtn.style.cssText = `
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5em;
+                cursor: pointer;
+                padding: 0;
+                margin-left: auto;
+            `;
+            
+            // Add close functionality
+            closeBtn.addEventListener('click', () => notification.remove());
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+            
+            // Add to page
+            document.body.appendChild(notification);
+        }
+        
+        // Utility function for screen reader announcements
+        function announceToScreenReader(message) {
+            const announcement = document.createElement('div');
+            announcement.setAttribute('aria-live', 'polite');
+            announcement.textContent = message;
+            announcement.className = 'sr-only';
+            announcement.style.cssText = `
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border: 0;
+            `;
+            
+            document.body.appendChild(announcement);
+            setTimeout(() => {
+                if (announcement.parentElement) {
+                    document.body.removeChild(announcement);
+                }
+            }, 1000);
+        }
     </script>
 </body>
 </html>

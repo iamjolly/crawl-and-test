@@ -1,0 +1,58 @@
+{
+  "name": "design-system-scripts",
+  "description": "Build scripts for the A11y Design System",
+  "scripts": {
+    "build:design-system": "npm-run-all design-system:clean design-system:sass design-system:docs",
+    "build:design-system:dev": "npm-run-all design-system:sass:dev design-system:docs:dev",
+    "watch:design-system": "npm-run-all --parallel design-system:sass:watch design-system:docs:watch",
+    
+    "design-system:clean": "rm -rf dist/design-system",
+    "design-system:sass": "sass src/styles/design-system/_index.scss dist/design-system/design-system.css --style compressed --source-map",
+    "design-system:sass:dev": "sass src/styles/design-system/_index.scss dist/design-system/design-system.css --style expanded --source-map",
+    "design-system:sass:watch": "sass src/styles/design-system/_index.scss dist/design-system/design-system.css --watch --style expanded --source-map",
+    
+    "design-system:docs": "npm-run-all design-system:docs:copy design-system:docs:build",
+    "design-system:docs:dev": "npm-run-all design-system:docs:copy design-system:docs:build:dev",
+    "design-system:docs:copy": "cp design-system-showcase.html dist/design-system/index.html && cp -r src/styles/design-system/testing dist/design-system/",
+    "design-system:docs:build": "node scripts/build-design-system-docs.js",
+    "design-system:docs:build:dev": "node scripts/build-design-system-docs.js --dev",
+    "design-system:docs:watch": "chokidar 'design-system-showcase.html' 'src/styles/design-system/**/*' -c 'npm run design-system:docs:dev'",
+    
+    "serve:design-system": "http-server dist/design-system -p 3001 -o",
+    "serve:design-system:dev": "http-server . -p 3001 -o /design-system-showcase.html",
+    
+    "test:design-system": "npm-run-all design-system:test:*",
+    "design-system:test:sass": "sass src/styles/design-system/_index.scss /tmp/test-design-system.css && rm /tmp/test-design-system.css",
+    "design-system:test:accessibility": "node scripts/test-design-system-accessibility.js",
+    "design-system:test:visual": "backstop test --config=backstop.design-system.js",
+    
+    "lint:design-system": "npm-run-all lint:design-system:*",
+    "lint:design-system:sass": "stylelint 'src/styles/design-system/**/*.scss' --fix",
+    "lint:design-system:html": "html-validate design-system-showcase.html",
+    
+    "deploy:design-system": "npm-run-all build:design-system deploy:design-system:gh-pages",
+    "deploy:design-system:gh-pages": "gh-pages -d dist/design-system -b gh-pages-design-system",
+    "deploy:design-system:netlify": "netlify deploy --dir=dist/design-system --prod"
+  },
+  "devDependencies": {
+    "sass": "^1.69.0",
+    "chokidar-cli": "^3.0.0",
+    "http-server": "^14.1.1",
+    "stylelint": "^15.11.0",
+    "stylelint-config-standard-scss": "^11.1.0",
+    "html-validate": "^8.7.4",
+    "gh-pages": "^6.1.0",
+    "netlify-cli": "^17.10.1",
+    "backstopjs": "^6.2.2",
+    "axe-core": "^4.8.2",
+    "puppeteer": "^21.5.2"
+  },
+  "design-system": {
+    "version": "1.0.0",
+    "description": "A11y Crawl & Test Design System",
+    "main": "dist/design-system/design-system.css",
+    "sass": "src/styles/design-system/_index.scss",
+    "documentation": "dist/design-system/index.html",
+    "testing": "dist/design-system/testing/index.html"
+  }
+}

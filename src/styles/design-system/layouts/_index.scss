@@ -1,0 +1,33 @@
+// ==========================================================================
+// Layouts Index
+// ==========================================================================
+//
+// Central index for all layout components.
+// Import this file to access all layout design elements.
+//
+
+// Import design tokens, foundation, components
+@use "../tokens" as tokens;
+@use "../foundation" as foundation;
+@use "../components/atoms" as atoms;
+@use "../components/molecules" as molecules;
+
+// Import all layout components
+@use "layout";
+
+// ==========================================================================
+// Layouts Exports
+// ==========================================================================
+//
+// This provides a single source of truth for all layout components.
+// Main application files should import from this index.
+//
+
+// Re-export all layout components
+@forward "layout";
+
+// Re-export all lower level modules for convenience
+@forward "../tokens";
+@forward "../foundation";
+@forward "../components/atoms";
+@forward "../components/molecules";

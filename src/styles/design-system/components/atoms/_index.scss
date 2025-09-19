@@ -1,0 +1,35 @@
+// ==========================================================================
+// Atoms Index
+// ==========================================================================
+//
+// Central index for all atomic components.
+// Import this file to access all atomic design elements.
+//
+
+// Import design tokens and foundation
+@use "../../tokens" as tokens;
+@use "../../foundation" as foundation;
+
+// Import all atomic components
+@use "badge";
+@use "button";
+@use "input";
+@use "link";
+
+// ==========================================================================
+// Atoms Exports
+// ==========================================================================
+//
+// This provides a single source of truth for all atomic components.
+// Molecular components and layouts should import from this index.
+//
+
+// Re-export all atomic components
+@forward "badge";
+@forward "button";
+@forward "input";  
+@forward "link";
+
+// Re-export tokens and foundation for convenience
+@forward "../../tokens";
+@forward "../../foundation";

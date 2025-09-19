@@ -8,17 +8,32 @@
   },
   "scripts": {
     "start": "node src/core/crawler.js",
-    "test": "node src/core/crawler.js --help",
+    "test": "echo \"Error: no test specified\" && exit 1",
     "install-browsers": "npx playwright install chromium",
-    "dev": "node src/servers/dashboard.js",
+    "dev": "npm-run-all --parallel sass:watch serve",
     "serve": "node src/servers/dashboard.js",
-    "build": "node src/generators/html.js --detailed",
-    "build:domain": "node src/generators/html.js --detailed --domain",
+    "serve:reports": "node src/servers/dashboard.js",
+    "serve:dashboard": "node src/servers/dashboard.js",
+    "build": "npm-run-all sass:build html:build",
+    "build:domain": "npm-run-all sass:build html:domain",
+    "build:prod": "NODE_ENV=production npm-run-all sass:build css:optimize html:build",
+    "sass:build": "npm-run-all --parallel sass:design-system sass:legacy-compat sass:report",
+    "sass:watch": "npm-run-all --parallel sass:design-system:watch sass:legacy-compat:watch sass:report:watch",
+    "sass:design-system": "sass src/styles/design-system/_index.scss public/styles/design-system.css --style compressed",
+    "sass:design-system:watch": "sass src/styles/design-system/_index.scss public/styles/design-system.css --watch --style expanded",
+    "sass:legacy-compat": "sass src/styles/scss/shared.scss public/styles/shared.css --style compressed",
+    "sass:legacy-compat:watch": "sass src/styles/scss/shared.scss public/styles/shared.css --watch --style expanded",
+    "sass:report": "sass src/styles/design-system/_index.scss public/styles/report.css --style compressed",
+    "sass:report:watch": "sass src/styles/design-system/_index.scss public/styles/report.css --watch --style expanded",
+    "css:optimize": "npm-run-all --parallel css:optimize:design-system css:optimize:report css:optimize:legacy",
+    "css:optimize:design-system": "postcss public/styles/design-system.css --output public/styles/design-system.css",
+    "css:optimize:report": "postcss public/styles/report.css --output public/styles/report.css",
+    "css:optimize:legacy": "postcss public/styles/shared.css --output public/styles/shared.css",
+    "html:build": "node src/generators/html.js --detailed",
+    "html:domain": "node src/generators/html.js --detailed --domain",
     "regenerate-html": "node src/generators/html.js",
-    "regenerate-detailed": "node src/generators/html.js --detailed",
     "generate-index": "node src/generators/index.js",
-    "clean": "rm -rf public/reports/*",
-    "clean:public": "rm -rf public/reports/*",
+    "clean": "rm -rf public/reports/* public/styles/*.css",
     "cleanup-old-html": "node src/utils/cleanup.js"
   },
   "keywords": [
@@ -47,5 +62,14 @@
   },
   "engines": {
     "node": ">=16.0.0"
+  },
+  "devDependencies": {
+    "@fullhuman/postcss-purgecss": "^7.0.2",
+    "autoprefixer": "^10.4.21",
+    "cssnano": "^7.1.1",
+    "npm-run-all": "^4.1.5",
+    "postcss": "^8.5.6",
+    "postcss-cli": "^11.0.1",
+    "sass": "^1.92.1"
   }
 }

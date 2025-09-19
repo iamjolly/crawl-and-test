@@ -33,24 +33,8 @@ function loadTemplate(templateName) {
   }
 }
 
-function loadCSS() {
-  const cssFiles = ['report.css', 'accordion.css', 'accessibility.css'];
-  let combinedCSS = '';
-  
-  cssFiles.forEach(file => {
-    const cssPath = path.join(config.STYLES_DIR, file);
-    try {
-      combinedCSS += fs.readFileSync(cssPath, 'utf8') + '\n';
-    } catch (error) {
-      console.error(`❌ Failed to load CSS file: ${file}`, error.message);
-    }
-  });
-  
-  return combinedCSS;
-}
-
 function loadJS() {
-  const jsFiles = ['utils.js', 'accordion.js'];
+  const jsFiles = ['accordion.js', 'utils.js'];
   let combinedJS = '';
   
   jsFiles.forEach(file => {
@@ -105,21 +89,23 @@ function copyAssetsToPublic() {
     fs.mkdirSync(scriptsDir, { recursive: true });
   }
   
-  // Copy CSS files
-  const cssFiles = ['report.css', 'accordion.css', 'accessibility.css'];
+  // Copy CSS files (from compiled SASS)
+  const cssFiles = ['shared.css', 'dashboard.css', 'report.css', 'design-system.css'];
   cssFiles.forEach(file => {
-    const srcPath = path.join(__dirname, 'src', 'styles', file);
+    const srcPath = path.join(__dirname, '..', '..', 'public', 'styles', file);
     const destPath = path.join(stylesDir, file);
     
     if (fs.existsSync(srcPath)) {
       fs.copyFileSync(srcPath, destPath);
+    } else {
+      console.warn(`⚠️  CSS file not found: ${srcPath}. Run 'npm run sass:build' first.`);
     }
   });
   
   // Copy JS files
   const jsFiles = ['accordion.js', 'utils.js'];
   jsFiles.forEach(file => {
-    const srcPath = path.join(__dirname, 'src', 'scripts', file);
+    const srcPath = path.join(__dirname, '..', 'scripts', file);
     const destPath = path.join(scriptsDir, file);
     
     if (fs.existsSync(srcPath)) {
@@ -132,40 +118,63 @@ function copyAssetsToPublic() {
 function generateIssuesSection(title, issues, type) {
   let content = `
     <div class="issue-section">
-      <h4>${title} (${issues.length})</h4>`;
+      <h4>${title} (${issues.length})</h4>
+      <div class="issues-container">`;
   
-  issues.forEach(issue => {
+  issues.forEach((issue, issueIndex) => {
     const impactClass = issue.impact ? `impact-${issue.impact}` : 'impact-minor';
     const issueClass = type === 'warning' ? 'warning' : '';
     const borderColor = type === 'warning' ? '#ffc107' : '#dc3545';
+    const issueId = `issue-${issueIndex + 1}`;
+    const headerId = `${issueId}-header`;
+    const contentId = `${issueId}-content`;
+    
+    // Generate issue summary - now as a static header instead of accordion
+    const elementCount = issue.nodes ? issue.nodes.length : 0;
+    const elementText = type === 'warning' ? 'Elements needing review' : 'Affected elements';
     
     content += `
-      <div class="issue ${issueClass}">
-        <div class="issue-title">${escapeHtml(issue.id)}</div>
-        <div class="issue-impact ${impactClass}">${escapeHtml(issue.impact || 'unknown')} impact</div>
-        <div class="issue-description">${escapeHtml(issue.description)}</div>
-        <div class="issue-help">
-          <strong>Help:</strong> <a href="${issue.helpUrl}" target="_blank">${escapeHtml(issue.help)}</a>
-        </div>`;
+      <div class="report-card ${impactClass}">
+      <div class="report-header">
+        <div class="violation-info">
+        <h5 class="violation-title">
+          ${escapeHtml(issue.id)}
+          <span class="impact-badge impact-${(issue.impact || 'minor')}">${escapeHtml(issue.impact || 'minor')}</span>
+        </h5>
+        <div class="violation-description">${escapeHtml(issue.description)}</div>
+        <ul class="violation-meta">
+          <li class="violation-count">${elementText}: ${elementCount}</li>
+          <li class="violation-wcag">Impact: ${escapeHtml(issue.impact || 'unknown')}</li>
+        </ul>
+        </div>
+      </div>
+      <div class="report-body">
+        <div class="violation-details">`;
+
+    // Add help information
+    content += `
+            <div class="violation-help">
+              <h6>How to Fix</h6>
+              <p><a href="${issue.helpUrl}" target="_blank">${escapeHtml(issue.help)}</a></p>
+            </div>`;
     
     // Add W3C documentation links if available
     if (wcagMapper.isAvailable() && issue.tags) {
       const w3cLinks = wcagMapper.getW3cLinksForRule(issue.tags);
       if (w3cLinks.length > 0) {
         content += `
-        <div class="w3c-links" style="margin-top: 12px; padding: 10px; background-color: #f8f9fa; border-left: 3px solid #004085; border-radius: 3px;">
-          <h5 style="margin: 0 0 8px 0; font-size: 14px;">W3C WCAG Documentation</h5>`;
+            <div class="violation-help">
+              <h6>W3C WCAG Documentation</h6>`;
         
         w3cLinks.forEach(link => {
-          content += `
-          <ul style="margin: 4px 0; padding: 0; list-style: none;">`;
+          content += `<ul>`;
           
           if (link.references.quickref) {
-            content += `<li style="margin: 2px 0;"><a href="${link.references.quickref.url}" target="_blank" style="color: #004085;">How to Meet ${link.criterion.id} - ${escapeHtml(link.criterion.title)} (Level ${link.criterion.level})</a></li>`;
+            content += `<li><a href="${link.references.quickref.url}" target="_blank">How to Meet ${link.criterion.id} - ${escapeHtml(link.criterion.title)} (Level ${link.criterion.level})</a></li>`;
           }
           
           if (link.references.understanding) {
-            content += `<li style="margin: 2px 0;"><a href="${link.references.understanding.url}" target="_blank" style="color: #004085;">Understanding ${link.criterion.id} - ${escapeHtml(link.criterion.title)} (Level ${link.criterion.level})</a></li>`;
+            content += `<li><a href="${link.references.understanding.url}" target="_blank">Understanding ${link.criterion.id} - ${escapeHtml(link.criterion.title)} (Level ${link.criterion.level})</a></li>`;
           }
           
           content += `</ul>`;
@@ -175,56 +184,69 @@ function generateIssuesSection(title, issues, type) {
       }
     }
     
+    // Add affected elements details
     if (issue.nodes && issue.nodes.length > 0) {
       const elementText = type === 'warning' ? 'Elements Needing Review' : 'Affected Elements';
-      content += `<div style="margin-top: 12px;"><strong>${elementText} (${issue.nodes.length}):</strong></div>`;
+      content += `
+            <h6>${elementText} (${issue.nodes.length})</h6>
+            <div class="violation-elements">`;
       
       issue.nodes.forEach((node, nodeIndex) => {
-        content += `<div class="issue-node" style="margin: 8px 0; padding: 8px; border-left: 3px solid ${borderColor}; background: #f8f9fa;">`;
-        content += `<strong>Element ${nodeIndex + 1}:</strong>`;
+        content += `
+              <div class="element-item">
+                <h7>Element ${nodeIndex + 1}</h7>`;
         
         // Add target selectors
         if (node.target && node.target.length > 0) {
           content += `
-            <div class="issue-target">
-              <strong>Selector:</strong> ${escapeHtml(node.target.join(' > '))}
-            </div>`;
+                <div class="element-selector">
+                  <strong>Selector:</strong> ${escapeHtml(node.target.join(' > '))}
+                </div>`;
         }
         
         // Add HTML snippet
         if (node.html) {
           content += `
-            <div class="issue-html">
-              <strong>HTML:</strong><br>
-              ${escapeHtml(node.html)}
-            </div>`;
+                <div class="element-html">
+                  <strong>HTML:</strong>
+                  <pre><code>${escapeHtml(node.html)}</code></pre>
+                </div>`;
         }
         
         // Add failure summary
         if (node.failureSummary) {
-          const failureLabel = type === 'warning' ? 'Review Needed' : 'Failure';
+          const failureLabel = type === 'warning' ? 'Review Needed' : 'Failure Details';
           content += `
-            <div class="issue-failure">
-              <strong>${failureLabel}:</strong> ${escapeHtml(node.failureSummary)}
-            </div>`;
+                <div class="element-failure">
+                  <strong>${failureLabel}:</strong>
+                  <p>${escapeHtml(node.failureSummary)}</p>
+                </div>`;
         }
         
         // Add specific message
         if (node.message) {
           content += `
-            <div style="margin: 8px 0; font-size: 13px;">
-              <strong>Details:</strong> ${escapeHtml(node.message)}
-            </div>`;
+                <div class="element-details">
+                  <strong>Additional Details:</strong>
+                  <p>${escapeHtml(node.message)}</p>
+                </div>`;
         }
         
         content += `</div>`;
       });
+      
+      content += `</div>`;
     }
     
-    content += `</div>`;
+    content += `
+          </div>
+        </div>
+      </div>`;
   });
   
-  content += `</div>`;
+  content += `
+      </div>
+    </div>`;
   return content;
 }
 
@@ -332,20 +354,19 @@ function generateHTMLReport(data, filename) {
   }
 
   // Load templates and assets
-  const baseTemplate = loadTemplate('base');
+  const baseTemplate = loadTemplate('report-base');
   const summaryCardTemplate = loadTemplate('summary-card');
   const pagesSectionTemplate = loadTemplate('pages-section');
   const pageCardTemplate = loadTemplate('page-card');
   const noIssuesTemplate = loadTemplate('no-issues');
-  const css = loadCSS();
   const js = loadJS();
 
   // Generate summary cards
   const summaryCards = [
-    { title: '📄 Total Pages', value: summary.totalPages || 0, type: '' },
-    { title: '❌ Total Violations', value: summary.totalViolations || 0, type: 'error' },
-    { title: '⚠️ Total Warnings', value: summary.totalIncomplete || 0, type: 'warning' },
-    { title: '✅ Pages Passed', value: summary.pagesPassed || 0, type: '' }
+    { title: '<span aria-hidden="true">📄</span> Total Pages', value: summary.totalPages || 0, type: 'info' },
+    { title: '<span aria-hidden="true">❌</span> Total Violations', value: summary.totalViolations || 0, type: 'error' },
+    { title: '<span aria-hidden="true">⚠️</span> Total Warnings', value: summary.totalIncomplete || 0, type: 'warning' },
+    { title: '<span aria-hidden="true">✅</span> Pages Passed', value: summary.pagesPassed || 0, type: 'success' }
   ].map(card => 
     summaryCardTemplate
       .replace(/{{title}}/g, card.title)
@@ -371,13 +392,13 @@ function generateHTMLReport(data, filename) {
       // Generate page stats badges
       const pageStats = [];
       if (violations.length > 0) {
-        pageStats.push(`<span class="stat-badge stat-violations">❌ ${violations.length} violation${violations.length !== 1 ? 's' : ''}</span>`);
+        pageStats.push(`<span class="stat-badge stat-violations"><span aria-hidden="true">❌</span> ${violations.length} violation${violations.length !== 1 ? 's' : ''}</span>`);
       }
       if (incomplete.length > 0) {
-        pageStats.push(`<span class="stat-badge stat-warnings">⚠️ ${incomplete.length} warning${incomplete.length !== 1 ? 's' : ''}</span>`);
+        pageStats.push(`<span class="stat-badge stat-warnings"><span aria-hidden="true">⚠️</span> ${incomplete.length} warning${incomplete.length !== 1 ? 's' : ''}</span>`);
       }
       if (totalIssues === 0) {
-        pageStats.push('<span class="stat-badge stat-passed">✅ No issues</span>');
+        pageStats.push('<span class="stat-badge stat-passed"><span aria-hidden="true">✅</span> No issues</span>');
       }
 
       // Generate issues content
@@ -387,18 +408,18 @@ function generateHTMLReport(data, filename) {
         issuesContent = `
           <div class="issue-section">
             <div class="no-issues">
-              <h4>✅ No accessibility issues found on this page!</h4>
+              <h4><span aria-hidden="true">✅</span> No accessibility issues found on this page!</h4>
             </div>
           </div>`;
       } else {
         // Process violations
         if (violations.length > 0) {
-          issuesContent += generateIssuesSection('❌ Violations', violations, 'violation');
+          issuesContent += generateIssuesSection('<span aria-hidden="true">❌</span> Violations', violations, 'violation');
         }
         
         // Process incomplete items
         if (incomplete.length > 0) {
-          issuesContent += generateIssuesSection('⚠️ Needs Review', incomplete, 'warning');
+          issuesContent += generateIssuesSection('<span aria-hidden="true">⚠️</span> Needs Review', incomplete, 'warning');
         }
       }
 

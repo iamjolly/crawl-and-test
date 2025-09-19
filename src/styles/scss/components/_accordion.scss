@@ -1,0 +1,17 @@
+// ==========================================================================
+// Accordion Component (Legacy Import)
+// ==========================================================================
+//
+// This file now imports accordion styles from the design system.
+// The accordion component has been moved to the design system for better
+// organization and consistency.
+//
+
+// Import the accordion from the design system
+@use '../../design-system' as ds;
+
+// Note: All accordion styles are now defined in:
+// src/styles/design-system/components/molecules/_accordion.scss
+//
+// This file can be removed once all imports are updated to use
+// the design system directly.

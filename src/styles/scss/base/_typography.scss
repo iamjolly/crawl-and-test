@@ -1,0 +1,186 @@
+// ==========================================================================
+// Typography
+// ==========================================================================
+//
+// Typography styles and utilities for the CATS application.
+//
+
+@import '../abstracts/variables';
+@import '../abstracts/mixins';
+
+// ==========================================================================
+// Headings
+// ==========================================================================
+
+h1 {
+  @include heading($font-size-h1, $font-weight-bold);
+}
+
+h2 {
+  @include heading($font-size-h2, $font-weight-semibold);
+}
+
+h3 {
+  @include heading($font-size-h3, $font-weight-semibold);
+}
+
+h4 {
+  @include heading($font-size-h4, $font-weight-medium);
+}
+
+h5 {
+  @include heading($font-size-h5, $font-weight-medium);
+}
+
+h6 {
+  @include heading($font-size-h6, $font-weight-medium);
+}
+
+// ==========================================================================
+// Body Text
+// ==========================================================================
+
+.text-small {
+  font-size: $font-size-small;
+}
+
+.text-smaller {
+  font-size: $font-size-smaller;
+}
+
+.text-tiny {
+  font-size: $font-size-tiny;
+}
+
+.text-large {
+  font-size: $font-size-large;
+}
+
+// ==========================================================================
+// Font Weights
+// ==========================================================================
+
+.text-normal {
+  font-weight: $font-weight-normal;
+}
+
+.text-medium {
+  font-weight: $font-weight-medium;
+}
+
+.text-semibold {
+  font-weight: $font-weight-semibold;
+}
+
+.text-bold {
+  font-weight: $font-weight-bold;
+}
+
+// ==========================================================================
+// Text Colors
+// ==========================================================================
+
+.text-primary {
+  color: $color-primary;
+}
+
+.text-muted {
+  color: $color-text-muted;
+}
+
+.text-light {
+  color: $color-text-light;
+}
+
+.text-lighter {
+  color: $color-text-lighter;
+}
+
+.text-success {
+  color: $color-success;
+}
+
+.text-warning {
+  color: $color-warning;
+}
+
+.text-danger {
+  color: $color-danger;
+}
+
+// ==========================================================================
+// Text Alignment
+// ==========================================================================
+
+.text-left {
+  text-align: left;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+// ==========================================================================
+// Code and Preformatted Text
+// ==========================================================================
+
+.code-block {
+  @include text-code();
+  display: block;
+  padding: $spacing-lg;
+  margin: $spacing-xl 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.code-inline {
+  @include text-code();
+}
+
+// ==========================================================================
+// Lists
+// ==========================================================================
+
+.list-unstyled {
+  list-style: none;
+  padding-left: 0;
+}
+
+.list-inline {
+  list-style: none;
+  padding-left: 0;
+  
+  li {
+    display: inline-block;
+    margin-right: $spacing-lg;
+    margin-bottom: 0;
+  }
+}
+
+// ==========================================================================
+// Links
+// ==========================================================================
+
+.link {
+  @include link();
+}
+
+.link-muted {
+  color: $color-text-muted;
+  
+  &:hover {
+    color: $color-primary;
+  }
+}
+
+.link-no-underline {
+  text-decoration: none;
+  
+  &:hover {
+    text-decoration: none;
+  }
+}

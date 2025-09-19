@@ -1,0 +1,120 @@
+// ==========================================================================
+// Design Tokens Index
+// ==========================================================================
+//
+// Central index for all design tokens.
+// Import this file to access the complete token system.
+//
+
+// Import all token categories
+@use "colors";
+@use "typography";
+@use "spacing";
+@use "breakpoints";
+@use "elevation";
+
+// ==========================================================================
+// Token Exports
+// ==========================================================================
+//
+// This provides a single source of truth for all design tokens.
+// Components and layouts should import from this index rather than
+// individual token files to ensure consistency.
+//
+
+// Re-export all token modules for external use
+@forward "colors";
+@forward "typography";
+@forward "spacing";
+@forward "breakpoints";
+@forward "elevation";
+
+// ==========================================================================
+// Global Token Application
+// ==========================================================================
+//
+// Apply base tokens to the root element.
+// This ensures all CSS custom properties are available globally.
+//
+
+:root {
+  // Establish baseline typography
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-body);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  
+  // Establish baseline backgrounds
+  background-color: var(--color-background-primary);
+  
+  // Set global box-sizing
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+  
+  // Smooth scrolling
+  scroll-behavior: smooth;
+  
+  // Better text rendering
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+// ==========================================================================
+// Utility Classes for Tokens
+// ==========================================================================
+
+// Color utilities
+.text-primary { color: var(--color-text-primary) !important; }
+.text-secondary { color: var(--color-text-secondary) !important; }
+.text-muted { color: var(--color-text-muted) !important; }
+.text-success { color: var(--color-success) !important; }
+.text-warning { color: var(--color-warning) !important; }
+.text-danger { color: var(--color-danger) !important; }
+.text-info { color: var(--color-info) !important; }
+
+.bg-primary { background-color: var(--color-background-primary) !important; }
+.bg-secondary { background-color: var(--color-background-secondary) !important; }
+.bg-tertiary { background-color: var(--color-background-tertiary) !important; }
+
+// Typography utilities
+.font-weight-light { font-weight: var(--font-weight-light) !important; }
+.font-weight-normal { font-weight: var(--font-weight-normal) !important; }
+.font-weight-bold { font-weight: var(--font-weight-bold) !important; }
+
+.text-xs { font-size: var(--font-size-xs) !important; }
+.text-sm { font-size: var(--font-size-sm) !important; }
+.text-base { font-size: var(--font-size-base) !important; }
+.text-lg { font-size: var(--font-size-lg) !important; }
+.text-xl { font-size: var(--font-size-xl) !important; }
+
+// Spacing utilities
+.m-0 { margin: var(--space-0) !important; }
+.m-1 { margin: var(--space-1) !important; }
+.m-2 { margin: var(--space-2) !important; }
+.m-3 { margin: var(--space-3) !important; }
+.m-4 { margin: var(--space-4) !important; }
+
+.p-0 { padding: var(--space-0) !important; }
+.p-1 { padding: var(--space-1) !important; }
+.p-2 { padding: var(--space-2) !important; }
+.p-3 { padding: var(--space-3) !important; }
+.p-4 { padding: var(--space-4) !important; }
+
+// Elevation utilities
+.shadow-none { box-shadow: var(--shadow-none) !important; }
+.shadow-xs { box-shadow: var(--shadow-xs) !important; }
+.shadow-sm { box-shadow: var(--shadow-sm) !important; }
+.shadow-md { box-shadow: var(--shadow-md) !important; }
+.shadow-lg { box-shadow: var(--shadow-lg) !important; }
+
+// Border radius utilities
+.rounded-none { border-radius: var(--radius-none) !important; }
+.rounded-sm { border-radius: var(--radius-sm) !important; }
+.rounded { border-radius: var(--radius-md) !important; }
+.rounded-lg { border-radius: var(--radius-lg) !important; }
+.rounded-full { border-radius: var(--radius-full) !important; }

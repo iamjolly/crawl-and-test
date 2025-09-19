@@ -1,0 +1,274 @@
+// ==========================================================================
+// Navigation Component
+// ==========================================================================
+//
+// Main navigation and breadcrumb components.
+//
+
+@import '../abstracts/variables';
+@import '../abstracts/mixins';
+
+// ==========================================================================
+// Main Navigation
+// ==========================================================================
+
+.site-nav {
+  background: $gradient-primary;
+  padding: 0;
+  box-shadow: $box-shadow-small;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 $spacing-xl;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: $color-white;
+  font-weight: $font-weight-semibold;
+  font-size: 1.2em;
+  padding: 15px 0;
+  
+  &:hover {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+  }
+  
+  &:focus {
+    @include focus-visible();
+  }
+
+  .brand-icon {
+    margin-right: $spacing-sm;
+    font-size: 1.4em;
+  }
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0;
+
+  li {
+    margin: 0;
+  }
+}
+
+.nav-item {
+  margin: 0;
+}
+
+.nav-link {
+  display: block;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  padding: 18px 16px;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+  
+  &:hover {
+    color: $color-white;
+    background: rgba(255, 255, 255, 0.1);
+    text-decoration: none;
+  }
+  
+  &:focus {
+    @include focus-visible();
+  }
+
+  &.active {
+    color: $color-white;
+    border-bottom-color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.05);
+  }
+}// ==========================================================================
+// Breadcrumbs
+// ==========================================================================
+
+.breadcrumb-nav {
+  background: $color-background-light;
+  padding: 12px 0;
+  border-bottom: 1px solid $color-border-light;
+  font-size: 0.9em;
+}
+
+.breadcrumb-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 $spacing-xl;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: $color-text-light;
+  
+  li {
+    display: flex;
+    align-items: center;
+    
+    &:not(:last-child)::after {
+      content: '›';
+      margin: 0 $spacing-sm;
+      color: $color-text-lighter;
+      font-weight: bold;
+    }
+  }
+  
+  a {
+    color: $color-primary-light;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    
+    &:hover {
+      color: $color-primary-dark;
+      text-decoration: underline;
+    }
+    
+    &:focus {
+      @include focus-visible();
+    }
+  }
+  
+  .current {
+    color: $color-text-muted;
+    font-weight: $font-weight-medium;
+  }
+}
+
+// ==========================================================================
+// Secondary Navigation
+// ==========================================================================
+
+.secondary-nav {
+  background: $color-background-light;
+  border-bottom: 1px solid $color-border;
+  padding: $spacing-sm 0;
+  
+  .container {
+    @include container();
+  }
+  
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: $spacing-lg;
+  }
+  
+  li {
+    margin: 0;
+  }
+  
+  a {
+    color: $color-text-muted;
+    text-decoration: none;
+    padding: $spacing-sm $spacing-md;
+    border-radius: $border-radius-base;
+    transition: all $transition-base;
+    
+    &:hover {
+      color: $color-primary;
+      background-color: rgba($color-primary, 0.1);
+    }
+    
+    &:focus {
+      @include focus-visible();
+    }
+    
+    &.active {
+      color: $color-primary-darker;
+      background-color: rgba($color-primary, 0.1);
+      font-weight: $font-weight-medium;
+    }
+  }
+}
+
+// ==========================================================================
+// Mobile Navigation
+// ==========================================================================
+
+.nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: $color-white;
+  font-size: $font-size-large;
+  cursor: pointer;
+  padding: $spacing-sm;
+  
+  &:focus {
+    @include focus-visible();
+  }
+  
+  @include mobile-up() {
+    display: none;
+  }
+}
+
+@media (max-width: #{$breakpoint-tablet - 1px}) {
+  .nav-toggle {
+    display: block;
+  }
+  
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: $gradient-primary;
+    flex-direction: column;
+    padding: $spacing-lg;
+    box-shadow: $box-shadow-large;
+    
+    &.open {
+      display: flex;
+    }
+  }
+  
+  .nav-links li {
+    width: 100%;
+  }
+  
+  .nav-link {
+    display: block;
+    width: 100%;
+  }
+}
+
+// ==========================================================================
+// Skip Navigation
+// ==========================================================================
+
+.skip-nav {
+  position: absolute;
+  top: -100px;
+  left: $spacing-lg;
+  background: $color-primary;
+  color: $color-white;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $border-radius-base;
+  text-decoration: none;
+  z-index: $z-index-modal;
+  
+  &:focus {
+    top: $spacing-lg;
+  }
+}

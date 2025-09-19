@@ -1,0 +1,18 @@
+// ==========================================================================
+// Layout Components Index
+// ==========================================================================
+// 
+// This file exports all layout components for creating accessible page 
+// structures using semantic HTML5 landmarks.
+//
+// Layout components provide:
+// - Semantic page structure (header, nav, main, aside, footer)
+// - Consistent spacing and typography
+// - Accessible skip links and focus management
+// - Responsive design patterns
+// - WCAG 2.1 AA compliance
+// ==========================================================================
+
+@forward 'page-structure';
+@forward 'dashboard';
+@forward '../../layouts/layout';

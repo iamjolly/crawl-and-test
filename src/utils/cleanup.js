@@ -35,9 +35,10 @@ function cleanupOldHtmlFiles(reportsDir) {
 }
 
 function main() {
-  const reportsDir = path.join(__dirname, 'reports');
+  // Look for reports directory in project root, not relative to this script
+  const reportsDir = path.join(process.cwd(), 'public', 'reports');
   
-  console.log('🧹 Cleaning up old HTML files from /reports/ directory');
+  console.log('🧹 Cleaning up old HTML files from /public/reports/ directory');
   console.log('📂 Preserving JSON source data files');
   console.log('=====================================\n');
   
