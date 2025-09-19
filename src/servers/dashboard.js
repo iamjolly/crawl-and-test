@@ -5,12 +5,32 @@ const { v4: uuidv4 } = require('uuid');
 const { spawn } = require('child_process');
 const config = require('../core/config');
 const { generateIndexHTML } = require('../generators/index');
-const { formatTimestamp } = require('../scripts/utils');
+const { formatTimestamp, parseTimestampFromFilename } = require('../scripts/utils');
 
 const app = express();
 
 // Store active crawl jobs
 const activeJobs = new Map();
+
+// Template loading utilities
+function loadTemplate(templateName) {
+    const templatePath = path.join(config.TEMPLATES_DIR, `${templateName}.html`);
+    try {
+        return fs.readFileSync(templatePath, 'utf8');
+    } catch (error) {
+        console.error(`❌ Failed to load template: ${templateName}`, error.message);
+        return '';
+    }
+}
+
+function renderTemplate(templateContent, data) {
+    let rendered = templateContent;
+    for (const [key, value] of Object.entries(data)) {
+        const placeholder = new RegExp(`{{${key}}}`, 'g');
+        rendered = rendered.replace(placeholder, value || '');
+    }
+    return rendered;
+}
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -41,171 +61,22 @@ function getReportDirectories() {
         });
 }
 
-// Generate reports index HTML
-function generateReportsIndexHTML() {
+// Generate reports list HTML for reports index page
+function generateReportsListHTML() {
     const reportDirs = getReportDirectories();
     
-    const reportsList = reportDirs.length > 0 
-        ? reportDirs.map(dir => {
-            const dirPath = path.join(config.REPORTS_DIR, dir.domain);
-            const files = fs.readdirSync(dirPath);
-            const reports = files.filter(file => file.endsWith('.html'));
-            
-            const reportItems = reports.map(reportFile => {
-                const reportPath = `/reports/${dir.domain}/${reportFile}`;
-                // Handle multiple timestamp formats in filenames
-                const reportDate = reportFile.match(/(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}(?:-\d{3}Z|-\d{3})?)/);
-                let displayDate = 'Unknown';
-                
-                if (reportDate) {
-                    // Convert filename timestamp format to ISO format
-                    let isoTimestamp = reportDate[1];
-                    
-                    // Handle format with milliseconds: 2025-09-16T18-42-30-245Z or similar
-                    if (isoTimestamp.match(/-\d{3}Z?$/)) {
-                        isoTimestamp = isoTimestamp.replace(/T(\d{2})-(\d{2})-(\d{2})-(\d{3})(Z?)/, 'T$1:$2:$3.$4$5');
-                    } else {
-                        // Handle standard format: 2025-09-14T11-35-12
-                        isoTimestamp = isoTimestamp.replace(/T(\d{2})-(\d{2})-(\d{2})/, 'T$1:$2:$3');
-                    }
-                    
-                    displayDate = formatTimestamp(isoTimestamp);
-                }
-                
-                return `
-                    <tr>
-                        <td><a href="${reportPath}" class="report-link">${reportFile.replace('.html', '')}</a></td>
-                        <td>${displayDate}</td>
-                    </tr>
-                `;
-            }).join('');
-            
-            return `
-                <div class="domain-section">
-                    <h3>${dir.domain}</h3>
-                    <p>${dir.reportCount} report(s) available</p>
-                    <table class="reports-table">
-                        <thead>
-                            <tr>
-                                <th>Report</th>
-                                <th>Generated</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${reportItems}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        }).join('')
-        : '<p class="no-reports">No reports generated yet. Start a crawl to create your first report!</p>';
-
-    return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accessibility Reports - CATS</title>
-    <link rel="stylesheet" href="/styles/design-system.css">
-    <link rel="stylesheet" href="/styles/shared.css">
-</head>
-<body class="page-container">
-    <!-- Skip Links -->
-    <div class="skip-links">
-        <a href="#main-content" class="skip-links__link">Skip to main content</a>
-    </div>
+    if (reportDirs.length === 0) {
+        return '<p class="no-reports">No reports generated yet. Start a crawl to create your first report!</p>';
+    }
     
-    <!-- Site Header -->
-    <header class="site-header" role="banner">
-        <div class="site-header__container">
-            <a href="/" class="site-header__brand" aria-label="CATS Home">
-                <div class="site-header__logo">
-                    <span>C</span>
-                </div>
-                <h1 class="site-header__title">
-                    CATS
-                    <span class="site-header__subtitle">Accessibility Testing</span>
-                </h1>
-            </a>
-            
-            <nav class="site-header__nav">
-                <div id="nav-main" class="main-nav main-nav--horizontal" role="navigation" aria-label="Main navigation">
-                    <ul class="main-nav__list">
-                        <li class="main-nav__item">
-                            <a href="/" class="main-nav__link">Dashboard</a>
-                        </li>
-                        <li class="main-nav__item">
-                            <a href="/reports/" class="main-nav__link main-nav__link--active" aria-current="page">Reports</a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-            
-            <div class="site-header__utilities">
-                <!-- Future: user menu, settings, etc. -->
-            </div>
-        </div>
-    </header>
-    
-    <!-- Breadcrumb Navigation -->
-    <nav class="main-nav main-nav--breadcrumb" aria-label="Breadcrumb">
-        <div class="main-nav__container">
-            <ul class="main-nav__list">
-                <li class="main-nav__item">
-                    <a href="/" class="main-nav__link">Dashboard</a>
-                </li>
-                <li class="main-nav__item">
-                    <span class="main-nav__link main-nav__link--current">Reports</span>
-                </li>
-            </ul>
-        </div>
-    </nav>
-    
-    <!-- Main Content Area -->
-    <main id="main-content" class="page-main">
-        <div class="page-main__container">
-        <div class="header">
-            <h1>Accessibility Reports</h1>
-            <p>Browse all generated accessibility reports by domain</p>
-        </div>
+    return reportDirs.map(dir => {
+        const dirPath = path.join(config.REPORTS_DIR, dir.domain);
+        const files = fs.readdirSync(dirPath);
+        const reports = files.filter(file => file.endsWith('.html'));
         
-            ${reportsList}
-        
-        </div>
-    </main>
-</body>
-</html>
-    `;
-}
-
-// Generate HTML for domain-specific reports page
-function generateDomainReportsHTML(domain) {
-    const domainDir = path.join(config.REPORTS_DIR, domain);
-    const files = fs.readdirSync(domainDir);
-    const reports = files.filter(file => file.endsWith('.html'));
-    
-    const reportsList = reports.length > 0 
-        ? reports.map(reportFile => {
-            const reportPath = `/reports/${domain}/${reportFile}`;
-            // Handle multiple timestamp formats in filenames
-            const reportDate = reportFile.match(/(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}(-\d{3}Z|-\d{3})?)/);
-            let displayDate = 'Unknown';
-            
-            if (reportDate) {
-                // Convert filename timestamp format to ISO format
-                let isoTimestamp = reportDate[1];
-                
-                // Handle format with milliseconds: 2025-09-16T18-42-30-245Z or similar
-                if (isoTimestamp.match(/-\d{3}Z?$/)) {
-                    isoTimestamp = isoTimestamp.replace(/T(\d{2})-(\d{2})-(\d{2})-(\d{3})(Z?)/, 'T$1:$2:$3.$4$5');
-                } else {
-                    // Handle standard format: 2025-09-14T11-35-12
-                    isoTimestamp = isoTimestamp.replace(/T(\d{2})-(\d{2})-(\d{2})/, 'T$1:$2:$3');
-                }
-                
-                displayDate = formatTimestamp(isoTimestamp);
-            }
+        const reportItems = reports.map(reportFile => {
+            const reportPath = `/reports/${dir.domain}/${reportFile}`;
+            const displayDate = parseTimestampFromFilename(reportFile);
             
             return `
                 <tr>
@@ -213,123 +84,75 @@ function generateDomainReportsHTML(domain) {
                     <td>${displayDate}</td>
                 </tr>
             `;
-        }).join('')
-        : '<tr><td colspan="2" class="no-reports">No reports found for this domain.</td></tr>';
-    
-    return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Domain Reports: ${domain} - CATS</title>
-    <link rel="stylesheet" href="/styles/design-system.css">
-    <link rel="stylesheet" href="/styles/shared.css">
-</head>
-<body class="page-container">
-    <!-- Skip Links -->
-    <div class="skip-links">
-        <a href="#main-content" class="skip-links__link">Skip to main content</a>
-    </div>
-    
-    <!-- Site Header -->
-    <header class="site-header" role="banner">
-        <div class="site-header__container">
-            <a href="/" class="site-header__brand" aria-label="CATS Home">
-                <div class="site-header__logo">
-                    <span>C</span>
-                </div>
-                <h1 class="site-header__title">
-                    CATS
-                    <span class="site-header__subtitle">Accessibility Testing</span>
-                </h1>
-            </a>
-            
-            <nav class="site-header__nav">
-                <div id="nav-main" class="main-nav main-nav--horizontal" role="navigation" aria-label="Main navigation">
-                    <ul class="main-nav__list">
-                        <li class="main-nav__item">
-                            <a href="/" class="main-nav__link">Dashboard</a>
-                        </li>
-                        <li class="main-nav__item">
-                            <a href="/reports/" class="main-nav__link main-nav__link--active" aria-current="page">Reports</a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-            
-            <div class="site-header__utilities">
-                <!-- Future: user menu, settings, etc. -->
-            </div>
-        </div>
-    </header>
-    
-    <!-- Breadcrumb Navigation -->
-    <nav class="main-nav main-nav--breadcrumb" aria-label="Breadcrumb">
-        <div class="main-nav__container">
-            <ul class="main-nav__list">
-                <li class="main-nav__item">
-                    <a href="/" class="main-nav__link">Dashboard</a>
-                </li>
-                <li class="main-nav__item">
-                    <a href="/reports/" class="main-nav__link">Reports</a>
-                </li>
-                <li class="main-nav__item">
-                    <span class="main-nav__link main-nav__link--current">${domain}</span>
-                </li>
-            </ul>
-        </div>
-    </nav>
-    <nav class="breadcrumb-nav" aria-label="Breadcrumb">
-        <div class="breadcrumb-container">
-        <div class="breadcrumb-nav__container">
-            <ol class="breadcrumb-nav__list">
-                <li><a href="/">Dashboard</a></li>
-                <li><a href="/reports/">Reports</a></li>
-                <li><span class="current">${domain}</span></li>
-            </ol>
-        </div>
-    </nav>
-    
-    <!-- Main Content Area -->
-    <main id="main-content" class="page-main">
-        <div class="page-main__container">
-            
-            <!-- Back Navigation -->
-            <div style="margin-bottom: var(--space-4);">
-                <a href="/reports/" class="btn btn-secondary">
-                    <span class="icon" style="margin-right: var(--space-2);">←</span>
-                    Back to All Reports
-                </a>
-            </div>
-            
-            <!-- Page Header -->
-            <header class="content-section__header">
-                <h1 class="content-section__title">Reports for ${domain}</h1>
-                <p class="content-section__description">${reports.length} report(s) available</p>
-            </header>
-            
-            <!-- Reports Content -->
-            <section class="content-section">
+        }).join('');
         
-            <table class="reports-table">
-                <thead>
-                    <tr>
-                        <th>Report</th>
-                        <th>Generated</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${reportsList}
-                </tbody>
-            </table>
-            
-            </section>
-        </div>
-    </main>
-</body>
-</html>
-    `;
+        return `
+            <div class="domain-section">
+                <h3>${dir.domain}</h3>
+                <p>${dir.reportCount} report(s) available</p>
+                <table class="reports-table">
+                    <thead>
+                        <tr>
+                            <th>Report</th>
+                            <th>Generated</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${reportItems}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }).join('');
+}
+
+// Generate domain-specific reports list HTML
+function generateDomainReportsListHTML(domain) {
+    const domainDir = path.join(config.REPORTS_DIR, domain);
+    const files = fs.readdirSync(domainDir);
+    const reports = files.filter(file => file.endsWith('.html'));
+    
+    if (reports.length === 0) {
+        return '<tr><td colspan="2" class="no-reports">No reports found for this domain.</td></tr>';
+    }
+    
+    return reports.map(reportFile => {
+        const reportPath = `/reports/${domain}/${reportFile}`;
+        const displayDate = parseTimestampFromFilename(reportFile);
+        
+        return `
+            <tr>
+                <td><a href="${reportPath}" class="report-link">${reportFile.replace('.html', '')}</a></td>
+                <td>${displayDate}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Generate reports index HTML using template
+function generateReportsIndexHTML() {
+    const template = loadTemplate('reports-index');
+    const reportsList = generateReportsListHTML();
+    
+    return renderTemplate(template, {
+        reportsList
+    });
+}
+
+// Generate HTML for domain-specific reports page using template
+function generateDomainReportsHTML(domain) {
+    const domainDir = path.join(config.REPORTS_DIR, domain);
+    const files = fs.readdirSync(domainDir);
+    const reports = files.filter(file => file.endsWith('.html'));
+    
+    const template = loadTemplate('domain-reports');
+    const reportsList = generateDomainReportsListHTML(domain);
+    
+    return renderTemplate(template, {
+        domain,
+        reportCount: reports.length,
+        reportsList
+    });
 }
 
 // Routes
@@ -351,24 +174,12 @@ app.get('/browse/:domain', (req, res) => {
     
     // Check if domain directory exists
     if (!fs.existsSync(domainDir)) {
-        return res.status(404).send(`
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Error: Domain Not Found - CATS</title>
-                <link rel="stylesheet" href="/styles/report.css">
-            </head>
-            <body>
-                <div class="container">
-                    <h1>Domain Not Found</h1>
-                    <p>No reports found for domain: ${domain}</p>
-                    <a href="/" class="btn">Back to Dashboard</a>
-                </div>
-            </body>
-            </html>
-        `);
+        const template = loadTemplate('error-404');
+        const errorHTML = renderTemplate(template, {
+            errorTitle: 'Domain Not Found',
+            errorMessage: `No reports found for domain: ${domain}`
+        });
+        return res.status(404).send(errorHTML);
     }
     
     res.send(generateDomainReportsHTML(domain));
