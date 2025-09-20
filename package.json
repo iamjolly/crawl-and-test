@@ -54,7 +54,7 @@
     "wcag",
     "playwright"
   ],
-  "author": "",
+  "author": "A11y Is, LLC - iamjolly - a11y.is",
   "license": "MIT",
   "dependencies": {
     "axe-core": "^4.8.2",
