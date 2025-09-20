@@ -1,6 +1,124 @@
 {
+  "name": "cats-accessibility-crawler",
+  "version": "1.0.0",
+  "description": "CATS (Crawl and Test System) - A web crawler that performs accessibility scans using axe-core",
+  "main": "src/core/crawler.js",
+  "bin": {
+    "cats-crawl": "./src/core/crawler.js"
+  },
+  "scripts": {
+    "start": "node src/core/crawler.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/ --ext .js",
+    "lint:fix": "eslint src/ --ext .js --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "type-check": "echo \"Type checking not implemented yet\"",
+    "prepare": "husky install",
+    "install-browsers": "npx playwright install chromium",
+    "dev": "npm-run-all --parallel sass:watch serve",
+    "serve": "node src/servers/dashboard.js",
+    "serve:reports": "node src/servers/dashboard.js",
+    "serve:dashboard": "node src/servers/dashboard.js",
+    "build": "npm-run-all sass:build html:build",
+    "build:domain": "npm-run-all sass:build html:domain",
+    "build:prod": "NODE_ENV=production npm-run-all sass:build css:optimize html:build",
+    "sass:build": "npm-run-all --parallel sass:design-system sass:legacy-compat sass:report",
+    "sass:watch": "npm-run-all --parallel sass:design-system:watch sass:legacy-compat:watch sass:report:watch",
+    "sass:design-system": "sass src/styles/design-system/_index.scss public/styles/design-system.css --style compressed",
+    "sass:design-system:watch": "sass src/styles/design-system/_index.scss public/styles/design-system.css --watch --style expanded",
+    "sass:legacy-compat": "sass src/styles/scss/shared.scss public/styles/shared.css --style compressed",
+    "sass:legacy-compat:watch": "sass src/styles/scss/shared.scss public/styles/shared.css --watch --style expanded",
+    "sass:report": "sass src/styles/design-system/_index.scss public/styles/report.css --style compressed",
+    "sass:report:watch": "sass src/styles/design-system/_index.scss public/styles/report.css --watch --style expanded",
+    "css:optimize": "npm-run-all --parallel css:optimize:design-system css:optimize:report css:optimize:legacy",
+    "css:optimize:design-system": "postcss public/styles/design-system.css --output public/styles/design-system.css",
+    "css:optimize:report": "postcss public/styles/report.css --output public/styles/report.css",
+    "css:optimize:legacy": "postcss public/styles/shared.css --output public/styles/shared.css",
+    "html:build": "node src/generators/html.js --detailed",
+    "html:domain": "node src/generators/html.js --detailed --domain",
+    "regenerate-html": "node src/generators/html.js",
+    "generate-index": "node src/generators/index.js",
+    "clean": "rm -rf public/reports/* public/styles/*.css",
+    "cleanup-old-html": "node src/utils/cleanup.js"
+  },
+  "keywords": [
+    "accessibility",
+    "a11y",
+    "cats",
+    "crawl-and-test",
+    "crawler",
+    "axe-core",
+    "wcag",
+    "playwright"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axe-core": "^4.8.2",
+    "commander": "^14.0.1",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "multer": "^2.0.2",
+    "p-limit": "^7.1.1",
+    "playwright": "^1.40.0",
+    "robots-parser": "^3.0.1",
+    "uuid": "^9.0.1",
+    "xml2js": "^0.6.2",
+    "helmet": "^8.1.0",
+    "express-rate-limit": "^7.4.1",
+    "express-validator": "^7.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "devDependencies": {
-    "prettier": "2.7.1",
-    "supertest": "6.1.6"
+    "@fullhuman/postcss-purgecss": "^7.0.2",
+    "autoprefixer": "^10.4.21",
+    "cssnano": "^7.1.1",
+    "eslint": "^9.36.0",
+    "prettier": "^3.3.3",
+    "husky": "^9.1.6",
+    "lint-staged": "^16.1.6",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0",
+    "npm-run-all": "^4.1.5",
+    "postcss": "^8.5.6",
+    "postcss-cli": "^11.0.1",
+    "prettier": "^3.3.3",
+    "sass": "^1.92.1",
+    "supertest": "^7.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/**/*.test.js",
+      "!src/**/*.spec.js"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.js",
+      "**/?(*.)+(spec|test).js"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/setup.js"
+    ]
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
   }
 }
