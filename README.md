@@ -19,7 +19,7 @@ dashboard.
 
 ### Prerequisites
 
-- Node.js 16+
+- Node.js 22+
 - npm or yarn
 
 ### Installation
