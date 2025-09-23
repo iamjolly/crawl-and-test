@@ -120,6 +120,12 @@ coverage/
 dist/
 build/
 
+# Generated CSS files and source maps
+public/styles/*.css
+public/styles/*.css.map
+public/css/*.css.map
+*.css.map
+
 # =============================================================================
 # Browser & Crawler Artifacts
 # =============================================================================
