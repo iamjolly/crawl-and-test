@@ -78,6 +78,9 @@ Desktop.ini
 !.vscode/launch.json
 !.vscode/extensions.json
 
+# Claude Code
+.claude/
+
 # Sublime Text
 *.sublime-workspace
 *.sublime-project
@@ -116,6 +119,12 @@ coverage/
 # Build output (if any build process is added)
 dist/
 build/
+
+# Generated CSS files and source maps
+public/styles/*.css
+public/styles/*.css.map
+public/css/*.css.map
+*.css.map
 
 # =============================================================================
 # Browser & Crawler Artifacts

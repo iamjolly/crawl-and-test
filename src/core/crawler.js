@@ -5,7 +5,8 @@ const fs = require('fs/promises');
 const path = require('path');
 const { chromium } = require('playwright');
 const { Command } = require('commander');
-const pLimit = require('p-limit');
+// p-limit v7+ is ES module only, so we need dynamic import
+let pLimit;
 const robotsParser = require('robots-parser');
 const config = require('./config');
 const axe = require('axe-core');
@@ -376,7 +377,9 @@ async function crawlPage(pageUrl, currentDepth) {
   // Respect robots.txt
   const robotsTxtUrl = `${parsed.origin}/robots.txt`;
   try {
-    const robotsTxt = await page.evaluate(url => fetch(url).then(r => r.text()), robotsTxtUrl);
+    // Use browser context to fetch robots.txt instead of page.evaluate to avoid CORS issues
+    const response = await context.request.get(robotsTxtUrl);
+    const robotsTxt = await response.text();
     const r = robotsParser(robotsTxtUrl, robotsTxt);
     if (!r.isAllowed(pageUrl, 'MyCrawler')) {
       console.warn(`Disallowed by robots.txt: ${pageUrl}`);
@@ -429,6 +432,11 @@ async function crawlPage(pageUrl, currentDepth) {
 // Crawl loop with concurrency limit
 // ------------------------------------------------------------------
 async function main() {
+  // Dynamically import p-limit (ES module)
+  if (!pLimit) {
+    const pLimitModule = await import('p-limit');
+    pLimit = pLimitModule.default;
+  }
   const limit = pLimit(concurrency);
 
   // Get canonical domain for proper sitemap filtering
