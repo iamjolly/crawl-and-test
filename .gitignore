@@ -78,6 +78,9 @@ Desktop.ini
 !.vscode/launch.json
 !.vscode/extensions.json
 
+# Claude Code
+.claude/
+
 # Sublime Text
 *.sublime-workspace
 *.sublime-project
