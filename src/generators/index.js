@@ -40,13 +40,13 @@ function generateReportsListHTML() {
                 <h3>${dir.domain}</h3>
                 <p>${dir.reportCount} report(s) available</p>
                 ${
-                  dir.lastReport
-                    ? `
+  dir.lastReport
+    ? `
                     <a href="${lastReportUrl}" class="btn btn-view">View Latest Report</a>
                     <a href="/browse/${dir.domain}" class="btn btn-browse">Browse All</a>
                 `
-                    : '<p class="no-reports">No reports yet</p>'
-                }
+    : '<p class="no-reports">No reports yet</p>'
+}
             </div>
         `;
     })
