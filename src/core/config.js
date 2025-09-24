@@ -48,6 +48,17 @@ class CATSConfig {
     this.DEFAULT_WCAG_VERSION = process.env.CATS_WCAG_VERSION || '2.1';
     this.DEFAULT_WCAG_LEVEL = process.env.CATS_WCAG_LEVEL || 'AA';
 
+    // Job concurrency configuration
+    this.MAX_CONCURRENT_JOBS = parseInt(process.env.CATS_MAX_CONCURRENT_JOBS || '3', 10);
+    this.DEFAULT_CRAWLER_CONCURRENCY = parseInt(process.env.CATS_DEFAULT_CRAWLER_CONCURRENCY || '4', 10);
+    this.JOB_CLEANUP_DELAY_MS = parseInt(process.env.CATS_JOB_CLEANUP_DELAY_MS || '300000', 10); // 5 minutes
+    this.MAX_JOB_RUNTIME_MS = parseInt(process.env.CATS_MAX_JOB_RUNTIME_MS || '3600000', 10); // 1 hour
+
+    // Cloud Storage configuration
+    this.USE_CLOUD_STORAGE = process.env.CATS_USE_CLOUD_STORAGE === 'true';
+    this.GOOGLE_CLOUD_PROJECT = process.env.GOOGLE_CLOUD_PROJECT || process.env.GCLOUD_PROJECT;
+    this.STORAGE_BUCKET = process.env.CATS_STORAGE_BUCKET;
+
     // Application branding
     this.APP_NAME = process.env.CATS_APP_NAME || 'CATS';
     this.APP_FULL_NAME = process.env.CATS_APP_FULL_NAME || 'CATS (Crawl and Test System)';
@@ -102,6 +113,8 @@ class CATSConfig {
     console.log(`   SERVER: ${this.getServerUrl()}`);
     console.log(`   MAX_PAGES: ${this.MAX_PAGES}`);
     console.log(`   WCAG: ${this.DEFAULT_WCAG_VERSION} Level ${this.DEFAULT_WCAG_LEVEL}`);
+    console.log(`   CONCURRENCY: ${this.MAX_CONCURRENT_JOBS} jobs, ${this.DEFAULT_CRAWLER_CONCURRENCY} browsers/job`);
+    console.log(`   STORAGE: ${this.USE_CLOUD_STORAGE ? `GCS (${this.STORAGE_BUCKET})` : 'Local'}`);
   }
 
   /**

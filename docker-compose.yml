@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  cats-app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      # Local development - use local storage
+      - CATS_REPORTS_DIR=/app/public/reports
+      - CATS_PUBLIC_DIR=/app/public
+      # Google Cloud Storage (commented out for local dev)
+      # - GOOGLE_CLOUD_PROJECT=your-project-id
+      # - CATS_STORAGE_BUCKET=your-bucket-name
+      # - CATS_USE_CLOUD_STORAGE=true
+    volumes:
+      # Mount reports directory for local development
+      - ./public/reports:/app/public/reports
+      - ./public/styles:/app/public/styles
+      - ./public/scripts:/app/public/scripts
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Add a Google Cloud Storage emulator for local testing
+  gcs-emulator:
+    image: fsouza/fake-gcs-server:latest
+    ports:
+      - "4443:4443"
+    command: ["-scheme", "http", "-host", "0.0.0.0", "-port", "4443"]
+    profiles:
+      - gcs-testing
