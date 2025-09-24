@@ -10,7 +10,7 @@ permissions:
   contents: read
   security-events: write
 
-  jobs:
+jobs:
   test:
     runs-on: ubuntu-latest
 
