@@ -122,7 +122,7 @@ try {
 
   console.log('\n🎉 Design System documentation built successfully!');
   console.log(`📁 Output: ${distDir}`);
-  console.log(`🌐 View: http://localhost:3001 (run: npm run serve:design-system)`);
+  console.log('🌐 View: http://localhost:3001 (run: npm run serve:design-system)');
 
   if (!isDev) {
     console.log('\n🚀 Production build ready for deployment!');

@@ -1,6 +1,17 @@
 const js = require('@eslint/js');
 
 module.exports = [
+  // Ignore patterns
+  {
+    ignores: [
+      'node_modules/**',
+      'dist/**',
+      'public/styles/**',
+      'public/reports/**',
+      '_serverless-examples/**', // Example code, not production
+    ],
+  },
+
   // Base configuration for all JavaScript files
   {
     files: ['**/*.js'],

@@ -25,7 +25,7 @@ function formatTimestamp(timestamp) {
   try {
     const date = new Date(timestamp);
     return date.toLocaleString();
-  } catch (_e) {
+  } catch {
     return timestamp;
   }
 }
@@ -34,7 +34,7 @@ function formatTimestamp(timestamp) {
 function extractDomain(url) {
   try {
     return new URL(url).hostname;
-  } catch (_e) {
+  } catch {
     return 'Unknown';
   }
 }
@@ -62,7 +62,7 @@ async function copyToClipboard(text) {
   try {
     await navigator.clipboard.writeText(text);
     return true;
-  } catch (_err) {
+  } catch {
     // Fallback for older browsers
     const textArea = document.createElement('textarea');
     textArea.value = text;
@@ -71,7 +71,7 @@ async function copyToClipboard(text) {
     try {
       document.execCommand('copy');
       return true;
-    } catch (_err) {
+    } catch {
       return false;
     } finally {
       document.body.removeChild(textArea);

@@ -208,7 +208,7 @@ async function fetchSitemap(sitemapUrl) {
         return null;
       }
       content = await response.text();
-    } catch (_fetchError) {
+    } catch {
       // Fallback to Playwright for older Node.js versions
       const browser = await chromium.launch({ headless: true });
       const context = await browser.newContext();

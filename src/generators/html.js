@@ -33,7 +33,7 @@ function loadTemplate(templateName) {
   }
 }
 
-function loadJS() {
+function _loadJS() {
   const jsFiles = ['accordion.js', 'utils.js'];
   let combinedJS = '';
 
@@ -125,11 +125,7 @@ function generateIssuesSection(title, issues, type) {
 
   issues.forEach((issue, issueIndex) => {
     const impactClass = issue.impact ? `impact-${issue.impact}` : 'impact-minor';
-    const issueClass = type === 'warning' ? 'warning' : '';
-    const borderColor = type === 'warning' ? '#ffc107' : '#dc3545';
-    const issueId = `issue-${issueIndex + 1}`;
-    const headerId = `${issueId}-header`;
-    const contentId = `${issueId}-content`;
+    const _issueId = `issue-${issueIndex + 1}`;
 
     // Generate issue summary - now as a static header instead of accordion
     const elementCount = issue.nodes ? issue.nodes.length : 0;
@@ -286,7 +282,7 @@ function generateHTMLReport(data, filename) {
   if (pages.length > 0 && pages[0].pageUrl) {
     try {
       domain = new URL(pages[0].pageUrl).hostname;
-    } catch (e) {
+    } catch {
       // Fallback to extracting from filename
       domain = filename.split('_')[0] || 'Unknown';
     }
@@ -350,7 +346,6 @@ function generateHTMLReport(data, filename) {
   const pagesSectionTemplate = loadTemplate('pages-section');
   const pageCardTemplate = loadTemplate('page-card');
   const noIssuesTemplate = loadTemplate('no-issues');
-  const js = loadJS();
 
   // Generate summary cards
   const summaryCards = [
@@ -478,7 +473,6 @@ function generateHTMLReport(data, filename) {
   if (domainFromFilename && wcagVersionFromFilename && wcagLevelFromFilename) {
     // Try to find the actual JSON file with matching domain, version, and level
     try {
-      const reportDir = path.dirname(filename);
       const domainDir = path.join(config.REPORTS_DIR, domainFromFilename);
       if (fs.existsSync(domainDir)) {
         const files = fs.readdirSync(domainDir);
