@@ -13,16 +13,16 @@ const { body, param, validationResult } = require('express-validator');
 const helmetConfig = helmet({
   contentSecurityPolicy: {
     directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", 'data:', 'https:'],
-      fontSrc: ["'self'"],
-      connectSrc: ["'self'"],
-      frameSrc: ["'none'"],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'"],
-      manifestSrc: ["'self'"],
+      defaultSrc: ['\'self\''],
+      styleSrc: ['\'self\'', '\'unsafe-inline\''],
+      scriptSrc: ['\'self\''],
+      imgSrc: ['\'self\'', 'data:', 'https:'],
+      fontSrc: ['\'self\''],
+      connectSrc: ['\'self\''],
+      frameSrc: ['\'none\''],
+      objectSrc: ['\'none\''],
+      mediaSrc: ['\'self\''],
+      manifestSrc: ['\'self\''],
     },
   },
   crossOriginEmbedderPolicy: false, // Allow embedding for accessibility testing tools
