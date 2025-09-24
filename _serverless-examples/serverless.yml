@@ -5,7 +5,7 @@ service: cats-accessibility-crawler
 
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs22.x
   region: us-east-1
   stage: ${opt:stage, 'dev'}
 
@@ -49,8 +49,10 @@ functions:
           path: /crawl-site
           method: post
           cors: true
-    layers:
-      - arn:aws:lambda:us-east-1:764866452798:layer:chrome-aws-lambda:25 # Playwright layer
+    # Note: The chrome-aws-lambda layer may need updating for Node.js 22.x compatibility
+    # Consider using container image approach or updated Playwright Lambda layers
+    # layers:
+    #   - arn:aws:lambda:us-east-1:764866452798:layer:chrome-aws-lambda:25 # May not support Node.js 22.x
 
   generateReport:
     handler: lambda-report-generator.generateReport
