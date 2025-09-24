@@ -5,10 +5,10 @@ service: cats-accessibility-crawler
 
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs22.x
   region: us-east-1
   stage: ${opt:stage, 'dev'}
-  
+
   environment:
     REPORTS_BUCKET: ${self:custom.reportsBucket}
     REPORT_GENERATOR_FUNCTION: ${self:service}-${self:provider.stage}-generateReport
@@ -34,7 +34,7 @@ provider:
         - Effect: Allow
           Action:
             - lambda:InvokeFunction
-          Resource: "*"
+          Resource: '*'
 
 custom:
   reportsBucket: cats-a11y-reports-${self:provider.stage}
@@ -42,19 +42,21 @@ custom:
 functions:
   crawlSite:
     handler: lambda-crawler.crawlWebsite
-    timeout: 900  # 15 minutes (max for Lambda)
-    memorySize: 3008  # Max memory for Playwright
+    timeout: 900 # 15 minutes (max for Lambda)
+    memorySize: 3008 # Max memory for Playwright
     events:
       - http:
           path: /crawl-site
           method: post
           cors: true
-    layers:
-      - arn:aws:lambda:us-east-1:764866452798:layer:chrome-aws-lambda:25  # Playwright layer
+    # Note: The chrome-aws-lambda layer may need updating for Node.js 22.x compatibility
+    # Consider using container image approach or updated Playwright Lambda layers
+    # layers:
+    #   - arn:aws:lambda:us-east-1:764866452798:layer:chrome-aws-lambda:25 # May not support Node.js 22.x
 
   generateReport:
     handler: lambda-report-generator.generateReport
-    timeout: 300  # 5 minutes
+    timeout: 300 # 5 minutes
     memorySize: 1024
     events:
       - http:
@@ -86,7 +88,7 @@ resources:
                 Effect: Allow
                 Principal: '*'
                 Action: 's3:GetObject'
-                Resource: 
+                Resource:
                   - arn:aws:s3:::${self:custom.reportsBucket}/reports/*
                   - arn:aws:s3:::${self:custom.reportsBucket}/styles/*
                   - arn:aws:s3:::${self:custom.reportsBucket}/scripts/*

@@ -23,12 +23,12 @@ describe('Redirect Handling', () => {
         await browser.close();
 
         return new URL(playwrightFinalUrl).hostname;
-      } catch (playwrightError) {
+      } catch {
         await browser.close();
         // Fall back to fetch result if Playwright fails
         return new URL(fetchFinalUrl).hostname;
       }
-    } catch (error) {
+    } catch {
       // Fallback to original URL if all redirect checks fail
       return new URL(url).hostname;
     }

@@ -7,12 +7,12 @@
 //
 
 // Import design tokens first
-@use "../tokens" as tokens;
+@use '../tokens' as tokens;
 
 // Import foundation modules
-@use "reset";
-@use "typography";
-@use "utilities";
+@use 'reset';
+@use 'typography';
+@use 'utilities';
 
 // ==========================================================================
 // Foundation Exports
@@ -24,12 +24,12 @@
 //
 
 // Re-export all foundation modules for external use
-@forward "reset";
-@forward "typography";
-@forward "utilities";
+@forward 'reset';
+@forward 'typography';
+@forward 'utilities';
 
 // Re-export tokens for convenience
-@forward "../tokens";
+@forward '../tokens';
 
 // ==========================================================================
 // Foundation Base Styles
@@ -39,7 +39,12 @@
 //
 
 // Ensure proper focus management across all interactive elements
-a, button, input, select, textarea, [tabindex]:not([tabindex="-1"]) {
+a,
+button,
+input,
+select,
+textarea,
+[tabindex]:not([tabindex='-1']) {
   &:focus-visible {
     outline: 2px solid var(--color-primary-focus);
     outline-offset: 2px;
@@ -54,23 +59,23 @@ a, button, input, select, textarea, [tabindex]:not([tabindex="-1"]) {
   margin-right: auto;
   padding-left: var(--space-4);
   padding-right: var(--space-4);
-  
+
   @media (min-width: 576px) {
     max-width: var(--container-max-width-sm);
   }
-  
+
   @media (min-width: 768px) {
     max-width: var(--container-max-width-md);
   }
-  
+
   @media (min-width: 992px) {
     max-width: var(--container-max-width-lg);
   }
-  
+
   @media (min-width: 1200px) {
     max-width: var(--container-max-width-xl);
   }
-  
+
   @media (min-width: 1400px) {
     max-width: var(--container-max-width-xxl);
   }
@@ -87,17 +92,17 @@ a, button, input, select, textarea, [tabindex]:not([tabindex="-1"]) {
 .section {
   padding-top: var(--space-section-md);
   padding-bottom: var(--space-section-md);
-  
+
   &.section-sm {
     padding-top: var(--space-section-sm);
     padding-bottom: var(--space-section-sm);
   }
-  
+
   &.section-lg {
     padding-top: var(--space-section-lg);
     padding-bottom: var(--space-section-lg);
   }
-  
+
   &.section-xl {
     padding-top: var(--space-section-xl);
     padding-bottom: var(--space-section-xl);
@@ -109,13 +114,18 @@ a, button, input, select, textarea, [tabindex]:not([tabindex="-1"]) {
   > * + * {
     margin-top: var(--space-4);
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     + * {
       margin-top: var(--space-2);
     }
   }
-  
+
   p + h1,
   p + h2,
   p + h3,
@@ -133,15 +143,15 @@ a, button, input, select, textarea, [tabindex]:not([tabindex="-1"]) {
   border-radius: var(--radius-card);
   box-shadow: var(--elevation-card);
   padding: var(--space-card-padding-md);
-  
+
   &.card-sm {
     padding: var(--space-card-padding-sm);
   }
-  
+
   &.card-lg {
     padding: var(--space-card-padding-lg);
   }
-  
+
   &:hover {
     box-shadow: var(--elevation-card-hover);
   }
@@ -156,12 +166,12 @@ a, button, input, select, textarea, [tabindex]:not([tabindex="-1"]) {
 .list-inline {
   list-style: none;
   padding-left: 0;
-  
+
   li {
     display: inline-block;
     margin-right: var(--space-4);
     margin-bottom: 0;
-    
+
     &:last-child {
       margin-right: 0;
     }
@@ -181,7 +191,7 @@ a, button, input, select, textarea, [tabindex]:not([tabindex="-1"]) {
   text-decoration: none;
   font-weight: var(--font-weight-medium);
   transition: top 0.2s ease-in-out;
-  
+
   &:focus {
     top: var(--space-2);
     outline: 2px solid var(--color-text-inverse);
@@ -193,20 +203,15 @@ a, button, input, select, textarea, [tabindex]:not([tabindex="-1"]) {
 .loading {
   position: relative;
   overflow: hidden;
-  
+
   &::after {
-    content: "";
+    content: '';
     position: absolute;
     top: 0;
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.4),
-      transparent
-    );
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
     animation: loading 1.5s infinite;
   }
 }

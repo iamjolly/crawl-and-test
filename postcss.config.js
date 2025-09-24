@@ -1,12 +1,15 @@
 module.exports = {
   plugins: [
     require('cssnano')({
-      preset: ['default', {
-        discardComments: {
-          removeAll: true
+      preset: [
+        'default',
+        {
+          discardComments: {
+            removeAll: true,
+          },
+          normalizeWhitespace: true,
         },
-        normalizeWhitespace: true
-      }]
-    })
-  ]
+      ],
+    }),
+  ],
 };

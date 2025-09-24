@@ -1,74 +1,84 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Accessibility Reports - CATS</title>
-    <link rel="stylesheet" href="/styles/design-system.css">
-    <link rel="stylesheet" href="/styles/shared.css">
-</head>
-<body class="page-container">
+    <link rel="stylesheet" href="/styles/design-system.css" />
+    <link rel="stylesheet" href="/styles/shared.css" />
+  </head>
+  <body class="page-container">
     <!-- Skip Links -->
     <div class="skip-links">
-        <a href="#main-content" class="skip-links__link">Skip to main content</a>
+      <a href="#main-content" class="skip-links__link">Skip to main content</a>
     </div>
-    
+
     <!-- Site Header -->
     <header class="site-header" role="banner">
-        <div class="site-header__container">
-            <a href="/" class="site-header__brand" aria-label="CATS Home">
-                <div class="site-header__logo">
-                    <span>C</span>
-                </div>
-                <h1 class="site-header__title">
-                    CATS
-                    <span class="site-header__subtitle">Accessibility Testing</span>
-                </h1>
-            </a>
-            
-            <nav class="site-header__nav">
-                <div id="nav-main" class="main-nav main-nav--horizontal" role="navigation" aria-label="Main navigation">
-                    <ul class="main-nav__list">
-                        <li class="main-nav__item">
-                            <a href="/" class="main-nav__link">Dashboard</a>
-                        </li>
-                        <li class="main-nav__item">
-                            <a href="/reports/" class="main-nav__link main-nav__link--active" aria-current="page">Reports</a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-            
-            <div class="site-header__utilities">
-                <!-- Future: user menu, settings, etc. -->
-            </div>
+      <div class="site-header__container">
+        <a href="/" class="site-header__brand" aria-label="CATS Home">
+          <div class="site-header__logo">
+            <span>C</span>
+          </div>
+          <h1 class="site-header__title">
+            CATS
+            <span class="site-header__subtitle">Accessibility Testing</span>
+          </h1>
+        </a>
+
+        <nav class="site-header__nav">
+          <div
+            id="nav-main"
+            class="main-nav main-nav--horizontal"
+            role="navigation"
+            aria-label="Main navigation"
+          >
+            <ul class="main-nav__list">
+              <li class="main-nav__item">
+                <a href="/" class="main-nav__link">Dashboard</a>
+              </li>
+              <li class="main-nav__item">
+                <a
+                  href="/reports/"
+                  class="main-nav__link main-nav__link--active"
+                  aria-current="page"
+                  >Reports</a
+                >
+              </li>
+            </ul>
+          </div>
+        </nav>
+
+        <div class="site-header__utilities">
+          <!-- Future: user menu, settings, etc. -->
         </div>
+      </div>
     </header>
-    
+
     <!-- Breadcrumb Navigation -->
     <nav class="main-nav main-nav--breadcrumb" aria-label="Breadcrumb">
-        <div class="main-nav__container">
-            <ul class="main-nav__list">
-                <li class="main-nav__item">
-                    <a href="/" class="main-nav__link">Dashboard</a>
-                </li>
-                <li class="main-nav__item">
-                    <span class="main-nav__link main-nav__link--current">Reports</span>
-                </li>
-            </ul>
-        </div>
+      <div class="main-nav__container">
+        <ul class="main-nav__list">
+          <li class="main-nav__item">
+            <a href="/" class="main-nav__link">Dashboard</a>
+          </li>
+          <li class="main-nav__item">
+            <span class="main-nav__link main-nav__link--current">Reports</span>
+          </li>
+        </ul>
+      </div>
     </nav>
-    
+
     <!-- Main Content Area -->
     <main id="main-content" class="page-main">
-        <div class="page-main__container">
-            <div class="header">
-                <h1>Accessibility Reports</h1>
-                <p>Browse all generated accessibility reports by domain</p>
-            </div>
-            
-            {{reportsList}}
+      <div class="page-main__container">
+        <div class="header">
+          <h1>Accessibility Reports</h1>
+          <p>Browse all generated accessibility reports by domain</p>
         </div>
+
+        {{reportsList}}
+      </div>
     </main>
-</body>
+  </body>
 </html>

@@ -61,7 +61,7 @@ Paste error logs here
 - [ ] This bug affects report generation
 - [ ] This bug affects user interface accessibility
 - [ ] This bug affects crawler functionality
-- [ ] Other: ****\_\_\_****
+- [ ] Other: \***\*\_\_\_\*\***
 
 ## Additional Context
 

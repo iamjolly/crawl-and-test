@@ -2,7 +2,7 @@
 // Dashboard Layout Component
 // ==========================================================================
 //
-// Responsive dashboard layout with proper grid system, spacing, and 
+// Responsive dashboard layout with proper grid system, spacing, and
 // accessibility considerations for the CATS accessibility testing application.
 //
 
@@ -14,37 +14,37 @@
   display: grid;
   gap: var(--space-6);
   margin-bottom: var(--space-8);
-  
+
   // Default: stacked layout for mobile
   grid-template-columns: 1fr;
-  grid-template-areas: 
-    "form"
-    "jobs" 
-    "reports";
-  
+  grid-template-areas:
+    'form'
+    'jobs'
+    'reports';
+
   // Tablet: side-by-side for form and jobs
   @media (min-width: 768px) {
     grid-template-columns: 1fr 1fr;
-    grid-template-areas: 
-      "form jobs"
-      "reports reports";
+    grid-template-areas:
+      'form jobs'
+      'reports reports';
   }
-  
+
   // Desktop: optimize for larger screens
   @media (min-width: 1024px) {
     gap: var(--space-8);
     grid-template-columns: 1fr 1fr;
-    grid-template-areas: 
-      "form jobs"
-      "reports reports";
+    grid-template-areas:
+      'form jobs'
+      'reports reports';
   }
-  
+
   // Large desktop: three-column layout option
   @media (min-width: 1440px) {
     grid-template-columns: 1fr 1fr 1fr;
-    grid-template-areas: 
-      "form jobs ."
-      "reports reports .";
+    grid-template-areas:
+      'form jobs .'
+      'reports reports .';
   }
 }
 
@@ -54,7 +54,7 @@
 
 .dashboard-layout__form {
   grid-area: form;
-  
+
   .card {
     height: fit-content;
   }
@@ -62,7 +62,7 @@
 
 .dashboard-layout__jobs {
   grid-area: jobs;
-  
+
   .card {
     height: fit-content;
   }
@@ -81,7 +81,7 @@
   .card-header {
     padding: var(--space-5) var(--space-6);
     border-bottom: 1px solid var(--color-border);
-    
+
     .card-title {
       margin: 0;
       font-size: var(--font-size-h3);
@@ -89,15 +89,15 @@
       color: var(--color-text-primary);
     }
   }
-  
+
   .card-body {
     padding: var(--space-6);
   }
-  
+
   // Special styling for cards without explicit header/body structure
   &:not(:has(.card-header)):not(:has(.card-body)) {
     padding: var(--space-6);
-    
+
     h2 {
       margin: 0 0 var(--space-4) 0;
       font-size: var(--font-size-h3);
@@ -114,40 +114,42 @@
 .dashboard-layout__form {
   .form-group {
     margin-bottom: var(--space-5);
-    
+
     &:last-child {
       margin-bottom: 0;
     }
-    
+
     // Override the default form-group gap for tighter spacing
     gap: var(--space-3);
   }
-  
+
   .form-label {
     display: block;
     margin-bottom: var(--space-1);
     font-weight: var(--font-weight-medium);
     color: var(--color-text-primary);
   }
-  
+
   .form-control {
     width: 100%;
     padding: var(--space-3) var(--space-4);
     border: 2px solid var(--color-gray-600);
     border-radius: var(--radius-md);
     font-size: var(--font-size-base);
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    
+    transition:
+      border-color 0.15s ease-in-out,
+      box-shadow 0.15s ease-in-out;
+
     &:focus {
       outline: 2px solid var(--color-focus);
       outline-offset: 2px;
       border-color: var(--color-primary);
     }
-    
+
     &::placeholder {
       color: var(--color-text-muted);
     }
-    
+
     // Override browser validation styling - we use custom JS validation
     // These overrides target the exact selectors from _input.scss lines 73 and 84
     &:invalid,
@@ -155,39 +157,39 @@
     &:valid:not(:placeholder-shown),
     &.is-valid {
       border-color: var(--color-gray-600) !important;
-      
+
       &:focus {
         border-color: var(--color-primary) !important;
         box-shadow: 0 0 0 2px var(--color-focus) !important;
       }
     }
   }
-  
+
   // Additional specific overrides for input types to match design system specificity
-  input[type=text]:invalid,
-  input[type=text].is-invalid,
-  input[type=text]:valid:not(:placeholder-shown),
-  input[type=text].is-valid,
-  input[type=email]:invalid,
-  input[type=email].is-invalid,
-  input[type=email]:valid:not(:placeholder-shown),
-  input[type=email].is-valid,
-  input[type=url]:invalid,
-  input[type=url].is-invalid,
-  input[type=url]:valid:not(:placeholder-shown),
-  input[type=url].is-valid,
+  input[type='text']:invalid,
+  input[type='text'].is-invalid,
+  input[type='text']:valid:not(:placeholder-shown),
+  input[type='text'].is-valid,
+  input[type='email']:invalid,
+  input[type='email'].is-invalid,
+  input[type='email']:valid:not(:placeholder-shown),
+  input[type='email'].is-valid,
+  input[type='url']:invalid,
+  input[type='url'].is-invalid,
+  input[type='url']:valid:not(:placeholder-shown),
+  input[type='url'].is-valid,
   select:invalid,
   select.is-invalid,
   select:valid:not(:placeholder-shown),
   select.is-valid {
     border-color: var(--color-gray-600) !important;
-    
+
     &:focus {
       border-color: var(--color-primary) !important;
       box-shadow: 0 0 0 2px var(--color-focus) !important;
     }
   }
-  
+
   .form-text {
     display: block;
     margin-top: var(--space-1);
@@ -195,7 +197,7 @@
     color: var(--color-text-muted);
     line-height: var(--line-height-tight);
   }
-  
+
   // Error message styling
   .error-message {
     display: block;
@@ -207,28 +209,28 @@
     font-size: var(--font-size-sm);
     color: var(--color-error-dark);
     line-height: var(--line-height-tight);
-    
+
     &:empty {
       display: none;
     }
   }
-  
+
   // Invalid field styling
   .form-control.is-invalid {
     border-color: var(--color-error) !important;
     border-width: 3px !important;
-    
+
     &:focus {
       border-color: var(--color-error) !important;
       outline: 2px solid var(--color-error-light) !important;
       outline-offset: 2px;
     }
   }
-  
+
   select.form-control {
     cursor: pointer;
   }
-  
+
   .btn {
     margin-top: var(--space-4);
   }
@@ -249,46 +251,46 @@
       border-radius: var(--radius-md);
       margin-bottom: var(--space-3);
       background-color: var(--color-background-secondary);
-      
+
       &:last-child {
         margin-bottom: 0;
       }
-      
+
       strong {
         color: var(--color-text-primary);
         font-weight: var(--font-weight-semibold);
       }
-      
+
       small {
         color: var(--color-text-muted);
         font-size: var(--font-size-sm);
       }
     }
-    
+
     .job-status {
       padding: var(--space-1) var(--space-3);
       border-radius: var(--radius-full);
       font-size: var(--font-size-xs);
       font-weight: var(--font-weight-medium);
       text-transform: uppercase;
-      
+
       &.running {
         background-color: var(--color-warning-light);
         color: var(--color-warning-dark);
       }
-      
+
       &.completed {
         background-color: var(--color-success-light);
         color: var(--color-success-dark);
       }
-      
+
       &.failed {
         background-color: var(--color-error-light);
         color: var(--color-error-dark);
       }
     }
   }
-  
+
   .no-reports {
     text-align: center;
     color: var(--color-text-muted);
@@ -309,34 +311,34 @@
       padding: var(--space-5);
       margin-bottom: var(--space-4);
       background-color: var(--color-background-secondary);
-      
+
       &:last-child {
         margin-bottom: 0;
       }
-      
+
       h3 {
         margin: 0 0 var(--space-2) 0;
         font-size: var(--font-size-h4);
         font-weight: var(--font-weight-semibold);
         color: var(--color-text-primary);
       }
-      
+
       p {
         margin: 0 0 var(--space-3) 0;
         color: var(--color-text-secondary);
       }
-      
+
       .btn {
         margin-right: var(--space-2);
         margin-bottom: var(--space-2);
-        
+
         &:last-child {
           margin-right: 0;
         }
       }
     }
   }
-  
+
   .btn-refresh {
     background: none;
     border: 1px solid var(--color-border);
@@ -346,12 +348,12 @@
     font-size: var(--font-size-sm);
     cursor: pointer;
     transition: all 0.15s ease-in-out;
-    
+
     &:hover {
       background-color: var(--color-background-hover);
       color: var(--color-text-primary);
     }
-    
+
     &:focus {
       outline: 2px solid var(--color-focus);
       outline-offset: 2px;
@@ -365,7 +367,7 @@
 
 .content-section__header {
   margin-bottom: var(--space-8);
-  
+
   .content-section__title {
     margin: 0 0 var(--space-3) 0;
     font-size: var(--font-size-h1);
@@ -374,10 +376,10 @@
   }
 
   h1.content-section__title {
-      font-size: var(--font-size-2xl);
-      margin: 0 0 var(--space-1) 0;
-    }
-  
+    font-size: var(--font-size-2xl);
+    margin: 0 0 var(--space-1) 0;
+  }
+
   .content-section__description {
     margin: 0;
     font-size: var(--font-size-lg);

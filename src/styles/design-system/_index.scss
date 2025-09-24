@@ -7,7 +7,7 @@
 //
 // Usage:
 //   @use "design-system" as ds;
-//   
+//
 //   .my-component {
 //     background: ds.$color-primary;
 //     padding: ds.$space-4;
@@ -19,24 +19,24 @@
 // ==========================================================================
 
 // Import and re-export all design system modules
-@use "tokens" as tokens;
-@use "foundation" as foundation;  
-@use "components/atoms" as atoms;
-@use "components/molecules" as molecules;
-@use "components/organisms" as organisms;
-@use "components/layouts" as layouts;
+@use 'tokens' as tokens;
+@use 'foundation' as foundation;
+@use 'components/atoms' as atoms;
+@use 'components/molecules' as molecules;
+@use 'components/organisms' as organisms;
+@use 'components/layouts' as layouts;
 
 // ==========================================================================
 // Public API Exports
 // ==========================================================================
 
 // Export all modules for external consumption
-@forward "tokens";
-@forward "foundation";
-@forward "components/atoms";
-@forward "components/molecules";
-@forward "components/organisms";
-@forward "components/layouts";
+@forward 'tokens';
+@forward 'foundation';
+@forward 'components/atoms';
+@forward 'components/molecules';
+@forward 'components/organisms';
+@forward 'components/layouts';
 
 // ==========================================================================
 // Global Design System Initialization
@@ -53,8 +53,8 @@
 // ==========================================================================
 
 // Design system information for documentation and debugging
-$design-system-version: "1.0.0" !default;
-$design-system-name: "A11y Crawl & Test Design System" !default;
+$design-system-version: '1.0.0' !default;
+$design-system-name: 'A11y Crawl & Test Design System' !default;
 
 // Feature flags for optional functionality
 $enable-responsive-utilities: true !default;
@@ -73,27 +73,49 @@ $enable-dark-mode: false !default; // Future enhancement
     md: 768px,
     lg: 992px,
     xl: 1200px,
-    xxl: 1400px
+    xxl: 1400px,
   );
-  
+
   @each $name, $value in $breakpoints {
     @media (min-width: #{$value}) {
       // Responsive display utilities
-      .d-#{$name}-none { display: none !important; }
-      .d-#{$name}-block { display: block !important; }
-      .d-#{$name}-flex { display: flex !important; }
-      .d-#{$name}-grid { display: grid !important; }
-      
+      .d-#{$name}-none {
+        display: none !important;
+      }
+      .d-#{$name}-block {
+        display: block !important;
+      }
+      .d-#{$name}-flex {
+        display: flex !important;
+      }
+      .d-#{$name}-grid {
+        display: grid !important;
+      }
+
       // Responsive text alignment
-      .text-#{$name}-left { text-align: left !important; }
-      .text-#{$name}-center { text-align: center !important; }
-      .text-#{$name}-right { text-align: right !important; }
-      
+      .text-#{$name}-left {
+        text-align: left !important;
+      }
+      .text-#{$name}-center {
+        text-align: center !important;
+      }
+      .text-#{$name}-right {
+        text-align: right !important;
+      }
+
       // Responsive spacing utilities (selection)
-      .m-#{$name}-0 { margin: var(--space-0) !important; }
-      .m-#{$name}-4 { margin: var(--space-4) !important; }
-      .p-#{$name}-0 { padding: var(--space-0) !important; }
-      .p-#{$name}-4 { padding: var(--space-4) !important; }
+      .m-#{$name}-0 {
+        margin: var(--space-0) !important;
+      }
+      .m-#{$name}-4 {
+        margin: var(--space-4) !important;
+      }
+      .p-#{$name}-0 {
+        padding: var(--space-0) !important;
+      }
+      .p-#{$name}-4 {
+        padding: var(--space-4) !important;
+      }
     }
   }
 }
@@ -105,37 +127,39 @@ $enable-dark-mode: false !default; // Future enhancement
 @if $enable-print-styles {
   @media print {
     // Hide non-essential elements
-    .btn, .form-control, .card-actions {
+    .btn,
+    .form-control,
+    .card-actions {
       display: none !important;
     }
-    
+
     // Optimize text for print
     body {
       color: black !important;
       background: white !important;
     }
-    
+
     // Ensure links are visible
     a {
       color: black !important;
       text-decoration: underline !important;
     }
-    
+
     // Remove shadows and transitions
     * {
       box-shadow: none !important;
       transition: none !important;
     }
-    
+
     // Optimize cards for print
     .card {
       border: 1px solid black !important;
       break-inside: avoid;
     }
-    
+
     // Show link URLs after text
     a[href]:not(.btn):not(.nav-link)::after {
-      content: " (" attr(href) ")";
+      content: ' (' attr(href) ')';
       font-size: 0.875em;
       color: #666;
     }
@@ -154,17 +178,18 @@ $enable-dark-mode: false !default; // Future enhancement
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  
+
   // Enhanced focus animations for better accessibility
   @keyframes focus-pulse {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 1;
     }
     50% {
       opacity: 0.7;
     }
   }
-  
+
   .focus-pulse:focus-visible {
     animation: focus-pulse 2s ease-in-out infinite;
   }
@@ -179,14 +204,14 @@ $enable-dark-mode: false !default; // Future enhancement
 
 :root {
   --design-system-version: #{$design-system-version};
-  --design-system-name: "#{$design-system-name}";
-  
+  --design-system-name: '#{$design-system-name}';
+
   // Component availability flags
-  --has-buttons: "true";
-  --has-forms: "true";
-  --has-cards: "true";
-  --has-accordions: "true";
-  --has-layout-system: "true";
+  --has-buttons: 'true';
+  --has-forms: 'true';
+  --has-cards: 'true';
+  --has-accordions: 'true';
+  --has-layout-system: 'true';
 }
 
 // ==========================================================================
@@ -199,19 +224,19 @@ $debug-mode: false !default;
 @if $debug-mode {
   // Visual debugging helpers
   .debug-grid {
-    background-image: 
+    background-image:
       linear-gradient(rgba(255, 0, 0, 0.1) 1px, transparent 1px),
       linear-gradient(90deg, rgba(255, 0, 0, 0.1) 1px, transparent 1px);
     background-size: var(--space-4) var(--space-4);
   }
-  
+
   .debug-spacing * {
     outline: 1px solid rgba(255, 0, 0, 0.3) !important;
   }
-  
+
   // Log design system load
   body::before {
-    content: "Design System #{$design-system-version} Loaded";
+    content: 'Design System #{$design-system-version} Loaded';
     position: fixed;
     top: 0;
     right: 0;
@@ -229,7 +254,9 @@ $debug-mode: false !default;
 // ==========================================================================
 
 // Use contain property for better rendering performance
-.card, .btn, .form-group {
+.card,
+.btn,
+.form-group {
   contain: layout style;
 }
 
@@ -239,7 +266,9 @@ $debug-mode: false !default;
 }
 
 // Optimize grid layouts
-.grid, .layout-two-column, .layout-three-column {
+.grid,
+.layout-two-column,
+.layout-three-column {
   contain: layout;
 }
 
@@ -256,7 +285,7 @@ $debug-mode: false !default;
       --color-background-primary: #1a1a1a;
     }
   }
-  
+
   .theme-dark {
     // Explicit dark mode class overrides would go here
     --color-background-primary: #1a1a1a;

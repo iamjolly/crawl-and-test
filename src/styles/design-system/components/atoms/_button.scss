@@ -6,7 +6,7 @@
 // Provides all button variants with consistent styling.
 //
 
-@use "../../tokens" as tokens;
+@use '../../tokens' as tokens;
 
 // ==========================================================================
 // Base Button
@@ -20,7 +20,7 @@
   gap: var(--space-2);
   min-height: 44px; // Accessibility touch target
   padding: var(--space-btn-padding-y-md) var(--space-btn-padding-x-md);
-  
+
   // Typography
   font-family: var(--font-family-primary);
   font-size: var(--text-ui-medium);
@@ -29,19 +29,19 @@
   text-align: center;
   text-decoration: none;
   white-space: nowrap;
-  
+
   // Visual styling
   background-color: var(--color-background-secondary);
   border: 1px solid var(--color-border-primary);
   border-radius: var(--radius-button);
   box-shadow: var(--elevation-button);
   color: var(--color-text-primary);
-  
+
   // Interaction
   cursor: pointer;
   user-select: none;
   transition: all 0.2s ease-in-out;
-  
+
   // States
   &:hover:not(:disabled) {
     background-color: var(--color-background-tertiary);
@@ -49,25 +49,25 @@
     box-shadow: var(--elevation-button-hover);
     transform: translateY(-1px);
   }
-  
+
   &:focus-visible {
     outline: 3px solid var(--color-primary-focus);
     outline-offset: 3px;
     box-shadow: var(--elevation-button-hover);
     z-index: 1; // Ensure focus outline appears above other elements
   }
-  
+
   &:active:not(:disabled) {
     transform: translateY(0);
     box-shadow: var(--elevation-button);
   }
-  
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
   }
-  
+
   // Visited state - maintain exact same appearance as unvisited
   &:visited {
     color: inherit;
@@ -87,20 +87,20 @@
   background-color: var(--color-primary);
   border-color: var(--color-primary);
   color: var(--color-text-inverse);
-  
+
   &:hover:not(:disabled) {
     background-color: var(--color-primary-hover);
     border-color: var(--color-primary-hover);
     color: var(--color-text-inverse);
   }
-  
+
   &:focus-visible {
     outline: 3px solid var(--color-primary-focus);
     outline-offset: 3px;
     box-shadow: var(--elevation-button-hover);
     z-index: 1;
   }
-  
+
   &:visited {
     background-color: var(--color-primary);
     border-color: var(--color-primary);
@@ -115,32 +115,32 @@
   background-color: var(--color-background-primary);
   border-color: var(--color-primary);
   color: var(--color-primary);
-  
+
   &:hover:not(:disabled) {
     background-color: var(--color-primary);
     border-color: var(--color-primary);
     color: var(--color-text-inverse);
   }
-  
+
   &:visited {
     background-color: var(--color-background-primary);
     border-color: var(--color-primary);
     color: var(--color-primary);
     text-decoration: none;
   }
-  
+
   // Icon spacing
   .icon {
     width: 1em;
     height: 1em;
     flex-shrink: 0;
   }
-  
+
   .icon-left {
     margin-right: var(--space-1);
     margin-left: calc(var(--space-1) * -1);
   }
-  
+
   .icon-right {
     margin-left: var(--space-1);
     margin-right: calc(var(--space-1) * -1);
@@ -157,13 +157,13 @@
   background-color: var(--color-primary);
   border-color: var(--color-primary);
   color: var(--color-text-inverse);
-  
+
   &:hover:not(:disabled) {
     background-color: var(--color-primary-hover);
     border-color: var(--color-primary-hover);
     color: var(--color-text-inverse);
   }
-  
+
   &:focus-visible {
     outline: 3px solid var(--color-primary-focus);
     outline-offset: 3px;
@@ -178,7 +178,7 @@
   background-color: var(--color-background-primary);
   border-color: var(--color-primary);
   color: var(--color-primary);
-  
+
   &:hover:not(:disabled) {
     background-color: var(--color-primary);
     border-color: var(--color-primary);
@@ -192,7 +192,7 @@
   background-color: var(--color-success);
   border-color: var(--color-success);
   color: var(--color-text-inverse);
-  
+
   &:hover:not(:disabled) {
     background-color: var(--color-success-hover);
     border-color: var(--color-success-hover);
@@ -205,7 +205,7 @@
   background-color: var(--color-warning);
   border-color: var(--color-warning);
   color: var(--color-text-primary);
-  
+
   &:hover:not(:disabled) {
     background-color: var(--color-warning-hover);
     border-color: var(--color-warning-hover);
@@ -218,7 +218,7 @@
   background-color: var(--color-danger);
   border-color: var(--color-danger);
   color: var(--color-text-inverse);
-  
+
   &:hover:not(:disabled) {
     background-color: var(--color-danger-hover);
     border-color: var(--color-danger-hover);
@@ -231,7 +231,7 @@
   background-color: var(--color-info);
   border-color: var(--color-info);
   color: var(--color-text-inverse);
-  
+
   &:hover:not(:disabled) {
     background-color: var(--color-info-hover);
     border-color: var(--color-info-hover);
@@ -244,7 +244,7 @@
   background-color: var(--color-background-secondary);
   border-color: var(--color-border-primary);
   color: var(--color-text-primary);
-  
+
   &:hover:not(:disabled) {
     background-color: var(--color-background-tertiary);
     border-color: var(--color-border-secondary);
@@ -257,7 +257,7 @@
   background-color: var(--color-text-primary);
   border-color: var(--color-text-primary);
   color: var(--color-text-inverse);
-  
+
   &:hover:not(:disabled) {
     background-color: var(--color-text-secondary);
     border-color: var(--color-text-secondary);
@@ -272,7 +272,7 @@
   min-height: 32px;
   padding: var(--space-btn-padding-y-sm) var(--space-btn-padding-x-sm);
   font-size: var(--text-ui-small);
-  
+
   .icon {
     width: 0.875em;
     height: 0.875em;
@@ -283,7 +283,7 @@
   min-height: 56px;
   padding: var(--space-btn-padding-y-lg) var(--space-btn-padding-x-lg);
   font-size: var(--text-ui-large);
-  
+
   .icon {
     width: 1.125em;
     height: 1.125em;
@@ -298,21 +298,21 @@
 .btn-outline {
   background-color: transparent;
   border-width: 2px;
-  
+
   &.btn-primary {
     border-color: var(--color-primary);
     color: var(--color-primary);
-    
+
     &:hover:not(:disabled) {
       background-color: var(--color-primary);
       color: var(--color-text-inverse);
     }
   }
-  
+
   &.btn-secondary {
     border-color: var(--color-border-secondary);
     color: var(--color-text-secondary);
-    
+
     &:hover:not(:disabled) {
       background-color: var(--color-background-secondary);
       border-color: var(--color-border-primary);
@@ -325,11 +325,11 @@
 .btn-ghost {
   background-color: transparent;
   border-color: transparent;
-  
+
   &:hover:not(:disabled) {
     background-color: var(--color-background-secondary);
   }
-  
+
   &:focus-visible {
     outline: 3px solid var(--color-primary-focus);
     outline-offset: 3px;
@@ -346,13 +346,13 @@
   text-decoration: underline;
   min-height: auto;
   padding: var(--space-1) var(--space-2);
-  
+
   &:hover:not(:disabled) {
     background-color: transparent;
     color: var(--color-primary-hover);
     text-decoration: none;
   }
-  
+
   &:focus-visible {
     outline: 3px solid var(--color-primary-focus);
     outline-offset: 3px;
@@ -369,23 +369,23 @@
   display: inline-flex;
   border-radius: var(--radius-button);
   box-shadow: var(--elevation-button);
-  
+
   .btn {
     border-radius: 0;
     border-right-width: 0;
     box-shadow: none;
-    
+
     &:first-child {
       border-top-left-radius: var(--radius-button);
       border-bottom-left-radius: var(--radius-button);
     }
-    
+
     &:last-child {
       border-top-right-radius: var(--radius-button);
       border-bottom-right-radius: var(--radius-button);
       border-right-width: 1px;
     }
-    
+
     &:hover,
     &:focus {
       z-index: 1;
@@ -400,17 +400,17 @@
   flex-direction: column;
   align-items: flex-start;
   border-radius: var(--radius-button);
-  
+
   .btn {
     width: 100%;
     border-radius: 0;
     border-bottom-width: 0;
-    
+
     &:first-child {
       border-top-left-radius: var(--radius-button);
       border-top-right-radius: var(--radius-button);
     }
-    
+
     &:last-child {
       border-bottom-left-radius: var(--radius-button);
       border-bottom-right-radius: var(--radius-button);
@@ -427,7 +427,7 @@
 .btn-view {
   @extend .btn;
   @extend .btn-primary;
-  
+
   // Override hover to use darker blue to match browse button
   &:hover:not(:disabled) {
     background-color: var(--color-primary);
@@ -442,7 +442,7 @@
   @extend .btn-secondary;
 }
 
-// Download button (accessibility report specific)  
+// Download button (accessibility report specific)
 .btn-download {
   @extend .btn;
   @extend .btn-success;
@@ -455,9 +455,9 @@
 .btn-loading {
   position: relative;
   color: transparent;
-  
+
   &::after {
-    content: "";
+    content: '';
     position: absolute;
     top: 50%;
     left: 50%;
@@ -488,32 +488,32 @@
   background-color: #1e7e34;
   border-color: #1e7e34;
   color: var(--color-text-inverse);
-  
+
   &:hover:not(:disabled) {
     background-color: #155724;
     border-color: #155724;
     color: var(--color-text-inverse);
   }
-  
+
   &:focus-visible {
     outline: 3px solid #1e7e34;
     outline-offset: 3px;
   }
 }
 
-// Collapse All button - gray variant  
+// Collapse All button - gray variant
 .btn-collapse-all {
   @extend .btn;
   background-color: #545b62;
   border-color: #545b62;
   color: var(--color-text-inverse);
-  
+
   &:hover:not(:disabled) {
     background-color: #3d4349;
     border-color: #3d4349;
     color: var(--color-text-inverse);
   }
-  
+
   &:focus-visible {
     outline: 3px solid #545b62;
     outline-offset: 3px;
@@ -524,7 +524,7 @@
 .btn-fab {
   @extend .btn;
   @extend .btn-primary;
-  
+
   width: 56px;
   height: 56px;
   min-height: 56px;
@@ -535,11 +535,11 @@
   right: var(--space-6);
   z-index: var(--z-index-fixed);
   box-shadow: var(--elevation-card);
-  
+
   &:hover {
     box-shadow: var(--elevation-card-hover);
   }
-  
+
   .icon {
     width: 1.5em;
     height: 1.5em;

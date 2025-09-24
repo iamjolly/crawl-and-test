@@ -1,7 +1,7 @@
 // Example: How to integrate the design system into your application
 
 // 1. Import the complete design system
-@use "src/styles/design-system" as ds;
+@use 'src/styles/design-system' as ds;
 
 // 2. Or import specific modules
 // @use "src/styles/design-system/tokens" as tokens;
@@ -13,23 +13,23 @@
   background: ds.$color-background-primary;
   color: ds.$color-text-primary;
   font-family: ds.$font-family-primary;
-  
+
   // Use spacing system
   padding: ds.$space-6;
   gap: ds.$space-4;
-  
+
   // Extend design system components
   .my-button {
     @extend .btn;
     @extend .btn-primary;
-    
+
     // Custom overrides
     border-radius: ds.$radius-lg;
   }
-  
+
   .my-card {
     @extend .card;
-    
+
     // Add custom styles
     box-shadow: ds.$shadow-lg;
   }
@@ -42,7 +42,7 @@
   border-radius: ds.$radius-md;
   padding: ds.$space-4;
   color: ds.$color-warning-dark;
-  
+
   .alert-title {
     font-weight: ds.$font-weight-semibold;
     margin-bottom: ds.$space-2;
@@ -53,15 +53,15 @@
 .responsive-layout {
   display: grid;
   gap: ds.$space-4;
-  
+
   // Mobile first
   grid-template-columns: 1fr;
-  
+
   // Tablet and up
   @include ds.media-md {
     grid-template-columns: 1fr 300px;
   }
-  
+
   // Desktop and up
   @include ds.media-lg {
     grid-template-columns: 1fr 400px;

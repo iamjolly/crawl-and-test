@@ -2,75 +2,75 @@
 // Base button styling and variants
 
 .btn {
-    display: inline-block;
-    padding: 8px 16px;
-    margin: 4px;
-    border-radius: 4px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    border: none;
-    cursor: pointer;
-    font-family: inherit;
+  display: inline-block;
+  padding: 8px 16px;
+  margin: 4px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
 }
 
 // Button variants
 .btn-primary {
-    background: #566bc7; // Accessibility compliant blue
-    color: white;
-    
-    &:hover {
-        background: #5a67d8; // Original hover color from dashboard.css
-        text-decoration: none;
-    }
-    
-    &:disabled {
-        background: #6c757d;
-        cursor: not-allowed;
-    }
+  background: #566bc7; // Accessibility compliant blue
+  color: white;
+
+  &:hover {
+    background: #5a67d8; // Original hover color from dashboard.css
+    text-decoration: none;
+  }
+
+  &:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+  }
 }
 
 .btn-view {
-    background: #208636; // Accessibility compliant green (was #28a745)
-    color: white;
-    
-    &:hover {
-        background: #218838; // Original hover color from dashboard.css
-        text-decoration: none;
-    }
+  background: #208636; // Accessibility compliant green (was #28a745)
+  color: white;
+
+  &:hover {
+    background: #218838; // Original hover color from dashboard.css
+    text-decoration: none;
+  }
 }
 
 .btn-browse {
-    background: #118294; // Accessibility compliant teal (was #17a2b8)
-    color: white;
-    
-    &:hover {
-        background: #138496; // Original hover color from dashboard.css
-        text-decoration: none;
-    }
+  background: #118294; // Accessibility compliant teal (was #17a2b8)
+  color: white;
+
+  &:hover {
+    background: #138496; // Original hover color from dashboard.css
+    text-decoration: none;
+  }
 }
 
 // Download button specifically
 .btn-download {
-    background: #007bff;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 4px;
+  background: #007bff;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-block;
+
+  &:hover {
+    background: #0069d9; // Standard Bootstrap hover for #007bff
     text-decoration: none;
-    font-weight: 500;
-    display: inline-block;
-    
-    &:hover {
-        background: #0069d9; // Standard Bootstrap hover for #007bff
-        text-decoration: none;
-    }
+  }
 }
 
 // Link styling that should look like buttons
 a.btn {
+  color: white;
+
+  &:hover {
     color: white;
-    
-    &:hover {
-        color: white;
-    }
+  }
 }

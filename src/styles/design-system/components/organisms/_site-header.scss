@@ -1,7 +1,7 @@
 // ==========================================================================
 // Site Header Component
 // ==========================================================================
-// 
+//
 // The main site header containing branding, navigation, and utilities.
 // Designed for accessibility, responsiveness, and modern design principles.
 //
@@ -25,22 +25,22 @@
   top: 0;
   z-index: var(--z-index-sticky);
   box-shadow: var(--shadow-sm);
-  
+
   // Variants
   &--elevated {
     box-shadow: var(--shadow-md);
   }
-  
+
   &--transparent {
     background: transparent;
     border-bottom: none;
     box-shadow: none;
   }
-  
+
   &--dark {
     background: var(--color-background-inverse);
     border-bottom-color: var(--color-border-inverse);
-    
+
     .site-header__brand,
     .site-header__title {
       color: var(--color-text-inverse);
@@ -58,7 +58,7 @@
   justify-content: space-between;
   gap: var(--space-4);
   min-height: 72px; // Ensure consistent header height
-  
+
   @media (max-width: 768px) {
     padding: var(--space-3) var(--space-4);
     min-height: 64px;
@@ -75,18 +75,18 @@
   font-weight: var(--font-weight-semibold);
   transition: color var(--transition-fast);
   flex-shrink: 0;
-  
+
   &:hover {
     color: var(--color-primary);
     text-decoration: none;
   }
-  
+
   &:focus-visible {
     outline: 3px solid var(--color-focus);
     outline-offset: 3px;
     border-radius: var(--radius-sm);
   }
-  
+
   // Active state for current page
   &--active {
     color: var(--color-primary);
@@ -106,7 +106,7 @@
   color: var(--color-text-inverse);
   font-weight: var(--font-weight-bold);
   font-size: var(--text-body);
-  
+
   // If using an image
   img {
     width: 100%;
@@ -114,7 +114,7 @@
     object-fit: contain;
     border-radius: var(--radius-sm);
   }
-  
+
   @media (max-width: 768px) {
     width: 32px;
     height: 32px;
@@ -129,11 +129,11 @@
   font-weight: var(--font-weight-semibold);
   color: inherit;
   line-height: 1.2;
-  
+
   @media (max-width: 768px) {
     font-size: var(--text-heading-h5);
   }
-  
+
   // Subtitle support
   .site-header__subtitle {
     display: block;
@@ -149,7 +149,7 @@
   flex: 1;
   display: flex;
   justify-content: center;
-  
+
   @media (max-width: 768px) {
     display: none; // Hide in mobile, use hamburger menu
   }
@@ -173,17 +173,17 @@
   cursor: pointer;
   border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
-  
+
   &:hover {
     background: var(--color-background-secondary);
     color: var(--color-primary);
   }
-  
+
   &:focus-visible {
     outline: 3px solid var(--color-focus);
     outline-offset: 2px;
   }
-  
+
   // Show on mobile
   @media (max-width: 768px) {
     display: flex;
@@ -192,7 +192,7 @@
     width: 40px;
     height: 40px;
   }
-  
+
   // Hamburger icon
   .icon {
     width: 24px;
@@ -200,7 +200,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    
+
     span {
       display: block;
       height: 2px;
@@ -209,17 +209,17 @@
       transition: all var(--transition-fast);
     }
   }
-  
+
   // Animated hamburger to X
-  &[aria-expanded="true"] .icon {
+  &[aria-expanded='true'] .icon {
     span:nth-child(1) {
       transform: rotate(45deg) translate(5px, 5px);
     }
-    
+
     span:nth-child(2) {
       opacity: 0;
     }
-    
+
     span:nth-child(3) {
       transform: rotate(-45deg) translate(7px, -6px);
     }
@@ -239,28 +239,28 @@
       }
     }
   }
-  
+
   // High contrast mode support
   @media (prefers-contrast: high) {
     border-bottom-width: 2px;
-    
+
     .site-header__brand {
       text-decoration: underline;
       text-decoration-color: transparent;
-      
+
       &:hover {
         text-decoration-color: currentColor;
       }
     }
   }
-  
+
   // Reduced motion support
   @media (prefers-reduced-motion: reduce) {
     .site-header__brand,
     .site-header__menu-toggle {
       transition: none;
     }
-    
+
     .site-header__menu-toggle .icon span {
       transition: none;
     }
@@ -273,7 +273,7 @@
     position: static;
     box-shadow: none;
     border-bottom: 2px solid var(--color-text-primary);
-    
+
     .site-header__utilities,
     .site-header__menu-toggle {
       display: none;

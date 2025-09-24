@@ -35,12 +35,12 @@ body {
   border-bottom: 2px solid $color-border;
   padding-bottom: $spacing-xl;
   margin-bottom: $spacing-xl;
-  
+
   h1 {
     color: $color-text;
     margin: 0 0 $spacing-md 0;
   }
-  
+
   .report-meta {
     display: flex;
     flex-wrap: wrap;
@@ -49,12 +49,12 @@ body {
     font-size: $font-size-small;
     color: $color-text-muted;
   }
-  
+
   .report-meta-item {
     display: flex;
     align-items: center;
     gap: $spacing-xs;
-    
+
     strong {
       color: $color-text;
     }
@@ -70,41 +70,49 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: $spacing-lg;
   margin-bottom: $spacing-2xl;
-  
+
   .summary-card {
     @include card();
     padding: $spacing-lg;
     text-align: center;
     border-left: 4px solid $color-border;
-    
+
     &.violations {
       border-left-color: $color-danger;
     }
-    
+
     &.incomplete {
       border-left-color: $color-warning;
     }
-    
+
     &.passes {
       border-left-color: $color-success;
     }
-    
+
     &.inapplicable {
       border-left-color: $color-text-light;
     }
   }
-  
+
   .summary-number {
     font-size: $font-size-h1;
     font-weight: $font-weight-bold;
     margin: 0 0 $spacing-xs 0;
-    
-    &.violations { color: $color-danger; }
-    &.incomplete { color: $color-warning; }
-    &.passes { color: $color-success; }
-    &.inapplicable { color: $color-text-light; }
+
+    &.violations {
+      color: $color-danger;
+    }
+    &.incomplete {
+      color: $color-warning;
+    }
+    &.passes {
+      color: $color-success;
+    }
+    &.inapplicable {
+      color: $color-text-light;
+    }
   }
-  
+
   .summary-label {
     font-size: $font-size-small;
     font-weight: $font-weight-medium;
@@ -120,7 +128,7 @@ body {
 
 .issue-section {
   margin-bottom: $spacing-2xl;
-  
+
   h4 {
     margin-bottom: $spacing-lg;
     padding-bottom: $spacing-sm;
@@ -134,15 +142,15 @@ body {
   border-radius: 0 4px 4px 0;
   padding: 10px 15px;
   margin-bottom: 10px;
-  
+
   &.warning {
     border-left-color: $color-warning;
   }
-  
+
   &.info {
     border-left-color: $color-info;
   }
-  
+
   &.pass {
     border-left-color: $color-success;
   }
@@ -163,22 +171,22 @@ body {
   font-weight: bold;
   text-transform: uppercase;
   margin-bottom: 8px;
-  
+
   &.impact-critical {
     background: #ffebee;
     color: #000;
   }
-  
+
   &.impact-serious {
     background: #fff3e0;
     color: #000;
   }
-  
+
   &.impact-moderate {
     background: #fff8e1;
     color: #000;
   }
-  
+
   &.impact-minor {
     background: #e3f2fd;
     color: #000;
@@ -192,7 +200,7 @@ body {
 
 .issue-help {
   margin-bottom: $spacing-md;
-  
+
   a {
     @include link();
   }
@@ -208,21 +216,21 @@ body {
   background-color: $color-background-light;
   border-left: 3px solid $color-primary;
   border-radius: $border-radius-small;
-  
+
   h5 {
     margin: 0 0 $spacing-sm 0;
     font-size: $font-size-small;
     font-weight: $font-weight-semibold;
   }
-  
+
   ul {
     margin: $spacing-xs 0 0 0;
     padding: 0;
     list-style: none;
-    
+
     li {
       margin: $spacing-xs 0;
-      
+
       a {
         @include link();
       }
@@ -244,7 +252,7 @@ body {
 
 .issue-target {
   margin: $spacing-xs 0;
-  
+
   strong {
     color: $color-text;
   }
@@ -280,12 +288,12 @@ body {
   .report-summary {
     grid-template-columns: 1fr;
   }
-  
+
   .report-meta {
     flex-direction: column;
     gap: $spacing-sm;
   }
-  
+
   .issue {
     padding: $spacing-md;
   }
@@ -303,24 +311,24 @@ body {
   background-color: $color-background-light;
   border-left: 3px solid $color-primary;
   border-radius: $border-radius-small;
-  
+
   h5 {
     margin: 0 0 $spacing-xs 0;
     font-size: $font-size-small;
   }
-  
+
   ul {
     margin: 4px 0;
     padding: 0;
     list-style: none;
   }
-  
+
   li {
     margin: 2px 0;
-    
+
     a {
       color: $color-primary;
-      
+
       &:hover {
         color: $color-primary-darker;
       }
@@ -331,7 +339,7 @@ body {
 // Issue element count styling
 .issue-element-count {
   margin-top: $spacing-sm;
-  
+
   strong {
     font-weight: $font-weight-medium;
   }
@@ -353,7 +361,7 @@ body {
   padding: 15px;
   border-radius: 6px;
   border-left: 4px solid #007bff;
-  
+
   h3 {
     margin: 0 0 10px 0;
     color: $color-text;
@@ -362,7 +370,7 @@ body {
     align-items: center;
     gap: var(--space-1);
   }
-  
+
   .value {
     font-size: 24px;
     font-weight: $font-weight-bold;
@@ -373,7 +381,7 @@ body {
 .summary-card-error {
   border-left-color: $color-danger;
   background: rgba($color-danger, 0.1);
-  
+
   .value {
     color: $color-text;
   }
@@ -382,7 +390,7 @@ body {
 .summary-card-warning {
   border-left-color: $color-warning;
   background: rgba($color-warning, 0.25);
-  
+
   .value {
     color: $color-text;
   }
@@ -392,7 +400,7 @@ body {
 .error {
   border-left-color: $color-danger;
   background: rgba($color-danger, 0.15);
-  
+
   .value {
     color: $color-text;
   }
@@ -401,7 +409,7 @@ body {
 .warning {
   border-left-color: $color-warning;
   background: rgba($color-warning, 0.25);
-  
+
   .value {
     color: $color-text;
   }
@@ -426,14 +434,14 @@ body {
   font-weight: 500;
   transition: background-color 0.2s ease;
   border: 2px solid #007bff;
-  
+
   &:hover {
     background: #0056b3;
     border-color: #0056b3;
     color: $color-white;
     text-decoration: none;
   }
-  
+
   &:focus {
     outline: 3px solid #007bff;
     outline-offset: 3px;
@@ -454,12 +462,12 @@ body {
   background: $color-background-light;
   padding: 15px;
   border-bottom: 1px solid $color-border;
-  
+
   h3 {
     margin: 0;
     color: $color-text;
   }
-  
+
   .url {
     color: $color-text;
     font-size: $font-size-small;
@@ -500,22 +508,22 @@ body {
   font-size: 0.8em;
   font-weight: 500;
   margin: 5px 0;
-  
+
   &.impact-critical {
     background: #ffebee;
     color: #000;
   }
-  
+
   &.impact-serious {
     background: #fff3e0;
     color: #000;
   }
-  
+
   &.impact-moderate {
     background: #fff8e1;
     color: #000;
   }
-  
+
   &.impact-minor {
     background: #e3f2fd;
     color: #000;
@@ -528,17 +536,17 @@ body {
     background: #ffebee;
     color: $color-text;
   }
-  
+
   &.impact-serious {
     background: #fff3e0;
     color: $color-text;
   }
-  
+
   &.impact-moderate {
     background: #fff8e1;
     color: $color-text;
   }
-  
+
   &.impact-minor {
     background: #e3f2fd;
     color: $color-text;
@@ -556,7 +564,7 @@ body {
     color: #004085;
     margin-bottom: 10px;
   }
-  
+
   details {
     margin-top: 10px;
   }
@@ -566,12 +574,12 @@ body {
   list-style: none;
   padding: 0;
   margin: 10px 0;
-  
+
   li {
     padding: 5px 0;
     border-bottom: 1px solid #f0f0f0;
     word-break: break-all;
-    
+
     &:last-child {
       border-bottom: none;
     }
@@ -598,12 +606,12 @@ body {
     box-shadow: none;
     border: 1px solid $color-border;
   }
-  
+
   .issue {
     break-inside: avoid;
     margin-bottom: $spacing-md;
   }
-  
+
   .w3c-links {
     break-inside: avoid;
   }

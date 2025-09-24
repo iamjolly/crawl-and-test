@@ -6,9 +6,9 @@
 // Provides consistent styling and layout for forms.
 //
 
-@use "../../tokens" as tokens;
-@use "../../foundation" as foundation;
-@use "../atoms" as atoms;
+@use '../../tokens' as tokens;
+@use '../../foundation' as foundation;
+@use '../atoms' as atoms;
 
 // ==========================================================================
 // Base Form
@@ -19,29 +19,29 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-form-group-gap);
-  
+
   // Reset default form margins
   margin: 0;
-  
+
   // Form sections
   .form-section {
     display: flex;
     flex-direction: column;
     gap: var(--space-form-group-gap);
-    
+
     &:not(:last-child) {
       padding-bottom: var(--space-form-group-gap);
       border-bottom: 1px solid var(--color-border-primary);
       margin-bottom: var(--space-form-group-gap);
     }
-    
+
     .form-section-title {
       font-size: var(--text-heading-5);
       font-weight: var(--font-weight-heading);
       color: var(--color-text-primary);
       margin: 0 0 var(--space-4) 0;
     }
-    
+
     .form-section-description {
       font-size: var(--text-body-small);
       color: var(--color-text-secondary);
@@ -58,34 +58,34 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-form-gap);
-  
+
   // Horizontal form group
   &.form-group-horizontal {
     flex-direction: row;
     align-items: flex-start;
     gap: var(--space-4);
-    
+
     .form-label {
       min-width: 120px;
       margin: var(--space-2) 0 0 0;
     }
-    
+
     .form-control-wrapper {
       flex: 1;
     }
   }
-  
+
   // Inline form group
   &.form-group-inline {
     flex-direction: row;
     align-items: center;
     gap: var(--space-4);
-    
+
     .form-label {
       margin: 0;
       white-space: nowrap;
     }
-    
+
     .form-control {
       width: auto;
     }
@@ -103,21 +103,21 @@
   color: var(--color-text-primary);
   line-height: var(--line-height-normal);
   margin: 0 0 var(--space-2) 0;
-  
+
   // Required indicator
   &.required::after,
   &[required]::after {
-    content: " *";
+    content: ' *';
     color: var(--color-danger);
   }
-  
+
   // Optional indicator
   &.optional::after {
-    content: " (optional)";
+    content: ' (optional)';
     color: var(--color-text-muted);
     font-weight: var(--font-weight-normal);
   }
-  
+
   // Disabled state
   &.disabled {
     color: var(--color-text-disabled);
@@ -133,7 +133,7 @@
   cursor: pointer;
   user-select: none;
   line-height: var(--line-height-normal);
-  
+
   &.disabled {
     color: var(--color-text-disabled);
     cursor: not-allowed;
@@ -150,28 +150,28 @@
 
 .form-control-wrapper {
   position: relative;
-  
+
   // Icon in input
   &.has-icon-left {
     .form-control {
       padding-left: var(--space-10);
     }
-    
+
     .form-icon {
       left: var(--space-3);
     }
   }
-  
+
   &.has-icon-right {
     .form-control {
       padding-right: var(--space-10);
     }
-    
+
     .form-icon {
       right: var(--space-3);
     }
   }
-  
+
   .form-icon {
     position: absolute;
     top: 50%;
@@ -197,15 +197,15 @@
 
 .form-help {
   @extend .form-text;
-  
+
   &.form-help-error {
     color: var(--color-danger);
   }
-  
+
   &.form-help-success {
     color: var(--color-success);
   }
-  
+
   &.form-help-warning {
     color: var(--color-warning);
   }
@@ -221,56 +221,56 @@
     .form-label {
       color: var(--color-danger);
     }
-    
+
     .form-control {
       border-color: var(--color-danger);
-      
+
       &:focus {
         border-color: var(--color-danger);
         box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
       }
     }
-    
+
     .form-text {
       color: var(--color-danger);
     }
   }
-  
+
   // Valid state
   &.is-valid {
     .form-label {
       color: var(--color-success);
     }
-    
+
     .form-control {
       border-color: var(--color-success);
-      
+
       &:focus {
         border-color: var(--color-success);
         box-shadow: 0 0 0 2px rgba(32, 134, 54, 0.25);
       }
     }
-    
+
     .form-text {
       color: var(--color-success);
     }
   }
-  
+
   // Warning state
   &.is-warning {
     .form-label {
       color: var(--color-warning);
     }
-    
+
     .form-control {
       border-color: var(--color-warning);
-      
+
       &:focus {
         border-color: var(--color-warning);
         box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.25);
       }
     }
-    
+
     .form-text {
       color: var(--color-warning);
     }
@@ -287,25 +287,25 @@
   gap: var(--space-2);
   min-height: 1.5rem;
   margin-bottom: var(--space-3);
-  
+
   .form-check-input {
     margin: 0;
     flex-shrink: 0;
   }
-  
+
   .form-check-label {
     margin: 0;
     flex: 1;
     line-height: 1.5;
   }
-  
+
   // Inline checks
   &.form-check-inline {
     display: inline-flex;
     margin-right: var(--space-6);
     margin-bottom: 0;
   }
-  
+
   // Switch variant
   &.form-switch {
     .form-check-input {
@@ -318,9 +318,9 @@
       background-size: contain;
       position: relative;
       cursor: pointer;
-      
+
       &::before {
-        content: "";
+        content: '';
         position: absolute;
         top: 2px;
         left: 2px;
@@ -331,16 +331,16 @@
         transition: transform 0.2s ease-in-out;
         box-shadow: var(--elevation-xs);
       }
-      
+
       &:checked {
         background-color: var(--color-primary);
         border-color: var(--color-primary);
-        
+
         &::before {
           transform: translateX(1.25rem);
         }
       }
-      
+
       &:focus {
         box-shadow: 0 0 0 2px var(--color-primary-focus);
       }
@@ -359,16 +359,16 @@
     grid-template-columns: minmax(120px, 1fr) 2fr;
     gap: var(--space-4);
     align-items: start;
-    
+
     .form-label {
       margin: var(--space-2) 0 0 0;
       text-align: right;
-      
+
       @media (max-width: 767px) {
         text-align: left;
       }
     }
-    
+
     @media (max-width: 767px) {
       grid-template-columns: 1fr;
       gap: var(--space-2);
@@ -382,36 +382,36 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-4);
-  
+
   .form-group {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: var(--space-2);
     margin-bottom: 0;
-    
+
     .form-label {
       margin: 0;
       white-space: nowrap;
     }
-    
+
     .form-control {
       width: auto;
     }
   }
-  
+
   @media (max-width: 575px) {
     flex-direction: column;
     align-items: stretch;
-    
+
     .form-group {
       flex-direction: column;
       align-items: stretch;
-      
+
       .form-label {
         text-align: left;
       }
-      
+
       .form-control {
         width: 100%;
       }
@@ -430,28 +430,28 @@
   margin-top: var(--space-6);
   padding-top: var(--space-6);
   border-top: 1px solid var(--color-border-primary);
-  
+
   &.form-actions-end {
     justify-content: flex-end;
   }
-  
+
   &.form-actions-center {
     justify-content: center;
   }
-  
+
   &.form-actions-between {
     justify-content: space-between;
   }
-  
+
   &.form-actions-stretch {
     .btn {
       flex: 1;
     }
   }
-  
+
   @media (max-width: 575px) {
     flex-direction: column;
-    
+
     .btn {
       width: 100%;
     }
@@ -467,7 +467,7 @@
   border-radius: var(--radius-lg);
   padding: var(--space-6);
   margin: 0 0 var(--space-6) 0;
-  
+
   .form-legend {
     font-size: var(--text-heading-5);
     font-weight: var(--font-weight-heading);
@@ -485,9 +485,9 @@
 .form-loading {
   position: relative;
   pointer-events: none;
-  
+
   &::before {
-    content: "";
+    content: '';
     position: absolute;
     top: 0;
     left: 0;
@@ -497,9 +497,9 @@
     border-radius: var(--radius-lg);
     z-index: 10;
   }
-  
+
   &::after {
-    content: "";
+    content: '';
     position: absolute;
     top: 50%;
     left: 50%;
@@ -526,11 +526,11 @@
 
 .form-card {
   @extend .card;
-  
+
   .form {
     padding: var(--space-card-padding-lg);
   }
-  
+
   .form-actions {
     margin-top: var(--space-6);
     padding-top: var(--space-6);

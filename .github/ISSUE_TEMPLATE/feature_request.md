@@ -33,7 +33,7 @@ Please select the category that best describes this feature:
 - [ ] Security enhancements
 - [ ] Developer experience
 - [ ] Documentation
-- [ ] Other: ****\_\_\_****
+- [ ] Other: \***\*\_\_\_\*\***
 
 ## Use Case
 

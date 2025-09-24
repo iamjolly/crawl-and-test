@@ -5,87 +5,87 @@
 
 // Escape HTML to prevent XSS
 function escapeHtml(text) {
-    if (!text) return '';
-    return text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+  if (!text) {return '';}
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 // Format timestamp for display
 function formatTimestamp(timestamp) {
-    if (!timestamp) return new Date().toLocaleString();
+  if (!timestamp) {return new Date().toLocaleString();}
     
-    try {
-        const date = new Date(timestamp);
-        return date.toLocaleString();
-    } catch (e) {
-        return timestamp;
-    }
+  try {
+    const date = new Date(timestamp);
+    return date.toLocaleString();
+  } catch {
+    return timestamp;
+  }
 }
 
 // Extract domain from URL
 function extractDomain(url) {
-    try {
-        return new URL(url).hostname;
-    } catch (e) {
-        return 'Unknown';
-    }
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return 'Unknown';
+  }
 }
 
 // Generate unique ID for elements
 function generateId(prefix = 'element') {
-    return `${prefix}-${Math.random().toString(36).substr(2, 9)}`;
+  return `${prefix}-${Math.random().toString(36).substr(2, 9)}`;
 }
 
 // Debounce function for performance
 function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
     };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
 }
 
 // Copy text to clipboard
 async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    // Fallback for older browsers
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
     try {
-        await navigator.clipboard.writeText(text);
-        return true;
-    } catch (err) {
-        // Fallback for older browsers
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        document.body.appendChild(textArea);
-        textArea.select();
-        try {
-            document.execCommand('copy');
-            return true;
-        } catch (err) {
-            return false;
-        } finally {
-            document.body.removeChild(textArea);
-        }
+      document.execCommand('copy');
+      return true;
+    } catch {
+      return false;
+    } finally {
+      document.body.removeChild(textArea);
     }
+  }
 }
 
 // Show notification to user
 function showNotification(message, type = 'info') {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.setAttribute('role', 'alert');
-    notification.setAttribute('aria-live', 'polite');
-    notification.textContent = message;
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = `notification notification-${type}`;
+  notification.setAttribute('role', 'alert');
+  notification.setAttribute('aria-live', 'polite');
+  notification.textContent = message;
     
-    // Style the notification
-    notification.style.cssText = `
+  // Style the notification
+  notification.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
@@ -98,48 +98,48 @@ function showNotification(message, type = 'info') {
         transition: opacity 0.3s ease;
     `;
     
-    document.body.appendChild(notification);
+  document.body.appendChild(notification);
     
-    // Animate in
-    setTimeout(() => {
-        notification.style.opacity = '1';
-    }, 10);
+  // Animate in
+  setTimeout(() => {
+    notification.style.opacity = '1';
+  }, 10);
     
-    // Remove after delay
+  // Remove after delay
+  setTimeout(() => {
+    notification.style.opacity = '0';
     setTimeout(() => {
-        notification.style.opacity = '0';
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
-            }
-        }, 300);
-    }, 3000);
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 300);
+  }, 3000);
 }
 
 // Add loading state to button
 function setButtonLoading(button, loading = true) {
-    if (loading) {
-        button.disabled = true;
-        button.setAttribute('aria-busy', 'true');
-        button.dataset.originalText = button.textContent;
-        button.textContent = '⏳ Loading...';
-    } else {
-        button.disabled = false;
-        button.setAttribute('aria-busy', 'false');
-        button.textContent = button.dataset.originalText || button.textContent;
-    }
+  if (loading) {
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
+    button.dataset.originalText = button.textContent;
+    button.textContent = '⏳ Loading...';
+  } else {
+    button.disabled = false;
+    button.setAttribute('aria-busy', 'false');
+    button.textContent = button.dataset.originalText || button.textContent;
+  }
 }
 
 // Export functions for potential module use
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        escapeHtml,
-        formatTimestamp,
-        extractDomain,
-        generateId,
-        debounce,
-        copyToClipboard,
-        showNotification,
-        setButtonLoading
-    };
+  module.exports = {
+    escapeHtml,
+    formatTimestamp,
+    extractDomain,
+    generateId,
+    debounce,
+    copyToClipboard,
+    showNotification,
+    setButtonLoading
+  };
 }

@@ -1,10 +1,13 @@
 # A11y Crawl & Test Design System
 
-> A comprehensive, accessible, and modern design system built with SASS and CSS custom properties.
+> A comprehensive, accessible, and modern design system built with SASS and CSS
+> custom properties.
 
 ## 🎯 Overview
 
-This design system provides a complete set of design tokens, components, and layouts for building accessible web applications. It follows atomic design principles and uses modern CSS custom properties for runtime theming.
+This design system provides a complete set of design tokens, components, and
+layouts for building accessible web applications. It follows atomic design
+principles and uses modern CSS custom properties for runtime theming.
 
 ### ✨ Key Features
 
@@ -21,7 +24,7 @@ This design system provides a complete set of design tokens, components, and lay
 
 ```scss
 // Import the complete design system
-@use "styles/design-system" as ds;
+@use 'styles/design-system' as ds;
 
 .my-component {
   background: ds.$color-primary;
@@ -34,17 +37,18 @@ This design system provides a complete set of design tokens, components, and lay
 
 ```scss
 // Import only tokens
-@use "styles/design-system/tokens" as tokens;
+@use 'styles/design-system/tokens' as tokens;
 
 // Import only components
-@use "styles/design-system/components/atoms" as atoms;
+@use 'styles/design-system/components/atoms' as atoms;
 ```
 
 ## 🎨 Design Tokens
 
 ### Colors
 
-Our color system provides semantic color tokens that map to accessible color values.
+Our color system provides semantic color tokens that map to accessible color
+values.
 
 ```scss
 // Primary colors
@@ -68,13 +72,14 @@ Our color system provides semantic color tokens that map to accessible color val
 
 ```scss
 // Font families
---font-family-primary: system-ui, -apple-system, 'Segoe UI', 'Roboto', sans-serif;
+--font-family-primary:
+  system-ui, -apple-system, 'Segoe UI', 'Roboto', sans-serif;
 --font-family-code: ui-monospace, 'Menlo', 'Monaco', monospace;
 
 // Font sizes (semantic)
 --text-heading-1: 1.875rem; // 30px
---text-heading-2: 1.5rem;    // 24px
---text-body-medium: 1rem;    // 16px
+--text-heading-2: 1.5rem; // 24px
+--text-body-medium: 1rem; // 16px
 --text-body-small: 0.875rem; // 14px
 
 // Font weights
@@ -90,12 +95,12 @@ Uses a 4px grid system for consistent spacing.
 
 ```scss
 // Base spacing scale
---space-1: 0.25rem;  // 4px
---space-2: 0.5rem;   // 8px
---space-3: 0.75rem;  // 12px
---space-4: 1rem;     // 16px
---space-6: 1.5rem;   // 24px
---space-8: 2rem;     // 32px
+--space-1: 0.25rem; // 4px
+--space-2: 0.5rem; // 8px
+--space-3: 0.75rem; // 12px
+--space-4: 1rem; // 16px
+--space-6: 1.5rem; // 24px
+--space-8: 2rem; // 32px
 
 // Semantic spacing
 --space-component-sm: var(--space-2);
@@ -142,7 +147,7 @@ Uses a 4px grid system for consistent spacing.
 .custom-button {
   @extend .btn;
   @extend .btn-primary;
-  
+
   // Custom overrides
   border-radius: var(--radius-lg);
 }
@@ -154,18 +159,23 @@ Uses a 4px grid system for consistent spacing.
 <!-- Text input -->
 <div class="form-group">
   <label class="form-label" for="email">Email</label>
-  <input type="email" class="form-control" id="email" placeholder="Enter email">
+  <input
+    type="email"
+    class="form-control"
+    id="email"
+    placeholder="Enter email"
+  />
   <div class="form-text">We'll never share your email.</div>
 </div>
 
 <!-- Input sizes -->
-<input type="text" class="form-control form-control-sm" placeholder="Small">
-<input type="text" class="form-control" placeholder="Default">
-<input type="text" class="form-control form-control-lg" placeholder="Large">
+<input type="text" class="form-control form-control-sm" placeholder="Small" />
+<input type="text" class="form-control" placeholder="Default" />
+<input type="text" class="form-control form-control-lg" placeholder="Large" />
 
 <!-- Input states -->
-<input type="text" class="form-control is-valid" placeholder="Valid">
-<input type="text" class="form-control is-invalid" placeholder="Invalid">
+<input type="text" class="form-control is-valid" placeholder="Valid" />
+<input type="text" class="form-control is-invalid" placeholder="Invalid" />
 ```
 
 #### Links
@@ -227,18 +237,18 @@ Uses a 4px grid system for consistent spacing.
 <form class="form">
   <div class="form-section">
     <h3 class="form-section-title">User Information</h3>
-    
+
     <div class="form-group">
       <label class="form-label required" for="name">Full Name</label>
-      <input type="text" class="form-control" id="name" required>
+      <input type="text" class="form-control" id="name" required />
     </div>
-    
+
     <div class="form-group">
       <label class="form-label" for="bio">Bio</label>
       <textarea class="form-control" id="bio" rows="3"></textarea>
     </div>
   </div>
-  
+
   <div class="form-actions">
     <button type="submit" class="btn btn-primary">Save</button>
     <button type="button" class="btn btn-secondary">Cancel</button>
@@ -446,9 +456,9 @@ Change themes by updating CSS custom properties:
 // Extend existing components
 .custom-card {
   @extend .card;
-  
+
   border: 2px solid var(--color-primary);
-  
+
   .card-header {
     background: var(--color-primary);
     color: var(--color-text-inverse);
@@ -458,12 +468,20 @@ Change themes by updating CSS custom properties:
 // Override specific properties
 .btn-custom {
   @extend .btn;
-  
-  background: linear-gradient(45deg, var(--color-primary), var(--color-success));
+
+  background: linear-gradient(
+    45deg,
+    var(--color-primary),
+    var(--color-success)
+  );
   border: none;
-  
+
   &:hover {
-    background: linear-gradient(45deg, var(--color-primary-hover), var(--color-success-hover));
+    background: linear-gradient(
+      45deg,
+      var(--color-primary-hover),
+      var(--color-success-hover)
+    );
   }
 }
 ```
@@ -479,7 +497,7 @@ $enable-print-styles: true;
 $enable-animations: true;
 $debug-mode: false; // Set to true for development
 
-@use "design-system" as ds with (
+@use 'design-system' as ds with (
   $enable-responsive-utilities: true,
   $debug-mode: false
 );
@@ -489,11 +507,11 @@ $debug-mode: false; // Set to true for development
 
 ```scss
 // Import only what you need
-@use "design-system/tokens" as tokens;
-@use "design-system/components/atoms" as atoms;
+@use 'design-system/tokens' as tokens;
+@use 'design-system/components/atoms' as atoms;
 
 // Tree-shake unused components
-@use "design-system" as ds with (
+@use 'design-system' as ds with (
   $include-molecules: false,
   $include-layouts: false
 );
@@ -507,11 +525,11 @@ $debug-mode: false; // Set to true for development
 
    ```scss
    // Old
-   @import "abstracts/variables";
-   @import "components/buttons";
-   
-   // New  
-   @use "design-system" as ds;
+   @import 'abstracts/variables';
+   @import 'components/buttons';
+
+   // New
+   @use 'design-system' as ds;
    ```
 
 2. **Update variable references:**
@@ -520,7 +538,7 @@ $debug-mode: false; // Set to true for development
    // Old
    color: $primary-color;
    padding: $spacer;
-   
+
    // New
    color: var(--color-primary);
    padding: var(--space-4);
@@ -531,7 +549,7 @@ $debug-mode: false; // Set to true for development
    ```html
    <!-- Old -->
    <button class="btn-primary">Button</button>
-   
+
    <!-- New -->
    <button class="btn btn-primary">Button</button>
    ```
@@ -552,19 +570,19 @@ $debug-mode: false; // Set to true for development
   <div class="form-section">
     <h2 class="form-section-title">Contact Information</h2>
     <p class="form-section-description">Please provide your contact details.</p>
-    
+
     <div class="form-group">
       <label class="form-label required" for="email">Email Address</label>
-      <input type="email" class="form-control" id="email" required>
+      <input type="email" class="form-control" id="email" required />
       <div class="form-text">We'll use this to send you updates.</div>
     </div>
-    
+
     <div class="form-group">
       <label class="form-label" for="phone">Phone Number</label>
-      <input type="tel" class="form-control" id="phone">
+      <input type="tel" class="form-control" id="phone" />
     </div>
   </div>
-  
+
   <div class="form-actions form-actions-end">
     <button type="button" class="btn btn-secondary">Cancel</button>
     <button type="submit" class="btn btn-primary">Submit</button>
@@ -581,15 +599,17 @@ $debug-mode: false; // Set to true for development
       <h1>Accessibility Dashboard</h1>
     </div>
   </header>
-  
+
   <main class="page-main">
     <div class="container">
       <div class="dashboard-layout">
         <div class="dashboard-header">
           <h2 class="dashboard-title">Recent Reports</h2>
-          <p class="dashboard-description">Monitor your website's accessibility compliance.</p>
+          <p class="dashboard-description">
+            Monitor your website's accessibility compliance.
+          </p>
         </div>
-        
+
         <div class="dashboard-item">
           <div class="card">
             <div class="card-body">
@@ -645,7 +665,7 @@ $debug-mode: false; // Set to true for development
 Inline critical styles for above-the-fold content:
 
 ```scss
-@use "design-system/critical" as critical;
+@use 'design-system/critical' as critical;
 ```
 
 ### Loading Strategy
@@ -658,7 +678,8 @@ Inline critical styles for above-the-fold content:
 
 ## 📄 License
 
-This design system is part of the A11y Crawl & Test project and follows the same licensing terms.
+This design system is part of the A11y Crawl & Test project and follows the same
+licensing terms.
 
 ## 🤝 Contributing
 
