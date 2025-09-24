@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
+        node-version: [22.x, 24.x]
 
     steps:
       - name: Checkout code
@@ -46,10 +46,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Use Node.js 20.x
+      - name: Use Node.js 24.x
         uses: actions/setup-node@v5
         with:
-          node-version: 20.x
+          node-version: 24.x
           cache: 'npm'
 
       - name: Install dependencies
@@ -57,10 +57,6 @@ jobs:
 
       - name: Run Prettier check
         run: npm run format:check
-
-      - name: Check for TypeScript errors
-        run: npm run type-check
-        continue-on-error: true
 
   security:
     runs-on: ubuntu-latest
