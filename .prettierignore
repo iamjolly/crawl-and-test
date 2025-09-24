@@ -7,6 +7,9 @@ public/styles/
 public/scripts/
 public/reports/
 
+# Template files with placeholder syntax
+src/templates/
+
 # Logs
 *.log
 

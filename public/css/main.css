@@ -6571,7 +6571,7 @@ a:not([href]):hover {
 }
 
 :root {
-  --design-system-version: 1.0;
+  --design-system-version: 1;
   --design-system-name: 'A11y Crawl & Test Design System';
   --has-buttons: 'true';
   --has-forms: 'true';
