@@ -10,20 +10,24 @@
   // ==========================================================================
   // Font Families
   // ==========================================================================
-  
-  --font-family-sans: system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Ubuntu', 'Cantarell', 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+  --font-family-sans:
+    system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Ubuntu', 'Cantarell', 'Noto Sans', sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   --font-family-serif: ui-serif, 'Times New Roman', 'Times', serif;
-  --font-family-mono: ui-monospace, 'Menlo', 'Monaco', 'Cascadia Code', 'Segoe UI Mono', 'Roboto Mono', 'Oxygen Mono', 'Ubuntu Monospace', 'Source Code Pro', 'Fira Mono', 'Droid Sans Mono', 'Courier New', monospace;
-  
+  --font-family-mono:
+    ui-monospace, 'Menlo', 'Monaco', 'Cascadia Code', 'Segoe UI Mono', 'Roboto Mono', 'Oxygen Mono',
+    'Ubuntu Monospace', 'Source Code Pro', 'Fira Mono', 'Droid Sans Mono', 'Courier New', monospace;
+
   // Primary font stack
   --font-family-primary: var(--font-family-sans);
   --font-family-secondary: var(--font-family-serif);
   --font-family-code: var(--font-family-mono);
-  
+
   // ==========================================================================
   // Font Weights
   // ==========================================================================
-  
+
   --font-weight-thin: 100;
   --font-weight-extralight: 200;
   --font-weight-light: 300;
@@ -33,62 +37,62 @@
   --font-weight-bold: 700;
   --font-weight-extrabold: 800;
   --font-weight-black: 900;
-  
+
   // Semantic weights
   --font-weight-heading: var(--font-weight-semibold);
   --font-weight-body: var(--font-weight-normal);
   --font-weight-strong: var(--font-weight-bold);
-  
+
   // ==========================================================================
   // Font Sizes
   // ==========================================================================
-  
+
   // Scale based on 1rem = 16px
-  --font-size-xs: 0.75rem;   // 12px
-  --font-size-sm: 0.875rem;  // 14px
-  --font-size-base: 1rem;    // 16px
-  --font-size-lg: 1.125rem;  // 18px
-  --font-size-xl: 1.25rem;   // 20px
-  --font-size-2xl: 1.5rem;   // 24px
+  --font-size-xs: 0.75rem; // 12px
+  --font-size-sm: 0.875rem; // 14px
+  --font-size-base: 1rem; // 16px
+  --font-size-lg: 1.125rem; // 18px
+  --font-size-xl: 1.25rem; // 20px
+  --font-size-2xl: 1.5rem; // 24px
   --font-size-3xl: 1.875rem; // 30px
-  --font-size-4xl: 2.25rem;  // 36px
-  --font-size-5xl: 3rem;     // 48px
-  --font-size-6xl: 3.75rem;  // 60px
-  --font-size-7xl: 4.5rem;   // 72px
-  --font-size-8xl: 6rem;     // 96px
-  --font-size-9xl: 8rem;     // 128px
-  
+  --font-size-4xl: 2.25rem; // 36px
+  --font-size-5xl: 3rem; // 48px
+  --font-size-6xl: 3.75rem; // 60px
+  --font-size-7xl: 4.5rem; // 72px
+  --font-size-8xl: 6rem; // 96px
+  --font-size-9xl: 8rem; // 128px
+
   // ==========================================================================
   // Line Heights
   // ==========================================================================
-  
+
   --line-height-none: 1;
   --line-height-tight: 1.25;
   --line-height-snug: 1.375;
   --line-height-normal: 1.5;
   --line-height-relaxed: 1.625;
   --line-height-loose: 2;
-  
+
   // ==========================================================================
   // Letter Spacing
   // ==========================================================================
-  
+
   --letter-spacing-tighter: -0.05em;
   --letter-spacing-tight: -0.025em;
   --letter-spacing-normal: 0em;
   --letter-spacing-wide: 0.025em;
   --letter-spacing-wider: 0.05em;
   --letter-spacing-widest: 0.1em;
-  
+
   // ==========================================================================
   // Semantic Typography Tokens
   // ==========================================================================
-  
+
   // Display text (hero titles, major headings)
   --text-display-large: var(--font-size-6xl);
   --text-display-medium: var(--font-size-5xl);
   --text-display-small: var(--font-size-4xl);
-  
+
   // Headings
   --text-heading-1: var(--font-size-3xl);
   --text-heading-2: var(--font-size-2xl);
@@ -96,18 +100,18 @@
   --text-heading-4: var(--font-size-lg);
   --text-heading-5: var(--font-size-base);
   --text-heading-6: var(--font-size-sm);
-  
+
   // Body text
   --text-body-large: var(--font-size-lg);
   --text-body-medium: var(--font-size-base);
   --text-body-small: var(--font-size-sm);
   --text-body-xs: var(--font-size-xs);
-  
+
   // UI elements
   --text-ui-large: var(--font-size-base);
   --text-ui-medium: var(--font-size-sm);
   --text-ui-small: var(--font-size-xs);
-  
+
   // Code and monospace
   --text-code-large: var(--font-size-base);
   --text-code-medium: var(--font-size-sm);

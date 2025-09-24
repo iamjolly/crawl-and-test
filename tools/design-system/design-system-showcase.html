@@ -1,1568 +1,2471 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>A11y Design System - Component Library</title>
-  
-  <!-- Compiled CSS - in production, this would link to compiled CSS -->
-  <style>
-    /* CSS Custom Properties - Design Tokens */
-    :root {
-      /* Colors */
-      --color-primary: #004085;
-      --color-primary-hover: #0056b3;
-      --color-primary-focus: #0056b3;
-      --color-secondary: #6c757d;
-      --color-success: #208636;
-      --color-warning: #ffc107;
-      --color-danger: #dc3545;
-      --color-info: #118294;
-      --color-light: #f8f9fa;
-      --color-dark: #212529;
-      
-      /* Text Colors */
-      --color-text-primary: #212529;
-      --color-text-secondary: #495057;
-      --color-text-muted: #6c757d;
-      --color-text-inverse: #ffffff;
-      
-      /* Background Colors */
-      --color-background-primary: #ffffff;
-      --color-background-secondary: #f8f9fa;
-      --color-background-tertiary: #e9ecef;
-      
-      /* Border Colors */
-      --color-border-light: #dee2e6;
-      --color-border-medium: #adb5bd;
-      --color-border-dark: #495057;
-      
-      /* Typography */
-      --font-family-primary: system-ui, -apple-system, 'Segoe UI', 'Roboto', sans-serif;
-      --font-family-code: ui-monospace, 'Menlo', 'Monaco', 'Cascadia Code', monospace;
-      
-      /* Font Sizes */
-      --text-heading-1: 1.875rem;
-      --text-heading-2: 1.5rem;
-      --text-heading-3: 1.25rem;
-      --text-body-large: 1.125rem;
-      --text-body-medium: 1rem;
-      --text-body-small: 0.875rem;
-      --text-caption: 0.75rem;
-      
-      /* Font Weights */
-      --font-weight-normal: 400;
-      --font-weight-medium: 500;
-      --font-weight-semibold: 600;
-      --font-weight-bold: 700;
-      
-      /* Spacing */
-      --space-1: 0.25rem;
-      --space-2: 0.5rem;
-      --space-3: 0.75rem;
-      --space-4: 1rem;
-      --space-6: 1.5rem;
-      --space-8: 2rem;
-      --space-12: 3rem;
-      
-      /* Border Radius */
-      --radius-sm: 0.125rem;
-      --radius-md: 0.375rem;
-      --radius-lg: 0.5rem;
-      
-      /* Shadows */
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    }
-    
-    /* Reset and Base Styles */
-    * {
-      box-sizing: border-box;
-    }
-    
-    body {
-      margin: 0;
-      font-family: var(--font-family-primary);
-      font-size: var(--text-body-medium);
-      line-height: 1.5;
-      color: var(--color-text-primary);
-      background: var(--color-background-primary);
-    }
-    
-    /* Layout */
-    .showcase-layout {
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      min-height: 100vh;
-    }
-    
-    .sidebar {
-      background: var(--color-background-secondary);
-      border-right: 1px solid var(--color-border-light);
-      padding: var(--space-6);
-      overflow-y: auto;
-    }
-    
-    .main-content {
-      padding: var(--space-8);
-      overflow-y: auto;
-      max-width: 1200px;
-    }
-    
-    /* Navigation */
-    .nav-title {
-      font-size: var(--text-heading-3);
-      font-weight: var(--font-weight-semibold);
-      margin: 0 0 var(--space-6) 0;
-      color: var(--color-primary);
-    }
-    
-    .nav-section {
-      margin-bottom: var(--space-6);
-    }
-    
-    .nav-section-title {
-      font-size: var(--text-body-small);
-      font-weight: var(--font-weight-semibold);
-      text-transform: uppercase;
-      color: var(--color-text-muted);
-      margin: 0 0 var(--space-3) 0;
-      letter-spacing: 0.05em;
-    }
-    
-    .nav-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    
-    .nav-item {
-      margin-bottom: var(--space-1);
-    }
-    
-    .nav-link {
-      display: block;
-      padding: var(--space-2) var(--space-3);
-      color: var(--color-text-secondary);
-      text-decoration: none;
-      border-radius: var(--radius-md);
-      transition: all 0.2s ease;
-    }
-    
-    .nav-link:hover,
-    .nav-link.active {
-      background: var(--color-primary);
-      color: var(--color-text-inverse);
-    }
-    
-    /* Content Sections */
-    .section {
-      margin-bottom: var(--space-12);
-    }
-    
-    .section-header {
-      margin-bottom: var(--space-8);
-      padding-bottom: var(--space-4);
-      border-bottom: 2px solid var(--color-border-light);
-    }
-    
-    .section-title {
-      font-size: var(--text-heading-1);
-      font-weight: var(--font-weight-bold);
-      margin: 0 0 var(--space-3) 0;
-      color: var(--color-primary);
-    }
-    
-    .section-description {
-      font-size: var(--text-body-large);
-      color: var(--color-text-secondary);
-      margin: 0;
-      max-width: 600px;
-    }
-    
-    /* Component Showcase */
-    .component-demo {
-      margin-bottom: var(--space-8);
-    }
-    
-    .demo-title {
-      font-size: var(--text-heading-3);
-      font-weight: var(--font-weight-semibold);
-      margin: 0 0 var(--space-4) 0;
-    }
-    
-    .demo-description {
-      color: var(--color-text-secondary);
-      margin: 0 0 var(--space-6) 0;
-    }
-    
-    .demo-example {
-      background: var(--color-background-secondary);
-      border: 1px solid var(--color-border-light);
-      border-radius: var(--radius-lg);
-      padding: var(--space-6);
-      margin-bottom: var(--space-4);
-    }
-    
-    .demo-code {
-      background: var(--color-dark);
-      color: var(--color-light);
-      padding: var(--space-4);
-      border-radius: var(--radius-md);
-      font-family: var(--font-family-code);
-      font-size: var(--text-body-small);
-      overflow-x: auto;
-      margin-bottom: var(--space-4);
-    }
-    
-    .demo-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: var(--space-4);
-    }
-    
-    /* Button Components */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: var(--space-2) var(--space-4);
-      font-size: var(--text-body-medium);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
-      text-decoration: none;
-      border: 1px solid transparent;
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      min-width: 80px;
-    }
-    
-    .btn:focus-visible {
-      outline: 3px solid var(--color-primary-focus);
-      outline-offset: 3px;
-      z-index: 1;
-    }
-    
-    .btn-primary {
-      background: var(--color-primary);
-      color: var(--color-text-inverse);
-      border-color: var(--color-primary);
-    }
-    
-    .btn-primary:hover {
-      background: var(--color-primary-hover);
-      border-color: var(--color-primary-hover);
-    }
-    
-    .btn-secondary {
-      background: var(--color-secondary);
-      color: var(--color-text-inverse);
-      border-color: var(--color-secondary);
-    }
-    
-    .btn-success {
-      background: var(--color-success);
-      color: var(--color-text-inverse);
-      border-color: var(--color-success);
-    }
-    
-    .btn-warning {
-      background: var(--color-warning);
-      color: var(--color-dark);
-      border-color: var(--color-warning);
-    }
-    
-    .btn-danger {
-      background: var(--color-danger);
-      color: var(--color-text-inverse);
-      border-color: var(--color-danger);
-    }
-    
-    .btn-outline-primary {
-      background: transparent;
-      color: var(--color-primary);
-      border-color: var(--color-primary);
-    }
-    
-    .btn-outline-primary:hover {
-      background: var(--color-primary);
-      color: var(--color-text-inverse);
-    }
-    
-    .btn-sm {
-      padding: var(--space-1) var(--space-3);
-      font-size: var(--text-body-small);
-    }
-    
-    .btn-lg {
-      padding: var(--space-3) var(--space-6);
-      font-size: var(--text-body-large);
-    }
-    
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    
-    /* Card Components */
-    .card {
-      background: var(--color-background-primary);
-      border: 1px solid var(--color-border-light);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-    }
-    
-    .card-header {
-      padding: var(--space-4) var(--space-6);
-      background: var(--color-background-secondary);
-      border-bottom: 1px solid var(--color-border-light);
-    }
-    
-    .card-title {
-      font-size: var(--text-heading-3);
-      font-weight: var(--font-weight-semibold);
-      margin: 0 0 var(--space-2) 0;
-    }
-    
-    .card-subtitle {
-      color: var(--color-text-secondary);
-      margin: 0;
-    }
-    
-    .card-body {
-      padding: var(--space-6);
-    }
-    
-    .card-text {
-      margin: 0 0 var(--space-4) 0;
-    }
-    
-    .card-text:last-child {
-      margin-bottom: 0;
-    }
-    
-    .card-footer {
-      padding: var(--space-4) var(--space-6);
-      background: var(--color-background-secondary);
-      border-top: 1px solid var(--color-border-light);
-    }
-    
-    .card-actions {
-      display: flex;
-      gap: var(--space-2);
-    }
-    
-    /* Form Components */
-    .form-group {
-      margin-bottom: var(--space-4);
-    }
-    
-    .form-label {
-      display: block;
-      font-weight: var(--font-weight-medium);
-      margin-bottom: var(--space-2);
-      color: var(--color-text-primary);
-    }
-    
-    .form-control {
-      display: block;
-      width: 100%;
-      padding: var(--space-2) var(--space-3);
-      font-size: var(--text-body-medium);
-      line-height: 1.5;
-      color: var(--color-text-primary);
-      background: var(--color-background-primary);
-      border: 1px solid var(--color-border-medium);
-      border-radius: var(--radius-md);
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    
-    .form-control:focus {
-      outline: none;
-      border-color: var(--color-primary);
-      box-shadow: 0 0 0 3px rgba(0, 64, 133, 0.1);
-    }
-    
-    /* Color Palette */
-    .color-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: var(--space-4);
-    }
-    
-    .color-swatch {
-      text-align: center;
-    }
-    
-    .color-preview {
-      height: 80px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--color-border-light);
-      margin-bottom: var(--space-2);
-    }
-    
-    .color-name {
-      font-weight: var(--font-weight-medium);
-      margin-bottom: var(--space-1);
-    }
-    
-    .color-value {
-      font-family: var(--font-family-code);
-      font-size: var(--text-body-small);
-      color: var(--color-text-muted);
-    }
-    
-    /* Typography Scale */
-    .type-scale .demo-item {
-      margin-bottom: var(--space-4);
-      padding-bottom: var(--space-4);
-      border-bottom: 1px solid var(--color-border-light);
-    }
-    
-    .type-scale .demo-item:last-child {
-      border-bottom: none;
-    }
-    
-    .type-meta {
-      font-family: var(--font-family-code);
-      font-size: var(--text-body-small);
-      color: var(--color-text-muted);
-      margin-top: var(--space-2);
-    }
-    
-    /* Responsive */
-    @media (max-width: 768px) {
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>A11y Design System - Component Library</title>
+
+    <!-- Compiled CSS - in production, this would link to compiled CSS -->
+    <style>
+      /* CSS Custom Properties - Design Tokens */
+      :root {
+        /* Colors */
+        --color-primary: #004085;
+        --color-primary-hover: #0056b3;
+        --color-primary-focus: #0056b3;
+        --color-secondary: #6c757d;
+        --color-success: #208636;
+        --color-warning: #ffc107;
+        --color-danger: #dc3545;
+        --color-info: #118294;
+        --color-light: #f8f9fa;
+        --color-dark: #212529;
+
+        /* Text Colors */
+        --color-text-primary: #212529;
+        --color-text-secondary: #495057;
+        --color-text-muted: #6c757d;
+        --color-text-inverse: #ffffff;
+
+        /* Background Colors */
+        --color-background-primary: #ffffff;
+        --color-background-secondary: #f8f9fa;
+        --color-background-tertiary: #e9ecef;
+
+        /* Border Colors */
+        --color-border-light: #dee2e6;
+        --color-border-medium: #adb5bd;
+        --color-border-dark: #495057;
+
+        /* Typography */
+        --font-family-primary: system-ui, -apple-system, 'Segoe UI', 'Roboto', sans-serif;
+        --font-family-code: ui-monospace, 'Menlo', 'Monaco', 'Cascadia Code', monospace;
+
+        /* Font Sizes */
+        --text-heading-1: 1.875rem;
+        --text-heading-2: 1.5rem;
+        --text-heading-3: 1.25rem;
+        --text-body-large: 1.125rem;
+        --text-body-medium: 1rem;
+        --text-body-small: 0.875rem;
+        --text-caption: 0.75rem;
+
+        /* Font Weights */
+        --font-weight-normal: 400;
+        --font-weight-medium: 500;
+        --font-weight-semibold: 600;
+        --font-weight-bold: 700;
+
+        /* Spacing */
+        --space-1: 0.25rem;
+        --space-2: 0.5rem;
+        --space-3: 0.75rem;
+        --space-4: 1rem;
+        --space-6: 1.5rem;
+        --space-8: 2rem;
+        --space-12: 3rem;
+
+        /* Border Radius */
+        --radius-sm: 0.125rem;
+        --radius-md: 0.375rem;
+        --radius-lg: 0.5rem;
+
+        /* Shadows */
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Reset and Base Styles */
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: var(--font-family-primary);
+        font-size: var(--text-body-medium);
+        line-height: 1.5;
+        color: var(--color-text-primary);
+        background: var(--color-background-primary);
+      }
+
+      /* Layout */
       .showcase-layout {
-        grid-template-columns: 1fr;
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        min-height: 100vh;
       }
-      
+
       .sidebar {
-        display: none;
+        background: var(--color-background-secondary);
+        border-right: 1px solid var(--color-border-light);
+        padding: var(--space-6);
+        overflow-y: auto;
       }
-      
+
       .main-content {
+        padding: var(--space-8);
+        overflow-y: auto;
+        max-width: 1200px;
+      }
+
+      /* Navigation */
+      .nav-title {
+        font-size: var(--text-heading-3);
+        font-weight: var(--font-weight-semibold);
+        margin: 0 0 var(--space-6) 0;
+        color: var(--color-primary);
+      }
+
+      .nav-section {
+        margin-bottom: var(--space-6);
+      }
+
+      .nav-section-title {
+        font-size: var(--text-body-small);
+        font-weight: var(--font-weight-semibold);
+        text-transform: uppercase;
+        color: var(--color-text-muted);
+        margin: 0 0 var(--space-3) 0;
+        letter-spacing: 0.05em;
+      }
+
+      .nav-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .nav-item {
+        margin-bottom: var(--space-1);
+      }
+
+      .nav-link {
+        display: block;
+        padding: var(--space-2) var(--space-3);
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        border-radius: var(--radius-md);
+        transition: all 0.2s ease;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        background: var(--color-primary);
+        color: var(--color-text-inverse);
+      }
+
+      /* Content Sections */
+      .section {
+        margin-bottom: var(--space-12);
+      }
+
+      .section-header {
+        margin-bottom: var(--space-8);
+        padding-bottom: var(--space-4);
+        border-bottom: 2px solid var(--color-border-light);
+      }
+
+      .section-title {
+        font-size: var(--text-heading-1);
+        font-weight: var(--font-weight-bold);
+        margin: 0 0 var(--space-3) 0;
+        color: var(--color-primary);
+      }
+
+      .section-description {
+        font-size: var(--text-body-large);
+        color: var(--color-text-secondary);
+        margin: 0;
+        max-width: 600px;
+      }
+
+      /* Component Showcase */
+      .component-demo {
+        margin-bottom: var(--space-8);
+      }
+
+      .demo-title {
+        font-size: var(--text-heading-3);
+        font-weight: var(--font-weight-semibold);
+        margin: 0 0 var(--space-4) 0;
+      }
+
+      .demo-description {
+        color: var(--color-text-secondary);
+        margin: 0 0 var(--space-6) 0;
+      }
+
+      .demo-example {
+        background: var(--color-background-secondary);
+        border: 1px solid var(--color-border-light);
+        border-radius: var(--radius-lg);
+        padding: var(--space-6);
+        margin-bottom: var(--space-4);
+      }
+
+      .demo-code {
+        background: var(--color-dark);
+        color: var(--color-light);
         padding: var(--space-4);
+        border-radius: var(--radius-md);
+        font-family: var(--font-family-code);
+        font-size: var(--text-body-small);
+        overflow-x: auto;
+        margin-bottom: var(--space-4);
       }
-    }
-  </style>
-</head>
-<body>
-  <div class="showcase-layout">
-    <!-- Sidebar Navigation -->
-    <nav class="sidebar">
-      <h1 class="nav-title">A11y Design System</h1>
-      
-      <div class="nav-section">
-        <h2 class="nav-section-title">Foundation</h2>
-        <ul class="nav-list">
-          <li class="nav-item"><a href="#colors" class="nav-link">Colors</a></li>
-          <li class="nav-item"><a href="#typography" class="nav-link">Typography</a></li>
-          <li class="nav-item"><a href="#spacing" class="nav-link">Spacing</a></li>
-        </ul>
-      </div>
-      
-      <div class="nav-section">
-        <h2 class="nav-section-title">Components</h2>
-        <ul class="nav-list">
-          <li class="nav-item"><a href="#buttons" class="nav-link active">Buttons</a></li>
-          <li class="nav-item"><a href="#forms" class="nav-link">Forms</a></li>
-          <li class="nav-item"><a href="#cards" class="nav-link">Cards</a></li>
-          <li class="nav-item"><a href="#accordions" class="nav-link">Accordions</a></li>
-        </ul>
-      </div>
-      
-      <div class="nav-section">
-        <h2 class="nav-section-title">Layout</h2>
-        <ul class="nav-list">
-          <li class="nav-item"><a href="#grid" class="nav-link">Grid System</a></li>
-          <li class="nav-item"><a href="#containers" class="nav-link">Containers</a></li>
-          <li class="nav-item"><a href="#layout" class="nav-link">Page Layout</a></li>
-        </ul>
-      </div>
-      
-      <div class="nav-section">
-        <h2 class="nav-section-title">Guidelines</h2>
-        <ul class="nav-list">
-          <li class="nav-item"><a href="#usage" class="nav-link">Usage</a></li>
-          <li class="nav-item"><a href="#accessibility" class="nav-link">Accessibility</a></li>
-        </ul>
-      </div>
-    </nav>
-    
-    <!-- Main Content -->
-    <main class="main-content">
-      
-      <!-- Colors Section -->
-      <section id="colors" class="section">
-        <div class="section-header">
-          <h1 class="section-title">Color System</h1>
-          <p class="section-description">
-            Our color palette is designed for accessibility and includes semantic colors that meet WCAG 2.1 AA contrast requirements.
-          </p>
-        </div>
-        
-        <div class="component-demo">
-          <h2 class="demo-title">Primary Colors</h2>
-          <div class="demo-example">
-            <div class="color-grid">
-              <div class="color-swatch">
-                <div class="color-preview" style="background: var(--color-primary);"></div>
-                <div class="color-name">Primary</div>
-                <div class="color-value">#004085</div>
-              </div>
-              <div class="color-swatch">
-                <div class="color-preview" style="background: var(--color-secondary);"></div>
-                <div class="color-name">Secondary</div>
-                <div class="color-value">#6c757d</div>
-              </div>
-              <div class="color-swatch">
-                <div class="color-preview" style="background: var(--color-success);"></div>
-                <div class="color-name">Success</div>
-                <div class="color-value">#208636</div>
-              </div>
-              <div class="color-swatch">
-                <div class="color-preview" style="background: var(--color-warning);"></div>
-                <div class="color-name">Warning</div>
-                <div class="color-value">#ffc107</div>
-              </div>
-              <div class="color-swatch">
-                <div class="color-preview" style="background: var(--color-danger);"></div>
-                <div class="color-name">Danger</div>
-                <div class="color-value">#dc3545</div>
-              </div>
-              <div class="color-swatch">
-                <div class="color-preview" style="background: var(--color-info);"></div>
-                <div class="color-name">Info</div>
-                <div class="color-value">#118294</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      
-      <!-- Typography Section -->
-      <section id="typography" class="section">
-        <div class="section-header">
-          <h1 class="section-title">Typography</h1>
-          <p class="section-description">
-            A clear hierarchy and readable type scale designed for accessibility and usability across all devices.
-          </p>
-        </div>
-        
-        <div class="component-demo">
-          <h2 class="demo-title">Type Scale</h2>
-          <div class="demo-example">
-            <div class="type-scale">
-              <div class="demo-item">
-                <h1 style="font-size: var(--text-heading-1); margin: 0;">Heading 1</h1>
-                <div class="type-meta">1.875rem / 30px - font-weight: 700</div>
-              </div>
-              <div class="demo-item">
-                <h2 style="font-size: var(--text-heading-2); margin: 0;">Heading 2</h2>
-                <div class="type-meta">1.5rem / 24px - font-weight: 600</div>
-              </div>
-              <div class="demo-item">
-                <h3 style="font-size: var(--text-heading-3); margin: 0;">Heading 3</h3>
-                <div class="type-meta">1.25rem / 20px - font-weight: 600</div>
-              </div>
-              <div class="demo-item">
-                <p style="font-size: var(--text-body-large); margin: 0;">Large body text for emphasis and introductions</p>
-                <div class="type-meta">1.125rem / 18px - font-weight: 400</div>
-              </div>
-              <div class="demo-item">
-                <p style="font-size: var(--text-body-medium); margin: 0;">Regular body text for main content</p>
-                <div class="type-meta">1rem / 16px - font-weight: 400</div>
-              </div>
-              <div class="demo-item">
-                <p style="font-size: var(--text-body-small); margin: 0;">Small text for captions and secondary information</p>
-                <div class="type-meta">0.875rem / 14px - font-weight: 400</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      
-      <!-- Buttons Section -->
-      <section id="buttons" class="section">
-        <div class="section-header">
-          <h1 class="section-title">Buttons</h1>
-          <p class="section-description">
-            Interactive buttons with clear visual hierarchy, accessible focus states, and consistent styling across variants.
-          </p>
-        </div>
-        
-        <div class="component-demo">
-          <h2 class="demo-title">Button Variants</h2>
-          <p class="demo-description">Primary buttons for main actions, secondary for supporting actions.</p>
-          
-          <div class="demo-example">
-            <div class="demo-grid">
-              <button class="btn btn-primary">Primary</button>
-              <button class="btn btn-secondary">Secondary</button>
-              <button class="btn btn-success">Success</button>
-              <button class="btn btn-warning">Warning</button>
-              <button class="btn btn-danger">Danger</button>
-              <button class="btn btn-outline-primary">Outline</button>
-            </div>
-          </div>
-          
-          <div class="demo-code">
-&lt;button class="btn btn-primary"&gt;Primary&lt;/button&gt;
-&lt;button class="btn btn-secondary"&gt;Secondary&lt;/button&gt;
-&lt;button class="btn btn-success"&gt;Success&lt;/button&gt;</div>
-        </div>
-        
-        <div class="component-demo">
-          <h2 class="demo-title">Button Sizes</h2>
-          <div class="demo-example">
-            <div style="display: flex; align-items: center; gap: var(--space-4);">
-              <button class="btn btn-primary btn-sm">Small</button>
-              <button class="btn btn-primary">Default</button>
-              <button class="btn btn-primary btn-lg">Large</button>
-            </div>
-          </div>
-          
-          <div class="demo-code">
-&lt;button class="btn btn-primary btn-sm"&gt;Small&lt;/button&gt;
-&lt;button class="btn btn-primary"&gt;Default&lt;/button&gt;
-&lt;button class="btn btn-primary btn-lg"&gt;Large&lt;/button&gt;</div>
-        </div>
-        
-        <div class="component-demo">
-          <h2 class="demo-title">Button States</h2>
-          <div class="demo-example">
-            <div style="display: flex; gap: var(--space-4);">
-              <button class="btn btn-primary">Normal</button>
-              <button class="btn btn-primary" disabled>Disabled</button>
-            </div>
-          </div>
-        </div>
-        
-        <div class="component-demo">
-          <h2 class="demo-title">Focus Indicators</h2>
-          <p class="demo-description">Enhanced focus styling with 3px offset for better visibility. Try using Tab to navigate between buttons.</p>
-          <div class="demo-example">
-            <div style="display: flex; flex-wrap: wrap; gap: var(--space-4);">
-              <button class="btn btn-primary">Primary Focus</button>
-              <button class="btn btn-secondary">Secondary Focus</button>
-              <button class="btn btn-outline-primary">Outline Focus</button>
-              <button class="btn btn-success">Success Focus</button>
-              <button class="btn btn-warning">Warning Focus</button>
-              <button class="btn btn-danger">Danger Focus</button>
-            </div>
-          </div>
-          <div class="demo-code">
-/* Enhanced focus styling with proper offset */
-.btn:focus-visible {
-  outline: 3px solid var(--color-primary-focus);
-  outline-offset: 3px;
-  z-index: 1;
-}</div>
-        </div>
-      </section>
-      
-      <!-- Forms Section -->
-      <section id="forms" class="section">
-        <div class="section-header">
-          <h1 class="section-title">Form Components</h1>
-          <p class="section-description">
-            Accessible form elements with clear labels, validation states, and consistent styling.
-          </p>
-        </div>
-        
-        <div class="component-demo">
-          <h2 class="demo-title">Form Elements</h2>
-          <div class="demo-example">
-            <form style="max-width: 400px;">
-              <div class="form-group">
-                <label class="form-label" for="demo-text">Text Input</label>
-                <input type="text" class="form-control" id="demo-text" placeholder="Enter text">
-              </div>
-              
-              <div class="form-group">
-                <label class="form-label" for="demo-email">Email Input</label>
-                <input type="email" class="form-control" id="demo-email" placeholder="Enter email">
-              </div>
-              
-              <div class="form-group">
-                <label class="form-label" for="demo-select">Select</label>
-                <select class="form-control" id="demo-select">
-                  <option>Choose an option</option>
-                  <option>Option 1</option>
-                  <option>Option 2</option>
-                </select>
-              </div>
-              
-              <div class="form-group">
-                <label class="form-label" for="demo-textarea">Textarea</label>
-                <textarea class="form-control" id="demo-textarea" rows="3" placeholder="Enter description"></textarea>
-              </div>
-              
-              <div style="display: flex; gap: var(--space-3);">
-                <button type="submit" class="btn btn-primary">Submit</button>
-                <button type="button" class="btn btn-secondary">Cancel</button>
-              </div>
-            </form>
-          </div>
-          
-          <div class="demo-code">
-&lt;div class="form-group"&gt;
-  &lt;label class="form-label" for="text-input"&gt;Text Input&lt;/label&gt;
-  &lt;input type="text" class="form-control" id="text-input"&gt;
-&lt;/div&gt;</div>
-        </div>
-      </section>
-      
-      <!-- Cards Section -->
-      <section id="cards" class="section">
-        <div class="section-header">
-          <h1 class="section-title">Card Components</h1>
-          <p class="section-description">
-            Flexible content containers with header, body, and footer sections for organizing information.
-          </p>
-        </div>
-        
-        <div class="component-demo">
-          <h2 class="demo-title">Basic Card</h2>
-          <div class="demo-example">
-            <div style="max-width: 400px;">
-              <div class="card">
-                <div class="card-header">
-                  <h3 class="card-title">Card Title</h3>
-                  <p class="card-subtitle">Card subtitle</p>
-                </div>
-                <div class="card-body">
-                  <p class="card-text">This is the card content area where you can place any type of content including text, images, or other components.</p>
-                </div>
-                <div class="card-footer">
-                  <div class="card-actions">
-                    <button class="btn btn-primary btn-sm">Action</button>
-                    <button class="btn btn-secondary btn-sm">More</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="demo-code">
-&lt;div class="card"&gt;
-  &lt;div class="card-header"&gt;
-    &lt;h3 class="card-title"&gt;Card Title&lt;/h3&gt;
-  &lt;/div&gt;
-  &lt;div class="card-body"&gt;
-    &lt;p class="card-text"&gt;Card content...&lt;/p&gt;
-  &lt;/div&gt;
-  &lt;div class="card-footer"&gt;
-    &lt;div class="card-actions"&gt;
-      &lt;button class="btn btn-primary"&gt;Action&lt;/button&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-&lt;/div&gt;</div>
-        </div>
-      </section>
-      
-      <!-- Accordions Section -->
-      <section id="accordions" class="section">
-        <div class="section-header">
-          <h1 class="section-title">Accordion Components</h1>
-          <p class="section-description">
-            Collapsible content sections with ARIA-compliant interactive behavior and accessibility features.
-          </p>
-        </div>
-        
-        <div class="component-demo">
-          <h2 class="demo-title">Basic Accordion</h2>
-          <p class="demo-description">Click headers to expand/collapse content sections.</p>
-          
-          <div class="demo-example">
-            <div style="max-width: 600px;">
-              <div style="border: 1px solid var(--color-border-light); border-radius: var(--radius-lg); overflow: hidden;">
-                
-                <div style="border-bottom: 1px solid var(--color-border-light);">
-                  <button style="width: 100%; padding: var(--space-4); text-align: left; background: var(--color-background-secondary); border: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: var(--font-weight-medium);" onclick="toggleAccordion(this)">
-                    <span>What is accessibility testing?</span>
-                    <span style="transition: transform 0.2s;">▼</span>
-                  </button>
-                  <div style="display: none; padding: var(--space-4); background: var(--color-background-primary);">
-                    <p style="margin: 0;">Accessibility testing evaluates how well a website or application can be used by people with disabilities. This includes testing for screen reader compatibility, keyboard navigation, color contrast, and other WCAG guidelines.</p>
-                  </div>
-                </div>
-                
-                <div style="border-bottom: 1px solid var(--color-border-light);">
-                  <button style="width: 100%; padding: var(--space-4); text-align: left; background: var(--color-background-secondary); border: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: var(--font-weight-medium);" onclick="toggleAccordion(this)">
-                    <span>How does automated testing work?</span>
-                    <span style="transition: transform 0.2s;">▼</span>
-                  </button>
-                  <div style="display: none; padding: var(--space-4); background: var(--color-background-primary);">
-                    <p style="margin: 0;">Our automated testing uses axe-core to scan web pages for accessibility violations. It can detect issues like missing alt text, insufficient color contrast, improper heading structure, and missing form labels.</p>
-                  </div>
-                </div>
-                
-                <div>
-                  <button style="width: 100%; padding: var(--space-4); text-align: left; background: var(--color-background-secondary); border: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: var(--font-weight-medium);" onclick="toggleAccordion(this)">
-                    <span>What reports are generated?</span>
-                    <span style="transition: transform 0.2s;">▼</span>
-                  </button>
-                  <div style="display: none; padding: var(--space-4); background: var(--color-background-primary);">
-                    <p style="margin: 0;">The system generates comprehensive HTML and JSON reports showing all accessibility violations found, organized by impact level (critical, serious, moderate, minor). Each violation includes detailed information and suggested fixes.</p>
-                  </div>
-                </div>
-                
-              </div>
-            </div>
-          </div>
-          
-          <div class="demo-code">
-&lt;div class="accordion"&gt;
-  &lt;div class="accordion-item"&gt;
-    &lt;h3 class="accordion-header"&gt;
-      &lt;button class="accordion-trigger" aria-expanded="false"&gt;
-        &lt;span class="accordion-title"&gt;Section Title&lt;/span&gt;
-        &lt;span class="accordion-icon"&gt;▼&lt;/span&gt;
-      &lt;/button&gt;
-    &lt;/h3&gt;
-    &lt;div class="accordion-content"&gt;
-      &lt;p&gt;Content goes here...&lt;/p&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-&lt;/div&gt;</div>
-        </div>
-        
-        <div class="component-demo">
-          <h2 class="demo-title">Report Accordion (Accessibility Violations)</h2>
-          <p class="demo-description">Specialized accordion for displaying accessibility test results with impact levels.</p>
-          
-          <div class="demo-example">
-            <div style="max-width: 600px;">
-              <div style="border: 1px solid var(--color-border-light); border-radius: var(--radius-lg); overflow: hidden;">
-                
-                <div style="border-bottom: 1px solid var(--color-border-light); border-left: 4px solid var(--color-danger);">
-                  <button style="width: 100%; padding: var(--space-4); text-align: left; background: var(--color-background-secondary); border: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="toggleAccordion(this)">
-                    <div style="display: flex; align-items: center; gap: var(--space-3);">
-                      <span style="background: var(--color-danger); color: white; padding: var(--space-1) var(--space-2); border-radius: var(--radius-sm); font-size: var(--text-body-small); font-weight: var(--font-weight-semibold);">Critical</span>
-                      <div>
-                        <div style="font-weight: var(--font-weight-semibold);">Images must have alt text</div>
-                        <div style="font-size: var(--text-body-small); color: var(--color-text-secondary);">Missing alternative text for images</div>
-                      </div>
-                    </div>
-                    <span style="transition: transform 0.2s;">▼</span>
-                  </button>
-                  <div style="display: none; padding: var(--space-4); background: var(--color-background-primary);">
-                    <p style="margin: 0 0 var(--space-3) 0;"><strong>Rule:</strong> image-alt</p>
-                    <p style="margin: 0 0 var(--space-3) 0;"><strong>Description:</strong> Images must have alternative text to be accessible to screen reader users.</p>
-                    <p style="margin: 0;"><strong>How to fix:</strong> Add descriptive alt text to all images using the alt attribute.</p>
-                  </div>
-                </div>
-                
-                <div style="border-left: 4px solid var(--color-warning);">
-                  <button style="width: 100%; padding: var(--space-4); text-align: left; background: var(--color-background-secondary); border: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="toggleAccordion(this)">
-                    <div style="display: flex; align-items: center; gap: var(--space-3);">
-                      <span style="background: var(--color-warning); color: var(--color-dark); padding: var(--space-1) var(--space-2); border-radius: var(--radius-sm); font-size: var(--text-body-small); font-weight: var(--font-weight-semibold);">Moderate</span>
-                      <div>
-                        <div style="font-weight: var(--font-weight-semibold);">Color contrast too low</div>
-                        <div style="font-size: var(--text-body-small); color: var(--color-text-secondary);">Text doesn't meet contrast requirements</div>
-                      </div>
-                    </div>
-                    <span style="transition: transform 0.2s;">▼</span>
-                  </button>
-                  <div style="display: none; padding: var(--space-4); background: var(--color-background-primary);">
-                    <p style="margin: 0 0 var(--space-3) 0;"><strong>Rule:</strong> color-contrast</p>
-                    <p style="margin: 0 0 var(--space-3) 0;"><strong>Description:</strong> Text must have sufficient contrast against its background.</p>
-                    <p style="margin: 0;"><strong>How to fix:</strong> Use darker text colors or lighter backgrounds to achieve at least 4.5:1 contrast ratio.</p>
-                  </div>
-                </div>
-                
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      
-      <!-- Grid System Section -->
-      <section id="grid" class="section">
-        <div class="section-header">
-          <h1 class="section-title">Grid System</h1>
-          <p class="section-description">
-            Flexible CSS Grid-based layout system with responsive breakpoints and consistent spacing.
-          </p>
-        </div>
-        
-        <div class="component-demo">
-          <h2 class="demo-title">Basic Grid</h2>
-          <p class="demo-description">12-column grid system that adapts to different screen sizes.</p>
-          
-          <div class="demo-example">
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); margin-bottom: var(--space-4);">
-              <div style="background: var(--color-primary); color: white; padding: var(--space-4); text-align: center; border-radius: var(--radius-md);">1/3</div>
-              <div style="background: var(--color-primary); color: white; padding: var(--space-4); text-align: center; border-radius: var(--radius-md);">1/3</div>
-              <div style="background: var(--color-primary); color: white; padding: var(--space-4); text-align: center; border-radius: var(--radius-md);">1/3</div>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-4); margin-bottom: var(--space-4);">
-              <div style="background: var(--color-success); color: white; padding: var(--space-4); text-align: center; border-radius: var(--radius-md);">2/3 Main Content</div>
-              <div style="background: var(--color-success); color: white; padding: var(--space-4); text-align: center; border-radius: var(--radius-md);">1/3 Sidebar</div>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4);">
-              <div style="background: var(--color-info); color: white; padding: var(--space-4); text-align: center; border-radius: var(--radius-md);">1/4</div>
-              <div style="background: var(--color-info); color: white; padding: var(--space-4); text-align: center; border-radius: var(--radius-md);">1/4</div>
-              <div style="background: var(--color-info); color: white; padding: var(--space-4); text-align: center; border-radius: var(--radius-md);">1/4</div>
-              <div style="background: var(--color-info); color: white; padding: var(--space-4); text-align: center; border-radius: var(--radius-md);">1/4</div>
-            </div>
-          </div>
-          
-          <div class="demo-code">
-&lt;!-- Equal columns --&gt;
-&lt;div class="grid grid-cols-3 gap-4"&gt;
-  &lt;div class="grid-item"&gt;Column 1&lt;/div&gt;
-  &lt;div class="grid-item"&gt;Column 2&lt;/div&gt;
-  &lt;div class="grid-item"&gt;Column 3&lt;/div&gt;
-&lt;/div&gt;
 
-&lt;!-- Responsive grid --&gt;
-&lt;div class="grid grid-cols-1 grid-md-2 grid-lg-3 gap-4"&gt;
-  &lt;div class="grid-item"&gt;Responsive item&lt;/div&gt;
-&lt;/div&gt;</div>
+      .demo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--space-4);
+      }
+
+      /* Button Components */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-2) var(--space-4);
+        font-size: var(--text-body-medium);
+        font-weight: var(--font-weight-medium);
+        line-height: 1.5;
+        text-decoration: none;
+        border: 1px solid transparent;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        min-width: 80px;
+      }
+
+      .btn:focus-visible {
+        outline: 3px solid var(--color-primary-focus);
+        outline-offset: 3px;
+        z-index: 1;
+      }
+
+      .btn-primary {
+        background: var(--color-primary);
+        color: var(--color-text-inverse);
+        border-color: var(--color-primary);
+      }
+
+      .btn-primary:hover {
+        background: var(--color-primary-hover);
+        border-color: var(--color-primary-hover);
+      }
+
+      .btn-secondary {
+        background: var(--color-secondary);
+        color: var(--color-text-inverse);
+        border-color: var(--color-secondary);
+      }
+
+      .btn-success {
+        background: var(--color-success);
+        color: var(--color-text-inverse);
+        border-color: var(--color-success);
+      }
+
+      .btn-warning {
+        background: var(--color-warning);
+        color: var(--color-dark);
+        border-color: var(--color-warning);
+      }
+
+      .btn-danger {
+        background: var(--color-danger);
+        color: var(--color-text-inverse);
+        border-color: var(--color-danger);
+      }
+
+      .btn-outline-primary {
+        background: transparent;
+        color: var(--color-primary);
+        border-color: var(--color-primary);
+      }
+
+      .btn-outline-primary:hover {
+        background: var(--color-primary);
+        color: var(--color-text-inverse);
+      }
+
+      .btn-sm {
+        padding: var(--space-1) var(--space-3);
+        font-size: var(--text-body-small);
+      }
+
+      .btn-lg {
+        padding: var(--space-3) var(--space-6);
+        font-size: var(--text-body-large);
+      }
+
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      /* Card Components */
+      .card {
+        background: var(--color-background-primary);
+        border: 1px solid var(--color-border-light);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .card-header {
+        padding: var(--space-4) var(--space-6);
+        background: var(--color-background-secondary);
+        border-bottom: 1px solid var(--color-border-light);
+      }
+
+      .card-title {
+        font-size: var(--text-heading-3);
+        font-weight: var(--font-weight-semibold);
+        margin: 0 0 var(--space-2) 0;
+      }
+
+      .card-subtitle {
+        color: var(--color-text-secondary);
+        margin: 0;
+      }
+
+      .card-body {
+        padding: var(--space-6);
+      }
+
+      .card-text {
+        margin: 0 0 var(--space-4) 0;
+      }
+
+      .card-text:last-child {
+        margin-bottom: 0;
+      }
+
+      .card-footer {
+        padding: var(--space-4) var(--space-6);
+        background: var(--color-background-secondary);
+        border-top: 1px solid var(--color-border-light);
+      }
+
+      .card-actions {
+        display: flex;
+        gap: var(--space-2);
+      }
+
+      /* Form Components */
+      .form-group {
+        margin-bottom: var(--space-4);
+      }
+
+      .form-label {
+        display: block;
+        font-weight: var(--font-weight-medium);
+        margin-bottom: var(--space-2);
+        color: var(--color-text-primary);
+      }
+
+      .form-control {
+        display: block;
+        width: 100%;
+        padding: var(--space-2) var(--space-3);
+        font-size: var(--text-body-medium);
+        line-height: 1.5;
+        color: var(--color-text-primary);
+        background: var(--color-background-primary);
+        border: 1px solid var(--color-border-medium);
+        border-radius: var(--radius-md);
+        transition:
+          border-color 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(0, 64, 133, 0.1);
+      }
+
+      /* Color Palette */
+      .color-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: var(--space-4);
+      }
+
+      .color-swatch {
+        text-align: center;
+      }
+
+      .color-preview {
+        height: 80px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--color-border-light);
+        margin-bottom: var(--space-2);
+      }
+
+      .color-name {
+        font-weight: var(--font-weight-medium);
+        margin-bottom: var(--space-1);
+      }
+
+      .color-value {
+        font-family: var(--font-family-code);
+        font-size: var(--text-body-small);
+        color: var(--color-text-muted);
+      }
+
+      /* Typography Scale */
+      .type-scale .demo-item {
+        margin-bottom: var(--space-4);
+        padding-bottom: var(--space-4);
+        border-bottom: 1px solid var(--color-border-light);
+      }
+
+      .type-scale .demo-item:last-child {
+        border-bottom: none;
+      }
+
+      .type-meta {
+        font-family: var(--font-family-code);
+        font-size: var(--text-body-small);
+        color: var(--color-text-muted);
+        margin-top: var(--space-2);
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .showcase-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          display: none;
+        }
+
+        .main-content {
+          padding: var(--space-4);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="showcase-layout">
+      <!-- Sidebar Navigation -->
+      <nav class="sidebar">
+        <h1 class="nav-title">A11y Design System</h1>
+
+        <div class="nav-section">
+          <h2 class="nav-section-title">Foundation</h2>
+          <ul class="nav-list">
+            <li class="nav-item"><a href="#colors" class="nav-link">Colors</a></li>
+            <li class="nav-item"><a href="#typography" class="nav-link">Typography</a></li>
+            <li class="nav-item"><a href="#spacing" class="nav-link">Spacing</a></li>
+          </ul>
         </div>
-        
-        <div class="component-demo">
-          <h2 class="demo-title">Responsive Grid</h2>
-          <p class="demo-description">Grid that changes column count based on screen size. Resize your browser to see the effect.</p>
-          
-          <div class="demo-example">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
-              <div style="background: var(--color-warning); color: var(--color-dark); padding: var(--space-4); text-align: center; border-radius: var(--radius-md);">Responsive</div>
-              <div style="background: var(--color-warning); color: var(--color-dark); padding: var(--space-4); text-align: center; border-radius: var(--radius-md);">Grid</div>
-              <div style="background: var(--color-warning); color: var(--color-dark); padding: var(--space-4); text-align: center; border-radius: var(--radius-md);">Items</div>
-              <div style="background: var(--color-warning); color: var(--color-dark); padding: var(--space-4); text-align: center; border-radius: var(--radius-md);">Auto-fit</div>
+
+        <div class="nav-section">
+          <h2 class="nav-section-title">Components</h2>
+          <ul class="nav-list">
+            <li class="nav-item"><a href="#buttons" class="nav-link active">Buttons</a></li>
+            <li class="nav-item"><a href="#forms" class="nav-link">Forms</a></li>
+            <li class="nav-item"><a href="#cards" class="nav-link">Cards</a></li>
+            <li class="nav-item"><a href="#accordions" class="nav-link">Accordions</a></li>
+          </ul>
+        </div>
+
+        <div class="nav-section">
+          <h2 class="nav-section-title">Layout</h2>
+          <ul class="nav-list">
+            <li class="nav-item"><a href="#grid" class="nav-link">Grid System</a></li>
+            <li class="nav-item"><a href="#containers" class="nav-link">Containers</a></li>
+            <li class="nav-item"><a href="#layout" class="nav-link">Page Layout</a></li>
+          </ul>
+        </div>
+
+        <div class="nav-section">
+          <h2 class="nav-section-title">Guidelines</h2>
+          <ul class="nav-list">
+            <li class="nav-item"><a href="#usage" class="nav-link">Usage</a></li>
+            <li class="nav-item"><a href="#accessibility" class="nav-link">Accessibility</a></li>
+          </ul>
+        </div>
+      </nav>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Colors Section -->
+        <section id="colors" class="section">
+          <div class="section-header">
+            <h1 class="section-title">Color System</h1>
+            <p class="section-description">
+              Our color palette is designed for accessibility and includes semantic colors that meet
+              WCAG 2.1 AA contrast requirements.
+            </p>
+          </div>
+
+          <div class="component-demo">
+            <h2 class="demo-title">Primary Colors</h2>
+            <div class="demo-example">
+              <div class="color-grid">
+                <div class="color-swatch">
+                  <div class="color-preview" style="background: var(--color-primary)"></div>
+                  <div class="color-name">Primary</div>
+                  <div class="color-value">#004085</div>
+                </div>
+                <div class="color-swatch">
+                  <div class="color-preview" style="background: var(--color-secondary)"></div>
+                  <div class="color-name">Secondary</div>
+                  <div class="color-value">#6c757d</div>
+                </div>
+                <div class="color-swatch">
+                  <div class="color-preview" style="background: var(--color-success)"></div>
+                  <div class="color-name">Success</div>
+                  <div class="color-value">#208636</div>
+                </div>
+                <div class="color-swatch">
+                  <div class="color-preview" style="background: var(--color-warning)"></div>
+                  <div class="color-name">Warning</div>
+                  <div class="color-value">#ffc107</div>
+                </div>
+                <div class="color-swatch">
+                  <div class="color-preview" style="background: var(--color-danger)"></div>
+                  <div class="color-name">Danger</div>
+                  <div class="color-value">#dc3545</div>
+                </div>
+                <div class="color-swatch">
+                  <div class="color-preview" style="background: var(--color-info)"></div>
+                  <div class="color-name">Info</div>
+                  <div class="color-value">#118294</div>
+                </div>
+              </div>
             </div>
           </div>
-          
-          <div class="demo-code">
-&lt;div class="grid-responsive"&gt;
-  &lt;div class="grid-item"&gt;Auto-sizing item&lt;/div&gt;
-&lt;/div&gt;
+        </section>
 
-&lt;style&gt;
-.grid-responsive {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-4);
-}
-&lt;/style&gt;</div>
-        </div>
-      </section>
-      
-      <!-- Containers Section -->
-      <section id="containers" class="section">
-        <div class="section-header">
-          <h1 class="section-title">Container System</h1>
-          <p class="section-description">
-            Responsive containers that provide consistent content width and centering across different screen sizes.
-          </p>
-        </div>
-        
-        <div class="component-demo">
-          <h2 class="demo-title">Container Types</h2>
-          <p class="demo-description">Different container styles for various layout needs.</p>
-          
-          <div class="demo-example">
-            <div style="background: var(--color-background-secondary); padding: var(--space-4); margin-bottom: var(--space-4); border-radius: var(--radius-md);">
-              <h4 style="margin: 0 0 var(--space-2) 0; color: var(--color-primary);">Fixed Container</h4>
-              <div style="max-width: 1200px; margin: 0 auto; background: var(--color-background-primary); padding: var(--space-4); border-radius: var(--radius-md);">
-                <p style="margin: 0;">This is a fixed-width container (max-width: 1200px) that centers content and provides consistent margins.</p>
-              </div>
-            </div>
-            
-            <div style="background: var(--color-background-secondary); padding: var(--space-4); margin-bottom: var(--space-4); border-radius: var(--radius-md);">
-              <h4 style="margin: 0 0 var(--space-2) 0; color: var(--color-success);">Fluid Container</h4>
-              <div style="width: 100%; background: var(--color-background-primary); padding: var(--space-4); border-radius: var(--radius-md);">
-                <p style="margin: 0;">This is a fluid container that takes up the full width of its parent element with consistent padding.</p>
-              </div>
-            </div>
-            
-            <div style="background: var(--color-background-secondary); padding: var(--space-4); border-radius: var(--radius-md);">
-              <h4 style="margin: 0 0 var(--space-2) 0; color: var(--color-info);">Narrow Container</h4>
-              <div style="max-width: 600px; margin: 0 auto; background: var(--color-background-primary); padding: var(--space-4); border-radius: var(--radius-md);">
-                <p style="margin: 0;">This is a narrow container (max-width: 600px) ideal for reading content like articles or forms.</p>
+        <!-- Typography Section -->
+        <section id="typography" class="section">
+          <div class="section-header">
+            <h1 class="section-title">Typography</h1>
+            <p class="section-description">
+              A clear hierarchy and readable type scale designed for accessibility and usability
+              across all devices.
+            </p>
+          </div>
+
+          <div class="component-demo">
+            <h2 class="demo-title">Type Scale</h2>
+            <div class="demo-example">
+              <div class="type-scale">
+                <div class="demo-item">
+                  <h1 style="font-size: var(--text-heading-1); margin: 0">Heading 1</h1>
+                  <div class="type-meta">1.875rem / 30px - font-weight: 700</div>
+                </div>
+                <div class="demo-item">
+                  <h2 style="font-size: var(--text-heading-2); margin: 0">Heading 2</h2>
+                  <div class="type-meta">1.5rem / 24px - font-weight: 600</div>
+                </div>
+                <div class="demo-item">
+                  <h3 style="font-size: var(--text-heading-3); margin: 0">Heading 3</h3>
+                  <div class="type-meta">1.25rem / 20px - font-weight: 600</div>
+                </div>
+                <div class="demo-item">
+                  <p style="font-size: var(--text-body-large); margin: 0">
+                    Large body text for emphasis and introductions
+                  </p>
+                  <div class="type-meta">1.125rem / 18px - font-weight: 400</div>
+                </div>
+                <div class="demo-item">
+                  <p style="font-size: var(--text-body-medium); margin: 0">
+                    Regular body text for main content
+                  </p>
+                  <div class="type-meta">1rem / 16px - font-weight: 400</div>
+                </div>
+                <div class="demo-item">
+                  <p style="font-size: var(--text-body-small); margin: 0">
+                    Small text for captions and secondary information
+                  </p>
+                  <div class="type-meta">0.875rem / 14px - font-weight: 400</div>
+                </div>
               </div>
             </div>
           </div>
-          
-          <div class="demo-code">
-&lt;!-- Fixed container --&gt;
-&lt;div class="container"&gt;
-  &lt;!-- Content --&gt;
-&lt;/div&gt;
+        </section>
 
-&lt;!-- Fluid container --&gt;
-&lt;div class="container-fluid"&gt;
-  &lt;!-- Content --&gt;
-&lt;/div&gt;
+        <!-- Buttons Section -->
+        <section id="buttons" class="section">
+          <div class="section-header">
+            <h1 class="section-title">Buttons</h1>
+            <p class="section-description">
+              Interactive buttons with clear visual hierarchy, accessible focus states, and
+              consistent styling across variants.
+            </p>
+          </div>
 
-&lt;!-- Narrow container --&gt;
-&lt;div class="container-narrow"&gt;
-  &lt;!-- Content --&gt;
-&lt;/div&gt;</div>
-        </div>
-        
-        <div class="component-demo">
-          <h2 class="demo-title">Container with Grid</h2>
-          <p class="demo-description">Combining containers with grid system for structured layouts.</p>
-          
-          <div class="demo-example">
-            <div style="max-width: 1200px; margin: 0 auto; padding: 0 var(--space-4);">
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-4);">
+          <div class="component-demo">
+            <h2 class="demo-title">Button Variants</h2>
+            <p class="demo-description">
+              Primary buttons for main actions, secondary for supporting actions.
+            </p>
+
+            <div class="demo-example">
+              <div class="demo-grid">
+                <button class="btn btn-primary">Primary</button>
+                <button class="btn btn-secondary">Secondary</button>
+                <button class="btn btn-success">Success</button>
+                <button class="btn btn-warning">Warning</button>
+                <button class="btn btn-danger">Danger</button>
+                <button class="btn btn-outline-primary">Outline</button>
+              </div>
+            </div>
+
+            <div class="demo-code">
+              &lt;button class="btn btn-primary"&gt;Primary&lt;/button&gt; &lt;button class="btn
+              btn-secondary"&gt;Secondary&lt;/button&gt; &lt;button class="btn
+              btn-success"&gt;Success&lt;/button&gt;
+            </div>
+          </div>
+
+          <div class="component-demo">
+            <h2 class="demo-title">Button Sizes</h2>
+            <div class="demo-example">
+              <div style="display: flex; align-items: center; gap: var(--space-4)">
+                <button class="btn btn-primary btn-sm">Small</button>
+                <button class="btn btn-primary">Default</button>
+                <button class="btn btn-primary btn-lg">Large</button>
+              </div>
+            </div>
+
+            <div class="demo-code">
+              &lt;button class="btn btn-primary btn-sm"&gt;Small&lt;/button&gt; &lt;button
+              class="btn btn-primary"&gt;Default&lt;/button&gt; &lt;button class="btn btn-primary
+              btn-lg"&gt;Large&lt;/button&gt;
+            </div>
+          </div>
+
+          <div class="component-demo">
+            <h2 class="demo-title">Button States</h2>
+            <div class="demo-example">
+              <div style="display: flex; gap: var(--space-4)">
+                <button class="btn btn-primary">Normal</button>
+                <button class="btn btn-primary" disabled>Disabled</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="component-demo">
+            <h2 class="demo-title">Focus Indicators</h2>
+            <p class="demo-description">
+              Enhanced focus styling with 3px offset for better visibility. Try using Tab to
+              navigate between buttons.
+            </p>
+            <div class="demo-example">
+              <div style="display: flex; flex-wrap: wrap; gap: var(--space-4)">
+                <button class="btn btn-primary">Primary Focus</button>
+                <button class="btn btn-secondary">Secondary Focus</button>
+                <button class="btn btn-outline-primary">Outline Focus</button>
+                <button class="btn btn-success">Success Focus</button>
+                <button class="btn btn-warning">Warning Focus</button>
+                <button class="btn btn-danger">Danger Focus</button>
+              </div>
+            </div>
+            <div class="demo-code">
+              /* Enhanced focus styling with proper offset */ .btn:focus-visible { outline: 3px
+              solid var(--color-primary-focus); outline-offset: 3px; z-index: 1; }
+            </div>
+          </div>
+        </section>
+
+        <!-- Forms Section -->
+        <section id="forms" class="section">
+          <div class="section-header">
+            <h1 class="section-title">Form Components</h1>
+            <p class="section-description">
+              Accessible form elements with clear labels, validation states, and consistent styling.
+            </p>
+          </div>
+
+          <div class="component-demo">
+            <h2 class="demo-title">Form Elements</h2>
+            <div class="demo-example">
+              <form style="max-width: 400px">
+                <div class="form-group">
+                  <label class="form-label" for="demo-text">Text Input</label>
+                  <input type="text" class="form-control" id="demo-text" placeholder="Enter text" />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="demo-email">Email Input</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="demo-email"
+                    placeholder="Enter email"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="demo-select">Select</label>
+                  <select class="form-control" id="demo-select">
+                    <option>Choose an option</option>
+                    <option>Option 1</option>
+                    <option>Option 2</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="demo-textarea">Textarea</label>
+                  <textarea
+                    class="form-control"
+                    id="demo-textarea"
+                    rows="3"
+                    placeholder="Enter description"
+                  ></textarea>
+                </div>
+
+                <div style="display: flex; gap: var(--space-3)">
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                  <button type="button" class="btn btn-secondary">Cancel</button>
+                </div>
+              </form>
+            </div>
+
+            <div class="demo-code">
+              &lt;div class="form-group"&gt; &lt;label class="form-label" for="text-input"&gt;Text
+              Input&lt;/label&gt; &lt;input type="text" class="form-control" id="text-input"&gt;
+              &lt;/div&gt;
+            </div>
+          </div>
+        </section>
+
+        <!-- Cards Section -->
+        <section id="cards" class="section">
+          <div class="section-header">
+            <h1 class="section-title">Card Components</h1>
+            <p class="section-description">
+              Flexible content containers with header, body, and footer sections for organizing
+              information.
+            </p>
+          </div>
+
+          <div class="component-demo">
+            <h2 class="demo-title">Basic Card</h2>
+            <div class="demo-example">
+              <div style="max-width: 400px">
                 <div class="card">
                   <div class="card-header">
-                    <h3 class="card-title">Container + Grid</h3>
+                    <h3 class="card-title">Card Title</h3>
+                    <p class="card-subtitle">Card subtitle</p>
                   </div>
                   <div class="card-body">
-                    <p class="card-text">Cards within a container and grid system for perfect alignment.</p>
+                    <p class="card-text">
+                      This is the card content area where you can place any type of content
+                      including text, images, or other components.
+                    </p>
+                  </div>
+                  <div class="card-footer">
+                    <div class="card-actions">
+                      <button class="btn btn-primary btn-sm">Action</button>
+                      <button class="btn btn-secondary btn-sm">More</button>
+                    </div>
                   </div>
                 </div>
-                <div class="card">
-                  <div class="card-header">
-                    <h3 class="card-title">Responsive Layout</h3>
+              </div>
+            </div>
+
+            <div class="demo-code">
+              &lt;div class="card"&gt; &lt;div class="card-header"&gt; &lt;h3
+              class="card-title"&gt;Card Title&lt;/h3&gt; &lt;/div&gt; &lt;div class="card-body"&gt;
+              &lt;p class="card-text"&gt;Card content...&lt;/p&gt; &lt;/div&gt; &lt;div
+              class="card-footer"&gt; &lt;div class="card-actions"&gt; &lt;button class="btn
+              btn-primary"&gt;Action&lt;/button&gt; &lt;/div&gt; &lt;/div&gt; &lt;/div&gt;
+            </div>
+          </div>
+        </section>
+
+        <!-- Accordions Section -->
+        <section id="accordions" class="section">
+          <div class="section-header">
+            <h1 class="section-title">Accordion Components</h1>
+            <p class="section-description">
+              Collapsible content sections with ARIA-compliant interactive behavior and
+              accessibility features.
+            </p>
+          </div>
+
+          <div class="component-demo">
+            <h2 class="demo-title">Basic Accordion</h2>
+            <p class="demo-description">Click headers to expand/collapse content sections.</p>
+
+            <div class="demo-example">
+              <div style="max-width: 600px">
+                <div
+                  style="
+                    border: 1px solid var(--color-border-light);
+                    border-radius: var(--radius-lg);
+                    overflow: hidden;
+                  "
+                >
+                  <div style="border-bottom: 1px solid var(--color-border-light)">
+                    <button
+                      style="
+                        width: 100%;
+                        padding: var(--space-4);
+                        text-align: left;
+                        background: var(--color-background-secondary);
+                        border: none;
+                        cursor: pointer;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        font-weight: var(--font-weight-medium);
+                      "
+                      onclick="toggleAccordion(this)"
+                    >
+                      <span>What is accessibility testing?</span>
+                      <span style="transition: transform 0.2s">▼</span>
+                    </button>
+                    <div
+                      style="
+                        display: none;
+                        padding: var(--space-4);
+                        background: var(--color-background-primary);
+                      "
+                    >
+                      <p style="margin: 0">
+                        Accessibility testing evaluates how well a website or application can be
+                        used by people with disabilities. This includes testing for screen reader
+                        compatibility, keyboard navigation, color contrast, and other WCAG
+                        guidelines.
+                      </p>
+                    </div>
                   </div>
-                  <div class="card-body">
-                    <p class="card-text">Automatically adjusts to screen size while maintaining readability.</p>
+
+                  <div style="border-bottom: 1px solid var(--color-border-light)">
+                    <button
+                      style="
+                        width: 100%;
+                        padding: var(--space-4);
+                        text-align: left;
+                        background: var(--color-background-secondary);
+                        border: none;
+                        cursor: pointer;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        font-weight: var(--font-weight-medium);
+                      "
+                      onclick="toggleAccordion(this)"
+                    >
+                      <span>How does automated testing work?</span>
+                      <span style="transition: transform 0.2s">▼</span>
+                    </button>
+                    <div
+                      style="
+                        display: none;
+                        padding: var(--space-4);
+                        background: var(--color-background-primary);
+                      "
+                    >
+                      <p style="margin: 0">
+                        Our automated testing uses axe-core to scan web pages for accessibility
+                        violations. It can detect issues like missing alt text, insufficient color
+                        contrast, improper heading structure, and missing form labels.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <button
+                      style="
+                        width: 100%;
+                        padding: var(--space-4);
+                        text-align: left;
+                        background: var(--color-background-secondary);
+                        border: none;
+                        cursor: pointer;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        font-weight: var(--font-weight-medium);
+                      "
+                      onclick="toggleAccordion(this)"
+                    >
+                      <span>What reports are generated?</span>
+                      <span style="transition: transform 0.2s">▼</span>
+                    </button>
+                    <div
+                      style="
+                        display: none;
+                        padding: var(--space-4);
+                        background: var(--color-background-primary);
+                      "
+                    >
+                      <p style="margin: 0">
+                        The system generates comprehensive HTML and JSON reports showing all
+                        accessibility violations found, organized by impact level (critical,
+                        serious, moderate, minor). Each violation includes detailed information and
+                        suggested fixes.
+                      </p>
+                    </div>
                   </div>
                 </div>
-                <div class="card">
-                  <div class="card-header">
-                    <h3 class="card-title">Consistent Spacing</h3>
+              </div>
+            </div>
+
+            <div class="demo-code">
+              &lt;div class="accordion"&gt; &lt;div class="accordion-item"&gt; &lt;h3
+              class="accordion-header"&gt; &lt;button class="accordion-trigger"
+              aria-expanded="false"&gt; &lt;span class="accordion-title"&gt;Section
+              Title&lt;/span&gt; &lt;span class="accordion-icon"&gt;▼&lt;/span&gt; &lt;/button&gt;
+              &lt;/h3&gt; &lt;div class="accordion-content"&gt; &lt;p&gt;Content goes
+              here...&lt;/p&gt; &lt;/div&gt; &lt;/div&gt; &lt;/div&gt;
+            </div>
+          </div>
+
+          <div class="component-demo">
+            <h2 class="demo-title">Report Accordion (Accessibility Violations)</h2>
+            <p class="demo-description">
+              Specialized accordion for displaying accessibility test results with impact levels.
+            </p>
+
+            <div class="demo-example">
+              <div style="max-width: 600px">
+                <div
+                  style="
+                    border: 1px solid var(--color-border-light);
+                    border-radius: var(--radius-lg);
+                    overflow: hidden;
+                  "
+                >
+                  <div
+                    style="
+                      border-bottom: 1px solid var(--color-border-light);
+                      border-left: 4px solid var(--color-danger);
+                    "
+                  >
+                    <button
+                      style="
+                        width: 100%;
+                        padding: var(--space-4);
+                        text-align: left;
+                        background: var(--color-background-secondary);
+                        border: none;
+                        cursor: pointer;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                      "
+                      onclick="toggleAccordion(this)"
+                    >
+                      <div style="display: flex; align-items: center; gap: var(--space-3)">
+                        <span
+                          style="
+                            background: var(--color-danger);
+                            color: white;
+                            padding: var(--space-1) var(--space-2);
+                            border-radius: var(--radius-sm);
+                            font-size: var(--text-body-small);
+                            font-weight: var(--font-weight-semibold);
+                          "
+                          >Critical</span
+                        >
+                        <div>
+                          <div style="font-weight: var(--font-weight-semibold)">
+                            Images must have alt text
+                          </div>
+                          <div
+                            style="
+                              font-size: var(--text-body-small);
+                              color: var(--color-text-secondary);
+                            "
+                          >
+                            Missing alternative text for images
+                          </div>
+                        </div>
+                      </div>
+                      <span style="transition: transform 0.2s">▼</span>
+                    </button>
+                    <div
+                      style="
+                        display: none;
+                        padding: var(--space-4);
+                        background: var(--color-background-primary);
+                      "
+                    >
+                      <p style="margin: 0 0 var(--space-3) 0"><strong>Rule:</strong> image-alt</p>
+                      <p style="margin: 0 0 var(--space-3) 0">
+                        <strong>Description:</strong> Images must have alternative text to be
+                        accessible to screen reader users.
+                      </p>
+                      <p style="margin: 0">
+                        <strong>How to fix:</strong> Add descriptive alt text to all images using
+                        the alt attribute.
+                      </p>
+                    </div>
                   </div>
-                  <div class="card-body">
-                    <p class="card-text">Uniform spacing and alignment across all content areas.</p>
+
+                  <div style="border-left: 4px solid var(--color-warning)">
+                    <button
+                      style="
+                        width: 100%;
+                        padding: var(--space-4);
+                        text-align: left;
+                        background: var(--color-background-secondary);
+                        border: none;
+                        cursor: pointer;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                      "
+                      onclick="toggleAccordion(this)"
+                    >
+                      <div style="display: flex; align-items: center; gap: var(--space-3)">
+                        <span
+                          style="
+                            background: var(--color-warning);
+                            color: var(--color-dark);
+                            padding: var(--space-1) var(--space-2);
+                            border-radius: var(--radius-sm);
+                            font-size: var(--text-body-small);
+                            font-weight: var(--font-weight-semibold);
+                          "
+                          >Moderate</span
+                        >
+                        <div>
+                          <div style="font-weight: var(--font-weight-semibold)">
+                            Color contrast too low
+                          </div>
+                          <div
+                            style="
+                              font-size: var(--text-body-small);
+                              color: var(--color-text-secondary);
+                            "
+                          >
+                            Text doesn't meet contrast requirements
+                          </div>
+                        </div>
+                      </div>
+                      <span style="transition: transform 0.2s">▼</span>
+                    </button>
+                    <div
+                      style="
+                        display: none;
+                        padding: var(--space-4);
+                        background: var(--color-background-primary);
+                      "
+                    >
+                      <p style="margin: 0 0 var(--space-3) 0">
+                        <strong>Rule:</strong> color-contrast
+                      </p>
+                      <p style="margin: 0 0 var(--space-3) 0">
+                        <strong>Description:</strong> Text must have sufficient contrast against its
+                        background.
+                      </p>
+                      <p style="margin: 0">
+                        <strong>How to fix:</strong> Use darker text colors or lighter backgrounds
+                        to achieve at least 4.5:1 contrast ratio.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
-      
-      <!-- Page Layout Section -->
-      <section id="layout" class="section">
-        <div class="section-header">
-          <h1 class="section-title">Page Layout & Semantic Structure</h1>
-          <p class="section-description">
-            Complete page structure components using semantic HTML5 landmarks with proper accessibility features including skip links.
-          </p>
-        </div>
-        
-        <div class="component-demo">
-          <h2 class="demo-title">Page Structure Template</h2>
-          <p class="demo-description">Semantic page layout with header, navigation, main content, sidebar, and footer.</p>
-          
-          <div class="demo-example">
-            <div style="border: 2px solid var(--color-border-light); border-radius: var(--radius-lg); overflow: hidden; min-height: 400px;">
-              
-              <!-- Skip Links Demo -->
-              <div style="position: relative; background: var(--color-info); color: white; padding: var(--space-2); text-align: center; font-size: var(--text-body-small);">
-                <strong>Skip Links:</strong> Press Tab to see skip links appear
-                <div style="position: absolute; top: var(--space-1); left: var(--space-2);">
-                  <a href="#demo-main" style="position: absolute; top: -100px; left: 0; background: var(--color-primary); color: white; padding: var(--space-1) var(--space-3); border-radius: var(--radius-sm); text-decoration: none; font-size: var(--text-body-small); transition: top 0.2s;" onfocus="this.style.position='static'; this.style.top='0';" onblur="this.style.position='absolute'; this.style.top='-100px';">Skip to main content</a>
-                  <a href="#demo-nav" style="position: absolute; top: -100px; left: 0; background: var(--color-primary); color: white; padding: var(--space-1) var(--space-3); border-radius: var(--radius-sm); text-decoration: none; font-size: var(--text-body-small); transition: top 0.2s; margin-top: var(--space-1);" onfocus="this.style.position='static'; this.style.top='0';" onblur="this.style.position='absolute'; this.style.top='-100px';">Skip to navigation</a>
+        </section>
+
+        <!-- Grid System Section -->
+        <section id="grid" class="section">
+          <div class="section-header">
+            <h1 class="section-title">Grid System</h1>
+            <p class="section-description">
+              Flexible CSS Grid-based layout system with responsive breakpoints and consistent
+              spacing.
+            </p>
+          </div>
+
+          <div class="component-demo">
+            <h2 class="demo-title">Basic Grid</h2>
+            <p class="demo-description">
+              12-column grid system that adapts to different screen sizes.
+            </p>
+
+            <div class="demo-example">
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: repeat(3, 1fr);
+                  gap: var(--space-4);
+                  margin-bottom: var(--space-4);
+                "
+              >
+                <div
+                  style="
+                    background: var(--color-primary);
+                    color: white;
+                    padding: var(--space-4);
+                    text-align: center;
+                    border-radius: var(--radius-md);
+                  "
+                >
+                  1/3
+                </div>
+                <div
+                  style="
+                    background: var(--color-primary);
+                    color: white;
+                    padding: var(--space-4);
+                    text-align: center;
+                    border-radius: var(--radius-md);
+                  "
+                >
+                  1/3
+                </div>
+                <div
+                  style="
+                    background: var(--color-primary);
+                    color: white;
+                    padding: var(--space-4);
+                    text-align: center;
+                    border-radius: var(--radius-md);
+                  "
+                >
+                  1/3
                 </div>
               </div>
-              
-              <!-- Header -->
-              <header style="background: var(--color-background-secondary); padding: var(--space-4); border-bottom: 1px solid var(--color-border-light); display: flex; align-items: center; justify-content: space-between;">
-                <div style="display: flex; align-items: center; gap: var(--space-3);">
-                  <div style="width: 32px; height: 32px; background: var(--color-primary); border-radius: var(--radius-sm);"></div>
-                  <div>
-                    <h1 style="margin: 0; font-size: var(--text-heading-h4);">CATS Application</h1>
-                    <p style="margin: 0; font-size: var(--text-body-small); color: var(--color-text-secondary);">Accessibility Testing System</p>
-                  </div>
+
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: 2fr 1fr;
+                  gap: var(--space-4);
+                  margin-bottom: var(--space-4);
+                "
+              >
+                <div
+                  style="
+                    background: var(--color-success);
+                    color: white;
+                    padding: var(--space-4);
+                    text-align: center;
+                    border-radius: var(--radius-md);
+                  "
+                >
+                  2/3 Main Content
                 </div>
-                <button style="background: none; border: none; font-size: var(--text-heading-h5); cursor: pointer; padding: var(--space-2);">☰</button>
-              </header>
-              
-              <!-- Navigation -->
-              <nav id="demo-nav" style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-darker, #003d7a) 100%); padding: 0;">
-                <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 var(--space-4);">
-                  <div style="display: flex; gap: 0;">
-                    <a href="#" style="color: white; text-decoration: none; padding: var(--space-3) var(--space-4); border-bottom: 2px solid transparent; transition: all 0.2s;">Dashboard</a>
-                    <a href="#" style="color: rgba(255,255,255,0.9); text-decoration: none; padding: var(--space-3) var(--space-4); border-bottom: 2px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.05);">Reports</a>
-                    <a href="#" style="color: rgba(255,255,255,0.9); text-decoration: none; padding: var(--space-3) var(--space-4); border-bottom: 2px solid transparent; transition: all 0.2s;">Settings</a>
-                  </div>
+                <div
+                  style="
+                    background: var(--color-success);
+                    color: white;
+                    padding: var(--space-4);
+                    text-align: center;
+                    border-radius: var(--radius-md);
+                  "
+                >
+                  1/3 Sidebar
                 </div>
-              </nav>
-              
-              <!-- Breadcrumb -->
-              <nav style="background: var(--color-background-secondary); padding: var(--space-2) var(--space-4); border-bottom: 1px solid var(--color-border-light); font-size: var(--text-body-small);">
-                <ol style="display: flex; align-items: center; list-style: none; margin: 0; padding: 0; color: var(--color-text-secondary);">
-                  <li><a href="#" style="color: var(--color-primary); text-decoration: none;">Dashboard</a></li>
-                  <li style="margin: 0 var(--space-2); color: var(--color-text-muted);">›</li>
-                  <li><a href="#" style="color: var(--color-primary); text-decoration: none;">Reports</a></li>
-                  <li style="margin: 0 var(--space-2); color: var(--color-text-muted);">›</li>
-                  <li style="color: var(--color-text-primary); font-weight: var(--font-weight-medium);">example.com Report</li>
-                </ol>
-              </nav>
-              
-              <!-- Main Content Area -->
-              <div style="display: flex; min-height: 300px;">
-                
-                <!-- Main Content -->
-                <main id="demo-main" style="flex: 1; padding: var(--space-4);">
-                  <section>
-                    <h2 style="margin: 0 0 var(--space-3) 0; font-size: var(--text-heading-h3);">Accessibility Report</h2>
-                    <p style="margin: 0 0 var(--space-4) 0; color: var(--color-text-secondary);">Comprehensive accessibility analysis results for your website.</p>
-                    
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-4);">
-                      <div class="card">
-                        <h3 style="margin: 0 0 var(--space-2) 0; color: var(--color-danger);">Critical Issues</h3>
-                        <div style="font-size: var(--text-heading-h2); font-weight: var(--font-weight-bold); color: var(--color-danger);">3</div>
-                      </div>
-                      <div class="card">
-                        <h3 style="margin: 0 0 var(--space-2) 0; color: var(--color-warning);">Moderate Issues</h3>
-                        <div style="font-size: var(--text-heading-h2); font-weight: var(--font-weight-bold); color: var(--color-warning);">7</div>
-                      </div>
-                      <div class="card">
-                        <h3 style="margin: 0 0 var(--space-2) 0; color: var(--color-success);">Passed Tests</h3>
-                        <div style="font-size: var(--text-heading-h2); font-weight: var(--font-weight-bold); color: var(--color-success);">45</div>
-                      </div>
-                    </div>
-                  </section>
-                </main>
-                
-                <!-- Sidebar -->
-                <aside style="width: 250px; background: var(--color-background-secondary); padding: var(--space-4); border-left: 1px solid var(--color-border-light);">
-                  <h3 style="margin: 0 0 var(--space-3) 0; font-size: var(--text-heading-h5);">Report Details</h3>
-                  <div style="font-size: var(--text-body-small); line-height: 1.6;">
-                    <p style="margin: 0 0 var(--space-2) 0;"><strong>Domain:</strong> example.com</p>
-                    <p style="margin: 0 0 var(--space-2) 0;"><strong>Generated:</strong> Sept 17, 2025</p>
-                    <p style="margin: 0 0 var(--space-2) 0;"><strong>Standard:</strong> WCAG 2.1 AA</p>
-                    <p style="margin: 0 0 var(--space-4) 0;"><strong>Pages:</strong> 12 scanned</p>
-                    
-                    <h4 style="margin: 0 0 var(--space-2) 0; font-size: var(--text-body-large);">Quick Actions</h4>
-                    <div style="display: flex; flex-direction: column; gap: var(--space-2);">
-                      <button class="btn btn-primary" style="font-size: var(--text-body-small);">Download PDF</button>
-                      <button class="btn btn-secondary" style="font-size: var(--text-body-small);">Export JSON</button>
-                    </div>
-                  </div>
-                </aside>
-                
               </div>
-              
-              <!-- Footer -->
-              <footer style="background: var(--color-background-secondary); padding: var(--space-4); border-top: 1px solid var(--color-border-light); margin-top: auto;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); margin-bottom: var(--space-4);">
-                  <div>
-                    <h4 style="margin: 0 0 var(--space-2) 0; font-size: var(--text-body-large);">About CATS</h4>
-                    <p style="margin: 0; font-size: var(--text-body-small); color: var(--color-text-secondary);">Automated accessibility testing system for WCAG compliance.</p>
-                  </div>
-                  <div>
-                    <h4 style="margin: 0 0 var(--space-2) 0; font-size: var(--text-body-large);">Support</h4>
-                    <p style="margin: 0; font-size: var(--text-body-small);"><a href="#" style="color: var(--color-primary); text-decoration: none;">Documentation</a> • <a href="#" style="color: var(--color-primary); text-decoration: none;">Help</a></p>
-                  </div>
+
+              <div
+                style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4)"
+              >
+                <div
+                  style="
+                    background: var(--color-info);
+                    color: white;
+                    padding: var(--space-4);
+                    text-align: center;
+                    border-radius: var(--radius-md);
+                  "
+                >
+                  1/4
                 </div>
-                <div style="border-top: 1px solid var(--color-border-light); padding-top: var(--space-3); text-align: center; color: var(--color-text-muted); font-size: var(--text-body-small);">
-                  © 2025 CATS Accessibility Testing System
+                <div
+                  style="
+                    background: var(--color-info);
+                    color: white;
+                    padding: var(--space-4);
+                    text-align: center;
+                    border-radius: var(--radius-md);
+                  "
+                >
+                  1/4
                 </div>
-              </footer>
-              
+                <div
+                  style="
+                    background: var(--color-info);
+                    color: white;
+                    padding: var(--space-4);
+                    text-align: center;
+                    border-radius: var(--radius-md);
+                  "
+                >
+                  1/4
+                </div>
+                <div
+                  style="
+                    background: var(--color-info);
+                    color: white;
+                    padding: var(--space-4);
+                    text-align: center;
+                    border-radius: var(--radius-md);
+                  "
+                >
+                  1/4
+                </div>
+              </div>
+            </div>
+
+            <div class="demo-code">
+              &lt;!-- Equal columns --&gt; &lt;div class="grid grid-cols-3 gap-4"&gt; &lt;div
+              class="grid-item"&gt;Column 1&lt;/div&gt; &lt;div class="grid-item"&gt;Column
+              2&lt;/div&gt; &lt;div class="grid-item"&gt;Column 3&lt;/div&gt; &lt;/div&gt; &lt;!--
+              Responsive grid --&gt; &lt;div class="grid grid-cols-1 grid-md-2 grid-lg-3 gap-4"&gt;
+              &lt;div class="grid-item"&gt;Responsive item&lt;/div&gt; &lt;/div&gt;
             </div>
           </div>
-          
-          <div class="demo-code">
-&lt;!-- Complete semantic page structure --&gt;
-&lt;div class="page-container"&gt;
-  
-  &lt;!-- Skip Links --&gt;
-  &lt;div class="skip-links"&gt;
-    &lt;a href="#main-content" class="skip-links__link"&gt;Skip to main content&lt;/a&gt;
-    &lt;a href="#nav-main" class="skip-links__link"&gt;Skip to navigation&lt;/a&gt;
-    &lt;a href="#sidebar" class="skip-links__link"&gt;Skip to sidebar&lt;/a&gt;
-  &lt;/div&gt;
-  
-  &lt;!-- Header --&gt;
-  &lt;header class="page-header"&gt;
-    &lt;div class="header-container"&gt;
-      &lt;a href="/" class="page-header__brand"&gt;
-        &lt;img src="logo.svg" alt="CATS" class="page-header__logo"&gt;
-        &lt;div&gt;
-          &lt;h1 class="page-header__title"&gt;CATS&lt;/h1&gt;
-          &lt;p class="page-header__subtitle"&gt;Accessibility Testing&lt;/p&gt;
-        &lt;/div&gt;
-      &lt;/a&gt;
-    &lt;/div&gt;
-  &lt;/header&gt;
-  
-  &lt;!-- Main Navigation --&gt;
-  &lt;nav id="nav-main" class="page-nav" role="navigation" aria-label="Main navigation"&gt;
-    &lt;div class="page-nav__container"&gt;
-      &lt;ul class="page-nav__links"&gt;
-        &lt;li&gt;&lt;a href="/" class="page-nav__link"&gt;Dashboard&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href="/reports" class="page-nav__link page-nav__link--active"&gt;Reports&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href="/settings" class="page-nav__link"&gt;Settings&lt;/a&gt;&lt;/li&gt;
-      &lt;/ul&gt;
-    &lt;/div&gt;
-  &lt;/nav&gt;
-  
-  &lt;!-- Breadcrumb Navigation --&gt;
-  &lt;nav class="breadcrumb-nav" aria-label="Breadcrumb"&gt;
-    &lt;div class="breadcrumb-nav__container"&gt;
-      &lt;ol class="breadcrumb-nav__list"&gt;
-        &lt;li&gt;&lt;a href="/"&gt;Dashboard&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href="/reports"&gt;Reports&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;span class="current"&gt;example.com Report&lt;/span&gt;&lt;/li&gt;
-      &lt;/ol&gt;
-    &lt;/div&gt;
-  &lt;/nav&gt;
-  
-  &lt;!-- Main Content Area --&gt;
-  &lt;main id="main-content" class="page-main page-main--with-sidebar"&gt;
-    &lt;div class="page-main__container"&gt;
-      &lt;div class="page-main__content"&gt;
-        &lt;section class="content-section"&gt;
-          &lt;header class="content-section__header"&gt;
-            &lt;h2 class="content-section__title"&gt;Accessibility Report&lt;/h2&gt;
-            &lt;p class="content-section__description"&gt;Analysis results&lt;/p&gt;
-          &lt;/header&gt;
-          &lt;!-- Main content --&gt;
-        &lt;/section&gt;
-      &lt;/div&gt;
-      
-      &lt;!-- Sidebar --&gt;
-      &lt;aside id="sidebar" class="page-aside"&gt;
-        &lt;h3 class="page-aside__title"&gt;Report Details&lt;/h3&gt;
-        &lt;div class="page-aside__content"&gt;
-          &lt;!-- Sidebar content --&gt;
-        &lt;/div&gt;
-      &lt;/aside&gt;
-    &lt;/div&gt;
-  &lt;/main&gt;
-  
-  &lt;!-- Footer --&gt;
-  &lt;footer class="page-footer"&gt;
-    &lt;div class="page-footer__container"&gt;
-      &lt;div class="page-footer__content"&gt;
-        &lt;!-- Footer content --&gt;
-      &lt;/div&gt;
-      &lt;div class="page-footer__bottom"&gt;
-        &lt;p&gt;© 2025 CATS Accessibility Testing System&lt;/p&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
-  &lt;/footer&gt;
-  
-&lt;/div&gt;</div>
-        </div>
-        
-        <div class="component-demo">
-          <h2 class="demo-title">Skip Links Component</h2>
-          <p class="demo-description">Enhanced skip links that provide multiple navigation options for screen reader users.</p>
-          
-          <div class="demo-example">
-            <div style="border: 2px solid var(--color-border-light); border-radius: var(--radius-lg); padding: var(--space-4); position: relative; background: var(--color-background-secondary);">
-              <p style="margin: 0 0 var(--space-3) 0; color: var(--color-text-secondary); font-size: var(--text-body-small);">
-                <strong>Tab through this area to see skip links appear:</strong>
-              </p>
-              
-              <!-- Multiple Skip Links -->
-              <div style="position: relative;">
-                <a href="#demo-main-2" style="position: absolute; top: -100px; left: 0; background: var(--color-primary); color: white; padding: var(--space-2) var(--space-4); border-radius: var(--radius-sm); text-decoration: none; font-weight: var(--font-weight-medium); box-shadow: var(--shadow-lg); transition: top 0.2s;" onfocus="this.style.position='static'; this.style.top='0';" onblur="this.style.position='absolute'; this.style.top='-100px';">Skip to main content</a>
-                <a href="#demo-nav-2" style="position: absolute; top: -100px; left: 0; background: var(--color-primary); color: white; padding: var(--space-2) var(--space-4); border-radius: var(--radius-sm); text-decoration: none; font-weight: var(--font-weight-medium); box-shadow: var(--shadow-lg); transition: top 0.2s; margin-top: calc(var(--space-2) + 36px);" onfocus="this.style.position='static'; this.style.top='0';" onblur="this.style.position='absolute'; this.style.top='-100px';">Skip to navigation</a>
-                <a href="#demo-search-2" style="position: absolute; top: -100px; left: 0; background: var(--color-primary); color: white; padding: var(--space-2) var(--space-4); border-radius: var(--radius-sm); text-decoration: none; font-weight: var(--font-weight-medium); box-shadow: var(--shadow-lg); transition: top 0.2s; margin-top: calc(var(--space-2) + 72px);" onfocus="this.style.position='static'; this.style.top='0';" onblur="this.style.position='absolute'; this.style.top='-100px';">Skip to search</a>
+
+          <div class="component-demo">
+            <h2 class="demo-title">Responsive Grid</h2>
+            <p class="demo-description">
+              Grid that changes column count based on screen size. Resize your browser to see the
+              effect.
+            </p>
+
+            <div class="demo-example">
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                  gap: var(--space-4);
+                "
+              >
+                <div
+                  style="
+                    background: var(--color-warning);
+                    color: var(--color-dark);
+                    padding: var(--space-4);
+                    text-align: center;
+                    border-radius: var(--radius-md);
+                  "
+                >
+                  Responsive
+                </div>
+                <div
+                  style="
+                    background: var(--color-warning);
+                    color: var(--color-dark);
+                    padding: var(--space-4);
+                    text-align: center;
+                    border-radius: var(--radius-md);
+                  "
+                >
+                  Grid
+                </div>
+                <div
+                  style="
+                    background: var(--color-warning);
+                    color: var(--color-dark);
+                    padding: var(--space-4);
+                    text-align: center;
+                    border-radius: var(--radius-md);
+                  "
+                >
+                  Items
+                </div>
+                <div
+                  style="
+                    background: var(--color-warning);
+                    color: var(--color-dark);
+                    padding: var(--space-4);
+                    text-align: center;
+                    border-radius: var(--radius-md);
+                  "
+                >
+                  Auto-fit
+                </div>
               </div>
-              
-              <div style="margin-top: var(--space-4); padding: var(--space-3); background: var(--color-background-primary); border-radius: var(--radius-md);">
-                <nav id="demo-nav-2" style="margin-bottom: var(--space-4);">
-                  <h3 style="margin: 0 0 var(--space-2) 0; font-size: var(--text-body-large);">Navigation</h3>
-                  <a href="#" style="color: var(--color-primary); margin-right: var(--space-3);">Dashboard</a>
-                  <a href="#" style="color: var(--color-primary); margin-right: var(--space-3);">Reports</a>
-                  <a href="#" style="color: var(--color-primary);">Settings</a>
+            </div>
+
+            <div class="demo-code">
+              &lt;div class="grid-responsive"&gt; &lt;div class="grid-item"&gt;Auto-sizing
+              item&lt;/div&gt; &lt;/div&gt; &lt;style&gt; .grid-responsive { display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); }
+              &lt;/style&gt;
+            </div>
+          </div>
+        </section>
+
+        <!-- Containers Section -->
+        <section id="containers" class="section">
+          <div class="section-header">
+            <h1 class="section-title">Container System</h1>
+            <p class="section-description">
+              Responsive containers that provide consistent content width and centering across
+              different screen sizes.
+            </p>
+          </div>
+
+          <div class="component-demo">
+            <h2 class="demo-title">Container Types</h2>
+            <p class="demo-description">Different container styles for various layout needs.</p>
+
+            <div class="demo-example">
+              <div
+                style="
+                  background: var(--color-background-secondary);
+                  padding: var(--space-4);
+                  margin-bottom: var(--space-4);
+                  border-radius: var(--radius-md);
+                "
+              >
+                <h4 style="margin: 0 0 var(--space-2) 0; color: var(--color-primary)">
+                  Fixed Container
+                </h4>
+                <div
+                  style="
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    background: var(--color-background-primary);
+                    padding: var(--space-4);
+                    border-radius: var(--radius-md);
+                  "
+                >
+                  <p style="margin: 0">
+                    This is a fixed-width container (max-width: 1200px) that centers content and
+                    provides consistent margins.
+                  </p>
+                </div>
+              </div>
+
+              <div
+                style="
+                  background: var(--color-background-secondary);
+                  padding: var(--space-4);
+                  margin-bottom: var(--space-4);
+                  border-radius: var(--radius-md);
+                "
+              >
+                <h4 style="margin: 0 0 var(--space-2) 0; color: var(--color-success)">
+                  Fluid Container
+                </h4>
+                <div
+                  style="
+                    width: 100%;
+                    background: var(--color-background-primary);
+                    padding: var(--space-4);
+                    border-radius: var(--radius-md);
+                  "
+                >
+                  <p style="margin: 0">
+                    This is a fluid container that takes up the full width of its parent element
+                    with consistent padding.
+                  </p>
+                </div>
+              </div>
+
+              <div
+                style="
+                  background: var(--color-background-secondary);
+                  padding: var(--space-4);
+                  border-radius: var(--radius-md);
+                "
+              >
+                <h4 style="margin: 0 0 var(--space-2) 0; color: var(--color-info)">
+                  Narrow Container
+                </h4>
+                <div
+                  style="
+                    max-width: 600px;
+                    margin: 0 auto;
+                    background: var(--color-background-primary);
+                    padding: var(--space-4);
+                    border-radius: var(--radius-md);
+                  "
+                >
+                  <p style="margin: 0">
+                    This is a narrow container (max-width: 600px) ideal for reading content like
+                    articles or forms.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="demo-code">
+              &lt;!-- Fixed container --&gt; &lt;div class="container"&gt; &lt;!-- Content --&gt;
+              &lt;/div&gt; &lt;!-- Fluid container --&gt; &lt;div class="container-fluid"&gt;
+              &lt;!-- Content --&gt; &lt;/div&gt; &lt;!-- Narrow container --&gt; &lt;div
+              class="container-narrow"&gt; &lt;!-- Content --&gt; &lt;/div&gt;
+            </div>
+          </div>
+
+          <div class="component-demo">
+            <h2 class="demo-title">Container with Grid</h2>
+            <p class="demo-description">
+              Combining containers with grid system for structured layouts.
+            </p>
+
+            <div class="demo-example">
+              <div style="max-width: 1200px; margin: 0 auto; padding: 0 var(--space-4)">
+                <div
+                  style="
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                    gap: var(--space-4);
+                  "
+                >
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title">Container + Grid</h3>
+                    </div>
+                    <div class="card-body">
+                      <p class="card-text">
+                        Cards within a container and grid system for perfect alignment.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title">Responsive Layout</h3>
+                    </div>
+                    <div class="card-body">
+                      <p class="card-text">
+                        Automatically adjusts to screen size while maintaining readability.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title">Consistent Spacing</h3>
+                    </div>
+                    <div class="card-body">
+                      <p class="card-text">
+                        Uniform spacing and alignment across all content areas.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Page Layout Section -->
+        <section id="layout" class="section">
+          <div class="section-header">
+            <h1 class="section-title">Page Layout & Semantic Structure</h1>
+            <p class="section-description">
+              Complete page structure components using semantic HTML5 landmarks with proper
+              accessibility features including skip links.
+            </p>
+          </div>
+
+          <div class="component-demo">
+            <h2 class="demo-title">Page Structure Template</h2>
+            <p class="demo-description">
+              Semantic page layout with header, navigation, main content, sidebar, and footer.
+            </p>
+
+            <div class="demo-example">
+              <div
+                style="
+                  border: 2px solid var(--color-border-light);
+                  border-radius: var(--radius-lg);
+                  overflow: hidden;
+                  min-height: 400px;
+                "
+              >
+                <!-- Skip Links Demo -->
+                <div
+                  style="
+                    position: relative;
+                    background: var(--color-info);
+                    color: white;
+                    padding: var(--space-2);
+                    text-align: center;
+                    font-size: var(--text-body-small);
+                  "
+                >
+                  <strong>Skip Links:</strong> Press Tab to see skip links appear
+                  <div style="position: absolute; top: var(--space-1); left: var(--space-2)">
+                    <a
+                      href="#demo-main"
+                      style="
+                        position: absolute;
+                        top: -100px;
+                        left: 0;
+                        background: var(--color-primary);
+                        color: white;
+                        padding: var(--space-1) var(--space-3);
+                        border-radius: var(--radius-sm);
+                        text-decoration: none;
+                        font-size: var(--text-body-small);
+                        transition: top 0.2s;
+                      "
+                      onfocus="this.style.position='static'; this.style.top='0';"
+                      onblur="this.style.position='absolute'; this.style.top='-100px';"
+                      >Skip to main content</a
+                    >
+                    <a
+                      href="#demo-nav"
+                      style="
+                        position: absolute;
+                        top: -100px;
+                        left: 0;
+                        background: var(--color-primary);
+                        color: white;
+                        padding: var(--space-1) var(--space-3);
+                        border-radius: var(--radius-sm);
+                        text-decoration: none;
+                        font-size: var(--text-body-small);
+                        transition: top 0.2s;
+                        margin-top: var(--space-1);
+                      "
+                      onfocus="this.style.position='static'; this.style.top='0';"
+                      onblur="this.style.position='absolute'; this.style.top='-100px';"
+                      >Skip to navigation</a
+                    >
+                  </div>
+                </div>
+
+                <!-- Header -->
+                <header
+                  style="
+                    background: var(--color-background-secondary);
+                    padding: var(--space-4);
+                    border-bottom: 1px solid var(--color-border-light);
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                  "
+                >
+                  <div style="display: flex; align-items: center; gap: var(--space-3)">
+                    <div
+                      style="
+                        width: 32px;
+                        height: 32px;
+                        background: var(--color-primary);
+                        border-radius: var(--radius-sm);
+                      "
+                    ></div>
+                    <div>
+                      <h1 style="margin: 0; font-size: var(--text-heading-h4)">CATS Application</h1>
+                      <p
+                        style="
+                          margin: 0;
+                          font-size: var(--text-body-small);
+                          color: var(--color-text-secondary);
+                        "
+                      >
+                        Accessibility Testing System
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    style="
+                      background: none;
+                      border: none;
+                      font-size: var(--text-heading-h5);
+                      cursor: pointer;
+                      padding: var(--space-2);
+                    "
+                  >
+                    ☰
+                  </button>
+                </header>
+
+                <!-- Navigation -->
+                <nav
+                  id="demo-nav"
+                  style="
+                    background: linear-gradient(
+                      135deg,
+                      var(--color-primary) 0%,
+                      var(--color-primary-darker, #003d7a) 100%
+                    );
+                    padding: 0;
+                  "
+                >
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      justify-content: space-between;
+                      padding: 0 var(--space-4);
+                    "
+                  >
+                    <div style="display: flex; gap: 0">
+                      <a
+                        href="#"
+                        style="
+                          color: white;
+                          text-decoration: none;
+                          padding: var(--space-3) var(--space-4);
+                          border-bottom: 2px solid transparent;
+                          transition: all 0.2s;
+                        "
+                        >Dashboard</a
+                      >
+                      <a
+                        href="#"
+                        style="
+                          color: rgba(255, 255, 255, 0.9);
+                          text-decoration: none;
+                          padding: var(--space-3) var(--space-4);
+                          border-bottom: 2px solid rgba(255, 255, 255, 0.8);
+                          background: rgba(255, 255, 255, 0.05);
+                        "
+                        >Reports</a
+                      >
+                      <a
+                        href="#"
+                        style="
+                          color: rgba(255, 255, 255, 0.9);
+                          text-decoration: none;
+                          padding: var(--space-3) var(--space-4);
+                          border-bottom: 2px solid transparent;
+                          transition: all 0.2s;
+                        "
+                        >Settings</a
+                      >
+                    </div>
+                  </div>
                 </nav>
-                
-                <div id="demo-search-2" style="margin-bottom: var(--space-4);">
-                  <h3 style="margin: 0 0 var(--space-2) 0; font-size: var(--text-body-large);">Search</h3>
-                  <input type="search" placeholder="Search reports..." style="padding: var(--space-2); border: 1px solid var(--color-border-light); border-radius: var(--radius-sm); width: 200px;">
-                </div>
-                
-                <main id="demo-main-2">
-                  <h3 style="margin: 0 0 var(--space-2) 0; font-size: var(--text-body-large);">Main Content</h3>
-                  <p style="margin: 0; color: var(--color-text-secondary);">This is the main content area that users can skip to directly.</p>
-                </main>
-              </div>
-            </div>
-          </div>
-          
-          <div class="demo-code">
-&lt;!-- Enhanced skip links with multiple targets --&gt;
-&lt;div class="skip-links"&gt;
-  &lt;a href="#main-content" class="skip-links__link"&gt;Skip to main content&lt;/a&gt;
-  &lt;a href="#navigation" class="skip-links__link"&gt;Skip to navigation&lt;/a&gt;
-  &lt;a href="#search" class="skip-links__link"&gt;Skip to search&lt;/a&gt;
-  &lt;a href="#sidebar" class="skip-links__link"&gt;Skip to sidebar&lt;/a&gt;
-&lt;/div&gt;
 
-&lt;!-- Or single skip link (legacy) --&gt;
-&lt;a href="#main-content" class="skip-link"&gt;Skip to main content&lt;/a&gt;</div>
-        </div>
-        
-        <div class="component-demo">
-          <h2 class="demo-title">Semantic Landmarks Guide</h2>
-          <p class="demo-description">Proper use of HTML5 semantic elements for accessibility and SEO.</p>
-          
-          <div class="demo-example">
-            <div style="background: var(--color-background-secondary); padding: var(--space-6); border-radius: var(--radius-lg);">
-              <h3 style="color: var(--color-primary); margin-top: 0;">Semantic HTML5 Elements</h3>
-              
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-4);">
-                
-                <div style="background: var(--color-background-primary); padding: var(--space-4); border-radius: var(--radius-md); border-left: 4px solid var(--color-primary);">
-                  <h4 style="margin: 0 0 var(--space-2) 0; color: var(--color-primary);">&lt;header&gt;</h4>
-                  <p style="margin: 0; font-size: var(--text-body-small);">Contains site branding, main navigation, or section headings. Use <code>role="banner"</code> for page header.</p>
+                <!-- Breadcrumb -->
+                <nav
+                  style="
+                    background: var(--color-background-secondary);
+                    padding: var(--space-2) var(--space-4);
+                    border-bottom: 1px solid var(--color-border-light);
+                    font-size: var(--text-body-small);
+                  "
+                >
+                  <ol
+                    style="
+                      display: flex;
+                      align-items: center;
+                      list-style: none;
+                      margin: 0;
+                      padding: 0;
+                      color: var(--color-text-secondary);
+                    "
+                  >
+                    <li>
+                      <a href="#" style="color: var(--color-primary); text-decoration: none"
+                        >Dashboard</a
+                      >
+                    </li>
+                    <li style="margin: 0 var(--space-2); color: var(--color-text-muted)">›</li>
+                    <li>
+                      <a href="#" style="color: var(--color-primary); text-decoration: none"
+                        >Reports</a
+                      >
+                    </li>
+                    <li style="margin: 0 var(--space-2); color: var(--color-text-muted)">›</li>
+                    <li
+                      style="
+                        color: var(--color-text-primary);
+                        font-weight: var(--font-weight-medium);
+                      "
+                    >
+                      example.com Report
+                    </li>
+                  </ol>
+                </nav>
+
+                <!-- Main Content Area -->
+                <div style="display: flex; min-height: 300px">
+                  <!-- Main Content -->
+                  <main id="demo-main" style="flex: 1; padding: var(--space-4)">
+                    <section>
+                      <h2 style="margin: 0 0 var(--space-3) 0; font-size: var(--text-heading-h3)">
+                        Accessibility Report
+                      </h2>
+                      <p style="margin: 0 0 var(--space-4) 0; color: var(--color-text-secondary)">
+                        Comprehensive accessibility analysis results for your website.
+                      </p>
+
+                      <div
+                        style="
+                          display: grid;
+                          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                          gap: var(--space-4);
+                          margin-bottom: var(--space-4);
+                        "
+                      >
+                        <div class="card">
+                          <h3 style="margin: 0 0 var(--space-2) 0; color: var(--color-danger)">
+                            Critical Issues
+                          </h3>
+                          <div
+                            style="
+                              font-size: var(--text-heading-h2);
+                              font-weight: var(--font-weight-bold);
+                              color: var(--color-danger);
+                            "
+                          >
+                            3
+                          </div>
+                        </div>
+                        <div class="card">
+                          <h3 style="margin: 0 0 var(--space-2) 0; color: var(--color-warning)">
+                            Moderate Issues
+                          </h3>
+                          <div
+                            style="
+                              font-size: var(--text-heading-h2);
+                              font-weight: var(--font-weight-bold);
+                              color: var(--color-warning);
+                            "
+                          >
+                            7
+                          </div>
+                        </div>
+                        <div class="card">
+                          <h3 style="margin: 0 0 var(--space-2) 0; color: var(--color-success)">
+                            Passed Tests
+                          </h3>
+                          <div
+                            style="
+                              font-size: var(--text-heading-h2);
+                              font-weight: var(--font-weight-bold);
+                              color: var(--color-success);
+                            "
+                          >
+                            45
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+                  </main>
+
+                  <!-- Sidebar -->
+                  <aside
+                    style="
+                      width: 250px;
+                      background: var(--color-background-secondary);
+                      padding: var(--space-4);
+                      border-left: 1px solid var(--color-border-light);
+                    "
+                  >
+                    <h3 style="margin: 0 0 var(--space-3) 0; font-size: var(--text-heading-h5)">
+                      Report Details
+                    </h3>
+                    <div style="font-size: var(--text-body-small); line-height: 1.6">
+                      <p style="margin: 0 0 var(--space-2) 0">
+                        <strong>Domain:</strong> example.com
+                      </p>
+                      <p style="margin: 0 0 var(--space-2) 0">
+                        <strong>Generated:</strong> Sept 17, 2025
+                      </p>
+                      <p style="margin: 0 0 var(--space-2) 0">
+                        <strong>Standard:</strong> WCAG 2.1 AA
+                      </p>
+                      <p style="margin: 0 0 var(--space-4) 0"><strong>Pages:</strong> 12 scanned</p>
+
+                      <h4 style="margin: 0 0 var(--space-2) 0; font-size: var(--text-body-large)">
+                        Quick Actions
+                      </h4>
+                      <div style="display: flex; flex-direction: column; gap: var(--space-2)">
+                        <button class="btn btn-primary" style="font-size: var(--text-body-small)">
+                          Download PDF
+                        </button>
+                        <button class="btn btn-secondary" style="font-size: var(--text-body-small)">
+                          Export JSON
+                        </button>
+                      </div>
+                    </div>
+                  </aside>
                 </div>
-                
-                <div style="background: var(--color-background-primary); padding: var(--space-4); border-radius: var(--radius-md); border-left: 4px solid var(--color-success);">
-                  <h4 style="margin: 0 0 var(--space-2) 0; color: var(--color-success);">&lt;nav&gt;</h4>
-                  <p style="margin: 0; font-size: var(--text-body-small);">Navigation links. Always include <code>aria-label</code> to distinguish multiple navs. Use <code>role="navigation"</code>.</p>
-                </div>
-                
-                <div style="background: var(--color-background-primary); padding: var(--space-4); border-radius: var(--radius-md); border-left: 4px solid var(--color-info);">
-                  <h4 style="margin: 0 0 var(--space-2) 0; color: var(--color-info);">&lt;main&gt;</h4>
-                  <p style="margin: 0; font-size: var(--text-body-small);">Primary content of the page. Only one per page. Must have unique content. Skip link target.</p>
-                </div>
-                
-                <div style="background: var(--color-background-primary); padding: var(--space-4); border-radius: var(--radius-md); border-left: 4px solid var(--color-warning);">
-                  <h4 style="margin: 0 0 var(--space-2) 0; color: var(--color-warning);">&lt;section&gt;</h4>
-                  <p style="margin: 0; font-size: var(--text-body-small);">Thematic groupings of content. Should have a heading. Use <code>aria-labelledby</code> to reference heading.</p>
-                </div>
-                
-                <div style="background: var(--color-background-primary); padding: var(--space-4); border-radius: var(--radius-md); border-left: 4px solid var(--color-secondary);">
-                  <h4 style="margin: 0 0 var(--space-2) 0; color: var(--color-secondary);">&lt;aside&gt;</h4>
-                  <p style="margin: 0; font-size: var(--text-body-small);">Sidebar content related to main content. Can contain navigation, ads, or supplementary info.</p>
-                </div>
-                
-                <div style="background: var(--color-background-primary); padding: var(--space-4); border-radius: var(--radius-md); border-left: 4px solid var(--color-muted);">
-                  <h4 style="margin: 0 0 var(--space-2) 0; color: var(--color-muted);">&lt;footer&gt;</h4>
-                  <p style="margin: 0; font-size: var(--text-body-small);">Page or section footer. Contains copyright, links, contact info. Use <code>role="contentinfo"</code> for page footer.</p>
-                </div>
-                
+
+                <!-- Footer -->
+                <footer
+                  style="
+                    background: var(--color-background-secondary);
+                    padding: var(--space-4);
+                    border-top: 1px solid var(--color-border-light);
+                    margin-top: auto;
+                  "
+                >
+                  <div
+                    style="
+                      display: grid;
+                      grid-template-columns: 1fr 1fr;
+                      gap: var(--space-6);
+                      margin-bottom: var(--space-4);
+                    "
+                  >
+                    <div>
+                      <h4 style="margin: 0 0 var(--space-2) 0; font-size: var(--text-body-large)">
+                        About CATS
+                      </h4>
+                      <p
+                        style="
+                          margin: 0;
+                          font-size: var(--text-body-small);
+                          color: var(--color-text-secondary);
+                        "
+                      >
+                        Automated accessibility testing system for WCAG compliance.
+                      </p>
+                    </div>
+                    <div>
+                      <h4 style="margin: 0 0 var(--space-2) 0; font-size: var(--text-body-large)">
+                        Support
+                      </h4>
+                      <p style="margin: 0; font-size: var(--text-body-small)">
+                        <a href="#" style="color: var(--color-primary); text-decoration: none"
+                          >Documentation</a
+                        >
+                        •
+                        <a href="#" style="color: var(--color-primary); text-decoration: none"
+                          >Help</a
+                        >
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    style="
+                      border-top: 1px solid var(--color-border-light);
+                      padding-top: var(--space-3);
+                      text-align: center;
+                      color: var(--color-text-muted);
+                      font-size: var(--text-body-small);
+                    "
+                  >
+                    © 2025 CATS Accessibility Testing System
+                  </div>
+                </footer>
               </div>
-              
-              <div style="margin-top: var(--space-6); padding: var(--space-4); background: var(--color-info); color: white; border-radius: var(--radius-md);">
-                <h4 style="margin: 0 0 var(--space-2) 0;">💡 Accessibility Tip</h4>
-                <p style="margin: 0; font-size: var(--text-body-small);">Screen readers use these landmarks to navigate quickly through page content. Users can jump between landmarks using keyboard shortcuts, making proper semantic structure essential for accessibility.</p>
+            </div>
+
+            <div class="demo-code">
+              &lt;!-- Complete semantic page structure --&gt; &lt;div class="page-container"&gt;
+              &lt;!-- Skip Links --&gt; &lt;div class="skip-links"&gt; &lt;a href="#main-content"
+              class="skip-links__link"&gt;Skip to main content&lt;/a&gt; &lt;a href="#nav-main"
+              class="skip-links__link"&gt;Skip to navigation&lt;/a&gt; &lt;a href="#sidebar"
+              class="skip-links__link"&gt;Skip to sidebar&lt;/a&gt; &lt;/div&gt; &lt;!-- Header
+              --&gt; &lt;header class="page-header"&gt; &lt;div class="header-container"&gt; &lt;a
+              href="/" class="page-header__brand"&gt; &lt;img src="logo.svg" alt="CATS"
+              class="page-header__logo"&gt; &lt;div&gt; &lt;h1
+              class="page-header__title"&gt;CATS&lt;/h1&gt; &lt;p
+              class="page-header__subtitle"&gt;Accessibility Testing&lt;/p&gt; &lt;/div&gt;
+              &lt;/a&gt; &lt;/div&gt; &lt;/header&gt; &lt;!-- Main Navigation --&gt; &lt;nav
+              id="nav-main" class="page-nav" role="navigation" aria-label="Main navigation"&gt;
+              &lt;div class="page-nav__container"&gt; &lt;ul class="page-nav__links"&gt;
+              &lt;li&gt;&lt;a href="/" class="page-nav__link"&gt;Dashboard&lt;/a&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;a href="/reports" class="page-nav__link
+              page-nav__link--active"&gt;Reports&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a
+              href="/settings" class="page-nav__link"&gt;Settings&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt;
+              &lt;/div&gt; &lt;/nav&gt; &lt;!-- Breadcrumb Navigation --&gt; &lt;nav
+              class="breadcrumb-nav" aria-label="Breadcrumb"&gt; &lt;div
+              class="breadcrumb-nav__container"&gt; &lt;ol class="breadcrumb-nav__list"&gt;
+              &lt;li&gt;&lt;a href="/"&gt;Dashboard&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a
+              href="/reports"&gt;Reports&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;span
+              class="current"&gt;example.com Report&lt;/span&gt;&lt;/li&gt; &lt;/ol&gt; &lt;/div&gt;
+              &lt;/nav&gt; &lt;!-- Main Content Area --&gt; &lt;main id="main-content"
+              class="page-main page-main--with-sidebar"&gt; &lt;div class="page-main__container"&gt;
+              &lt;div class="page-main__content"&gt; &lt;section class="content-section"&gt;
+              &lt;header class="content-section__header"&gt; &lt;h2
+              class="content-section__title"&gt;Accessibility Report&lt;/h2&gt; &lt;p
+              class="content-section__description"&gt;Analysis results&lt;/p&gt; &lt;/header&gt;
+              &lt;!-- Main content --&gt; &lt;/section&gt; &lt;/div&gt; &lt;!-- Sidebar --&gt;
+              &lt;aside id="sidebar" class="page-aside"&gt; &lt;h3
+              class="page-aside__title"&gt;Report Details&lt;/h3&gt; &lt;div
+              class="page-aside__content"&gt; &lt;!-- Sidebar content --&gt; &lt;/div&gt;
+              &lt;/aside&gt; &lt;/div&gt; &lt;/main&gt; &lt;!-- Footer --&gt; &lt;footer
+              class="page-footer"&gt; &lt;div class="page-footer__container"&gt; &lt;div
+              class="page-footer__content"&gt; &lt;!-- Footer content --&gt; &lt;/div&gt; &lt;div
+              class="page-footer__bottom"&gt; &lt;p&gt;© 2025 CATS Accessibility Testing
+              System&lt;/p&gt; &lt;/div&gt; &lt;/div&gt; &lt;/footer&gt; &lt;/div&gt;
+            </div>
+          </div>
+
+          <div class="component-demo">
+            <h2 class="demo-title">Skip Links Component</h2>
+            <p class="demo-description">
+              Enhanced skip links that provide multiple navigation options for screen reader users.
+            </p>
+
+            <div class="demo-example">
+              <div
+                style="
+                  border: 2px solid var(--color-border-light);
+                  border-radius: var(--radius-lg);
+                  padding: var(--space-4);
+                  position: relative;
+                  background: var(--color-background-secondary);
+                "
+              >
+                <p
+                  style="
+                    margin: 0 0 var(--space-3) 0;
+                    color: var(--color-text-secondary);
+                    font-size: var(--text-body-small);
+                  "
+                >
+                  <strong>Tab through this area to see skip links appear:</strong>
+                </p>
+
+                <!-- Multiple Skip Links -->
+                <div style="position: relative">
+                  <a
+                    href="#demo-main-2"
+                    style="
+                      position: absolute;
+                      top: -100px;
+                      left: 0;
+                      background: var(--color-primary);
+                      color: white;
+                      padding: var(--space-2) var(--space-4);
+                      border-radius: var(--radius-sm);
+                      text-decoration: none;
+                      font-weight: var(--font-weight-medium);
+                      box-shadow: var(--shadow-lg);
+                      transition: top 0.2s;
+                    "
+                    onfocus="this.style.position='static'; this.style.top='0';"
+                    onblur="this.style.position='absolute'; this.style.top='-100px';"
+                    >Skip to main content</a
+                  >
+                  <a
+                    href="#demo-nav-2"
+                    style="
+                      position: absolute;
+                      top: -100px;
+                      left: 0;
+                      background: var(--color-primary);
+                      color: white;
+                      padding: var(--space-2) var(--space-4);
+                      border-radius: var(--radius-sm);
+                      text-decoration: none;
+                      font-weight: var(--font-weight-medium);
+                      box-shadow: var(--shadow-lg);
+                      transition: top 0.2s;
+                      margin-top: calc(var(--space-2) + 36px);
+                    "
+                    onfocus="this.style.position='static'; this.style.top='0';"
+                    onblur="this.style.position='absolute'; this.style.top='-100px';"
+                    >Skip to navigation</a
+                  >
+                  <a
+                    href="#demo-search-2"
+                    style="
+                      position: absolute;
+                      top: -100px;
+                      left: 0;
+                      background: var(--color-primary);
+                      color: white;
+                      padding: var(--space-2) var(--space-4);
+                      border-radius: var(--radius-sm);
+                      text-decoration: none;
+                      font-weight: var(--font-weight-medium);
+                      box-shadow: var(--shadow-lg);
+                      transition: top 0.2s;
+                      margin-top: calc(var(--space-2) + 72px);
+                    "
+                    onfocus="this.style.position='static'; this.style.top='0';"
+                    onblur="this.style.position='absolute'; this.style.top='-100px';"
+                    >Skip to search</a
+                  >
+                </div>
+
+                <div
+                  style="
+                    margin-top: var(--space-4);
+                    padding: var(--space-3);
+                    background: var(--color-background-primary);
+                    border-radius: var(--radius-md);
+                  "
+                >
+                  <nav id="demo-nav-2" style="margin-bottom: var(--space-4)">
+                    <h3 style="margin: 0 0 var(--space-2) 0; font-size: var(--text-body-large)">
+                      Navigation
+                    </h3>
+                    <a href="#" style="color: var(--color-primary); margin-right: var(--space-3)"
+                      >Dashboard</a
+                    >
+                    <a href="#" style="color: var(--color-primary); margin-right: var(--space-3)"
+                      >Reports</a
+                    >
+                    <a href="#" style="color: var(--color-primary)">Settings</a>
+                  </nav>
+
+                  <div id="demo-search-2" style="margin-bottom: var(--space-4)">
+                    <h3 style="margin: 0 0 var(--space-2) 0; font-size: var(--text-body-large)">
+                      Search
+                    </h3>
+                    <input
+                      type="search"
+                      placeholder="Search reports..."
+                      style="
+                        padding: var(--space-2);
+                        border: 1px solid var(--color-border-light);
+                        border-radius: var(--radius-sm);
+                        width: 200px;
+                      "
+                    />
+                  </div>
+
+                  <main id="demo-main-2">
+                    <h3 style="margin: 0 0 var(--space-2) 0; font-size: var(--text-body-large)">
+                      Main Content
+                    </h3>
+                    <p style="margin: 0; color: var(--color-text-secondary)">
+                      This is the main content area that users can skip to directly.
+                    </p>
+                  </main>
+                </div>
+              </div>
+            </div>
+
+            <div class="demo-code">
+              &lt;!-- Enhanced skip links with multiple targets --&gt; &lt;div
+              class="skip-links"&gt; &lt;a href="#main-content" class="skip-links__link"&gt;Skip to
+              main content&lt;/a&gt; &lt;a href="#navigation" class="skip-links__link"&gt;Skip to
+              navigation&lt;/a&gt; &lt;a href="#search" class="skip-links__link"&gt;Skip to
+              search&lt;/a&gt; &lt;a href="#sidebar" class="skip-links__link"&gt;Skip to
+              sidebar&lt;/a&gt; &lt;/div&gt; &lt;!-- Or single skip link (legacy) --&gt; &lt;a
+              href="#main-content" class="skip-link"&gt;Skip to main content&lt;/a&gt;
+            </div>
+          </div>
+
+          <div class="component-demo">
+            <h2 class="demo-title">Semantic Landmarks Guide</h2>
+            <p class="demo-description">
+              Proper use of HTML5 semantic elements for accessibility and SEO.
+            </p>
+
+            <div class="demo-example">
+              <div
+                style="
+                  background: var(--color-background-secondary);
+                  padding: var(--space-6);
+                  border-radius: var(--radius-lg);
+                "
+              >
+                <h3 style="color: var(--color-primary); margin-top: 0">Semantic HTML5 Elements</h3>
+
+                <div
+                  style="
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                    gap: var(--space-4);
+                  "
+                >
+                  <div
+                    style="
+                      background: var(--color-background-primary);
+                      padding: var(--space-4);
+                      border-radius: var(--radius-md);
+                      border-left: 4px solid var(--color-primary);
+                    "
+                  >
+                    <h4 style="margin: 0 0 var(--space-2) 0; color: var(--color-primary)">
+                      &lt;header&gt;
+                    </h4>
+                    <p style="margin: 0; font-size: var(--text-body-small)">
+                      Contains site branding, main navigation, or section headings. Use
+                      <code>role="banner"</code> for page header.
+                    </p>
+                  </div>
+
+                  <div
+                    style="
+                      background: var(--color-background-primary);
+                      padding: var(--space-4);
+                      border-radius: var(--radius-md);
+                      border-left: 4px solid var(--color-success);
+                    "
+                  >
+                    <h4 style="margin: 0 0 var(--space-2) 0; color: var(--color-success)">
+                      &lt;nav&gt;
+                    </h4>
+                    <p style="margin: 0; font-size: var(--text-body-small)">
+                      Navigation links. Always include <code>aria-label</code> to distinguish
+                      multiple navs. Use <code>role="navigation"</code>.
+                    </p>
+                  </div>
+
+                  <div
+                    style="
+                      background: var(--color-background-primary);
+                      padding: var(--space-4);
+                      border-radius: var(--radius-md);
+                      border-left: 4px solid var(--color-info);
+                    "
+                  >
+                    <h4 style="margin: 0 0 var(--space-2) 0; color: var(--color-info)">
+                      &lt;main&gt;
+                    </h4>
+                    <p style="margin: 0; font-size: var(--text-body-small)">
+                      Primary content of the page. Only one per page. Must have unique content. Skip
+                      link target.
+                    </p>
+                  </div>
+
+                  <div
+                    style="
+                      background: var(--color-background-primary);
+                      padding: var(--space-4);
+                      border-radius: var(--radius-md);
+                      border-left: 4px solid var(--color-warning);
+                    "
+                  >
+                    <h4 style="margin: 0 0 var(--space-2) 0; color: var(--color-warning)">
+                      &lt;section&gt;
+                    </h4>
+                    <p style="margin: 0; font-size: var(--text-body-small)">
+                      Thematic groupings of content. Should have a heading. Use
+                      <code>aria-labelledby</code> to reference heading.
+                    </p>
+                  </div>
+
+                  <div
+                    style="
+                      background: var(--color-background-primary);
+                      padding: var(--space-4);
+                      border-radius: var(--radius-md);
+                      border-left: 4px solid var(--color-secondary);
+                    "
+                  >
+                    <h4 style="margin: 0 0 var(--space-2) 0; color: var(--color-secondary)">
+                      &lt;aside&gt;
+                    </h4>
+                    <p style="margin: 0; font-size: var(--text-body-small)">
+                      Sidebar content related to main content. Can contain navigation, ads, or
+                      supplementary info.
+                    </p>
+                  </div>
+
+                  <div
+                    style="
+                      background: var(--color-background-primary);
+                      padding: var(--space-4);
+                      border-radius: var(--radius-md);
+                      border-left: 4px solid var(--color-muted);
+                    "
+                  >
+                    <h4 style="margin: 0 0 var(--space-2) 0; color: var(--color-muted)">
+                      &lt;footer&gt;
+                    </h4>
+                    <p style="margin: 0; font-size: var(--text-body-small)">
+                      Page or section footer. Contains copyright, links, contact info. Use
+                      <code>role="contentinfo"</code> for page footer.
+                    </p>
+                  </div>
+                </div>
+
+                <div
+                  style="
+                    margin-top: var(--space-6);
+                    padding: var(--space-4);
+                    background: var(--color-info);
+                    color: white;
+                    border-radius: var(--radius-md);
+                  "
+                >
+                  <h4 style="margin: 0 0 var(--space-2) 0">💡 Accessibility Tip</h4>
+                  <p style="margin: 0; font-size: var(--text-body-small)">
+                    Screen readers use these landmarks to navigate quickly through page content.
+                    Users can jump between landmarks using keyboard shortcuts, making proper
+                    semantic structure essential for accessibility.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
-      
-      <!-- Usage Section -->
-      <section id="usage" class="section">
-        <div class="section-header">
-          <h1 class="section-title">Usage Guidelines</h1>
-          <p class="section-description">
-            Best practices for implementing and customizing the design system in your projects.
-          </p>
-        </div>
-        
-        <div class="component-demo">
-          <h2 class="demo-title">Getting Started</h2>
-          <div class="demo-example">
-            <div style="background: var(--color-background-secondary); padding: var(--space-6); border-radius: var(--radius-lg);">
-              <h3 style="color: var(--color-primary); margin-top: 0;">1. Include the Design System</h3>
-              <p>Add the design system CSS to your project:</p>
-              <div style="background: var(--color-dark); color: var(--color-light); padding: var(--space-3); border-radius: var(--radius-md); font-family: var(--font-family-code); margin: var(--space-3) 0;">
-&lt;link rel="stylesheet" href="path/to/design-system.css"&gt;
+        </section>
+
+        <!-- Usage Section -->
+        <section id="usage" class="section">
+          <div class="section-header">
+            <h1 class="section-title">Usage Guidelines</h1>
+            <p class="section-description">
+              Best practices for implementing and customizing the design system in your projects.
+            </p>
+          </div>
+
+          <div class="component-demo">
+            <h2 class="demo-title">Getting Started</h2>
+            <div class="demo-example">
+              <div
+                style="
+                  background: var(--color-background-secondary);
+                  padding: var(--space-6);
+                  border-radius: var(--radius-lg);
+                "
+              >
+                <h3 style="color: var(--color-primary); margin-top: 0">
+                  1. Include the Design System
+                </h3>
+                <p>Add the design system CSS to your project:</p>
+                <div
+                  style="
+                    background: var(--color-dark);
+                    color: var(--color-light);
+                    padding: var(--space-3);
+                    border-radius: var(--radius-md);
+                    font-family: var(--font-family-code);
+                    margin: var(--space-3) 0;
+                  "
+                >
+                  &lt;link rel="stylesheet" href="path/to/design-system.css"&gt;
+                </div>
+
+                <h3 style="color: var(--color-primary)">2. Use Semantic HTML</h3>
+                <p>Start with proper HTML structure and add design system classes:</p>
+                <div
+                  style="
+                    background: var(--color-dark);
+                    color: var(--color-light);
+                    padding: var(--space-3);
+                    border-radius: var(--radius-md);
+                    font-family: var(--font-family-code);
+                    margin: var(--space-3) 0;
+                  "
+                >
+                  &lt;button class="btn btn-primary"&gt;Action&lt;/button&gt; &lt;div
+                  class="card"&gt;...&lt;/div&gt;
+                </div>
+
+                <h3 style="color: var(--color-primary)">3. Follow Accessibility Guidelines</h3>
+                <p>
+                  Always include proper labels, alt text, and ARIA attributes for accessibility.
+                </p>
               </div>
-              
-              <h3 style="color: var(--color-primary);">2. Use Semantic HTML</h3>
-              <p>Start with proper HTML structure and add design system classes:</p>
-              <div style="background: var(--color-dark); color: var(--color-light); padding: var(--space-3); border-radius: var(--radius-md); font-family: var(--font-family-code); margin: var(--space-3) 0;">
-&lt;button class="btn btn-primary"&gt;Action&lt;/button&gt;
-&lt;div class="card"&gt;...&lt;/div&gt;
-              </div>
-              
-              <h3 style="color: var(--color-primary);">3. Follow Accessibility Guidelines</h3>
-              <p>Always include proper labels, alt text, and ARIA attributes for accessibility.</p>
             </div>
           </div>
-        </div>
-        
-        <div class="component-demo">
-          <h2 class="demo-title">Customization</h2>
-          <div class="demo-example">
-            <div style="background: var(--color-background-secondary); padding: var(--space-6); border-radius: var(--radius-lg);">
-              <h3 style="color: var(--color-success); margin-top: 0;">CSS Custom Properties</h3>
-              <p>Override design tokens using CSS custom properties:</p>
-              <div style="background: var(--color-dark); color: var(--color-light); padding: var(--space-3); border-radius: var(--radius-md); font-family: var(--font-family-code); margin: var(--space-3) 0;">
-:root {
-  --color-primary: #your-brand-color;
-  --font-family-primary: 'Your Font', sans-serif;
-  --space-4: 1.5rem; /* Adjust spacing */
-}
-              </div>
-              
-              <h3 style="color: var(--color-success);">Component Extensions</h3>
-              <p>Extend existing components with additional styles:</p>
-              <div style="background: var(--color-dark); color: var(--color-light); padding: var(--space-3); border-radius: var(--radius-md); font-family: var(--font-family-code); margin: var(--space-3) 0;">
-.btn-custom {
-  @extend .btn;
-  @extend .btn-primary;
-  border-radius: 2rem; /* Custom styling */
-}
+
+          <div class="component-demo">
+            <h2 class="demo-title">Customization</h2>
+            <div class="demo-example">
+              <div
+                style="
+                  background: var(--color-background-secondary);
+                  padding: var(--space-6);
+                  border-radius: var(--radius-lg);
+                "
+              >
+                <h3 style="color: var(--color-success); margin-top: 0">CSS Custom Properties</h3>
+                <p>Override design tokens using CSS custom properties:</p>
+                <div
+                  style="
+                    background: var(--color-dark);
+                    color: var(--color-light);
+                    padding: var(--space-3);
+                    border-radius: var(--radius-md);
+                    font-family: var(--font-family-code);
+                    margin: var(--space-3) 0;
+                  "
+                >
+                  :root { --color-primary: #your-brand-color; --font-family-primary: 'Your Font',
+                  sans-serif; --space-4: 1.5rem; /* Adjust spacing */ }
+                </div>
+
+                <h3 style="color: var(--color-success)">Component Extensions</h3>
+                <p>Extend existing components with additional styles:</p>
+                <div
+                  style="
+                    background: var(--color-dark);
+                    color: var(--color-light);
+                    padding: var(--space-3);
+                    border-radius: var(--radius-md);
+                    font-family: var(--font-family-code);
+                    margin: var(--space-3) 0;
+                  "
+                >
+                  .btn-custom { @extend .btn; @extend .btn-primary; border-radius: 2rem; /* Custom
+                  styling */ }
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        
-        <div class="component-demo">
-          <h2 class="demo-title">Do's and Don'ts</h2>
-          <div class="demo-example">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6);">
-              
-              <div style="background: rgba(var(--color-success-rgb, 32, 134, 54), 0.1); padding: var(--space-4); border-radius: var(--radius-lg); border-left: 4px solid var(--color-success);">
-                <h4 style="color: var(--color-success); margin-top: 0;">✅ Do</h4>
-                <ul style="margin: 0; padding-left: var(--space-4);">
-                  <li>Use semantic HTML elements</li>
-                  <li>Include proper ARIA labels</li>
-                  <li>Test with keyboard navigation</li>
-                  <li>Check color contrast ratios</li>
-                  <li>Use consistent spacing tokens</li>
-                  <li>Follow the established color hierarchy</li>
+
+          <div class="component-demo">
+            <h2 class="demo-title">Do's and Don'ts</h2>
+            <div class="demo-example">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6)">
+                <div
+                  style="
+                    background: rgba(var(--color-success-rgb, 32, 134, 54), 0.1);
+                    padding: var(--space-4);
+                    border-radius: var(--radius-lg);
+                    border-left: 4px solid var(--color-success);
+                  "
+                >
+                  <h4 style="color: var(--color-success); margin-top: 0">✅ Do</h4>
+                  <ul style="margin: 0; padding-left: var(--space-4)">
+                    <li>Use semantic HTML elements</li>
+                    <li>Include proper ARIA labels</li>
+                    <li>Test with keyboard navigation</li>
+                    <li>Check color contrast ratios</li>
+                    <li>Use consistent spacing tokens</li>
+                    <li>Follow the established color hierarchy</li>
+                  </ul>
+                </div>
+
+                <div
+                  style="
+                    background: rgba(var(--color-danger-rgb, 220, 53, 69), 0.1);
+                    padding: var(--space-4);
+                    border-radius: var(--radius-lg);
+                    border-left: 4px solid var(--color-danger);
+                  "
+                >
+                  <h4 style="color: var(--color-danger); margin-top: 0">❌ Don't</h4>
+                  <ul style="margin: 0; padding-left: var(--space-4)">
+                    <li>Override component styles arbitrarily</li>
+                    <li>Use non-semantic div/span for buttons</li>
+                    <li>Ignore focus indicators</li>
+                    <li>Use color alone to convey meaning</li>
+                    <li>Create inconsistent spacing</li>
+                    <li>Break the established visual hierarchy</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="component-demo">
+            <h2 class="demo-title">Browser Support</h2>
+            <div class="demo-example">
+              <div
+                style="
+                  background: var(--color-background-secondary);
+                  padding: var(--space-6);
+                  border-radius: var(--radius-lg);
+                "
+              >
+                <p><strong>Modern browsers with CSS Grid and Custom Properties support:</strong></p>
+                <ul style="line-height: 1.8">
+                  <li>Chrome 88+ ✅</li>
+                  <li>Firefox 85+ ✅</li>
+                  <li>Safari 14+ ✅</li>
+                  <li>Edge 88+ ✅</li>
+                </ul>
+
+                <p style="margin-top: var(--space-4)"><strong>Features used:</strong></p>
+                <ul style="line-height: 1.8">
+                  <li>CSS Custom Properties (CSS Variables)</li>
+                  <li>CSS Grid Layout</li>
+                  <li>Flexbox</li>
+                  <li>:focus-visible pseudo-class</li>
                 </ul>
               </div>
-              
-              <div style="background: rgba(var(--color-danger-rgb, 220, 53, 69), 0.1); padding: var(--space-4); border-radius: var(--radius-lg); border-left: 4px solid var(--color-danger);">
-                <h4 style="color: var(--color-danger); margin-top: 0;">❌ Don't</h4>
-                <ul style="margin: 0; padding-left: var(--space-4);">
-                  <li>Override component styles arbitrarily</li>
-                  <li>Use non-semantic div/span for buttons</li>
-                  <li>Ignore focus indicators</li>
-                  <li>Use color alone to convey meaning</li>
-                  <li>Create inconsistent spacing</li>
-                  <li>Break the established visual hierarchy</li>
-                </ul>
-              </div>
-              
             </div>
           </div>
-        </div>
-        
-        <div class="component-demo">
-          <h2 class="demo-title">Browser Support</h2>
-          <div class="demo-example">
-            <div style="background: var(--color-background-secondary); padding: var(--space-6); border-radius: var(--radius-lg);">
-              <p><strong>Modern browsers with CSS Grid and Custom Properties support:</strong></p>
-              <ul style="line-height: 1.8;">
-                <li>Chrome 88+ ✅</li>
-                <li>Firefox 85+ ✅</li>
-                <li>Safari 14+ ✅</li>
-                <li>Edge 88+ ✅</li>
-              </ul>
-              
-              <p style="margin-top: var(--space-4);"><strong>Features used:</strong></p>
-              <ul style="line-height: 1.8;">
-                <li>CSS Custom Properties (CSS Variables)</li>
-                <li>CSS Grid Layout</li>
-                <li>Flexbox</li>
-                <li>:focus-visible pseudo-class</li>
+        </section>
+
+        <!-- Accessibility Section -->
+        <section id="accessibility" class="section">
+          <div class="section-header">
+            <h1 class="section-title">Accessibility Guidelines</h1>
+            <p class="section-description">
+              Our design system is built with accessibility as a core principle, meeting WCAG 2.1 AA
+              standards.
+            </p>
+          </div>
+
+          <div class="component-demo">
+            <h2 class="demo-title">Key Features</h2>
+            <div class="demo-example">
+              <ul style="max-width: 600px; line-height: 1.8">
+                <li>
+                  <strong>Color Contrast:</strong> All text combinations meet WCAG 2.1 AA contrast
+                  requirements (4.5:1 minimum)
+                </li>
+                <li>
+                  <strong>Keyboard Navigation:</strong> All interactive elements are keyboard
+                  accessible with visible focus indicators
+                </li>
+                <li>
+                  <strong>Screen Reader Support:</strong> Semantic HTML and proper ARIA attributes
+                  for assistive technologies
+                </li>
+                <li>
+                  <strong>Responsive Design:</strong> Mobile-friendly layouts that work across all
+                  device sizes
+                </li>
+                <li>
+                  <strong>Clear Visual Hierarchy:</strong> Consistent heading structure and logical
+                  reading order
+                </li>
               </ul>
             </div>
           </div>
-        </div>
-      </section>
-      
-      <!-- Accessibility Section -->
-      <section id="accessibility" class="section">
-        <div class="section-header">
-          <h1 class="section-title">Accessibility Guidelines</h1>
-          <p class="section-description">
-            Our design system is built with accessibility as a core principle, meeting WCAG 2.1 AA standards.
-          </p>
-        </div>
-        
-        <div class="component-demo">
-          <h2 class="demo-title">Key Features</h2>
-          <div class="demo-example">
-            <ul style="max-width: 600px; line-height: 1.8;">
-              <li><strong>Color Contrast:</strong> All text combinations meet WCAG 2.1 AA contrast requirements (4.5:1 minimum)</li>
-              <li><strong>Keyboard Navigation:</strong> All interactive elements are keyboard accessible with visible focus indicators</li>
-              <li><strong>Screen Reader Support:</strong> Semantic HTML and proper ARIA attributes for assistive technologies</li>
-              <li><strong>Responsive Design:</strong> Mobile-friendly layouts that work across all device sizes</li>
-              <li><strong>Clear Visual Hierarchy:</strong> Consistent heading structure and logical reading order</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-      
-    </main>
-  </div>
-  
-  <!-- Simple JavaScript for navigation -->
-  <script>
-    // Smooth scrolling for navigation links
-    document.querySelectorAll('.nav-link').forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        // Remove active class from all links
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        
-        // Add active class to clicked link
-        this.classList.add('active');
-        
-        // Scroll to target
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        </section>
+      </main>
+    </div>
+
+    <!-- Simple JavaScript for navigation -->
+    <script>
+      // Smooth scrolling for navigation links
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+
+          // Remove active class from all links
+          document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+
+          // Add active class to clicked link
+          this.classList.add('active');
+
+          // Scroll to target
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
       });
-    });
-    
-    // Update active nav link on scroll
-    const sections = document.querySelectorAll('section[id]');
-    const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
-    
-    function updateActiveNav() {
-      let current = '';
-      
-      sections.forEach(section => {
-        const rect = section.getBoundingClientRect();
-        if (rect.top <= 100 && rect.bottom >= 100) {
-          current = section.getAttribute('id');
-        }
-      });
-      
-      navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === `#${current}`) {
-          link.classList.add('active');
-        }
-      });
-    }
-    
-    window.addEventListener('scroll', updateActiveNav);
-    updateActiveNav(); // Initial call
-    
-    // Accordion functionality
-    function toggleAccordion(button) {
-      const content = button.nextElementSibling;
-      const icon = button.querySelector('span:last-child');
-      const isExpanded = content.style.display !== 'none';
-      
-      if (isExpanded) {
-        content.style.display = 'none';
-        icon.style.transform = 'rotate(0deg)';
-        button.setAttribute('aria-expanded', 'false');
-      } else {
-        content.style.display = 'block';
-        icon.style.transform = 'rotate(180deg)';
-        button.setAttribute('aria-expanded', 'true');
+
+      // Update active nav link on scroll
+      const sections = document.querySelectorAll('section[id]');
+      const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
+
+      function updateActiveNav() {
+        let current = '';
+
+        sections.forEach(section => {
+          const rect = section.getBoundingClientRect();
+          if (rect.top <= 100 && rect.bottom >= 100) {
+            current = section.getAttribute('id');
+          }
+        });
+
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === `#${current}`) {
+            link.classList.add('active');
+          }
+        });
       }
-    }
-    
-    // Make toggleAccordion globally available
-    window.toggleAccordion = toggleAccordion;
-  </script>
-</body>
+
+      window.addEventListener('scroll', updateActiveNav);
+      updateActiveNav(); // Initial call
+
+      // Accordion functionality
+      function toggleAccordion(button) {
+        const content = button.nextElementSibling;
+        const icon = button.querySelector('span:last-child');
+        const isExpanded = content.style.display !== 'none';
+
+        if (isExpanded) {
+          content.style.display = 'none';
+          icon.style.transform = 'rotate(0deg)';
+          button.setAttribute('aria-expanded', 'false');
+        } else {
+          content.style.display = 'block';
+          icon.style.transform = 'rotate(180deg)';
+          button.setAttribute('aria-expanded', 'true');
+        }
+      }
+
+      // Make toggleAccordion globally available
+      window.toggleAccordion = toggleAccordion;
+    </script>
+  </body>
 </html>

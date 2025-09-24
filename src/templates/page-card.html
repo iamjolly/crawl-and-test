@@ -1,22 +1,22 @@
 <div class="accordion-item">
-    <button class="accordion-header" 
-            type="button"
-            aria-expanded="false" 
-            aria-controls="{{contentId}}"
-            id="{{headerId}}"
-            onclick="toggleAccordion('{{contentId}}', '{{headerId}}')">
-        <div class="page-summary">
-            <div>
-                <h3 class="page-title">{{pageTitle}}</h3>
-                <div class="page-url">{{pageUrl}}</div>
-            </div>
-            <div class="page-stats">
-                {{pageStats}}
-            </div>
-        </div>
-        <span class="accordion-toggle" aria-hidden="true">▶</span>
-    </button>
-    <div class="accordion-content" id="{{contentId}}" aria-labelledby="{{headerId}}">
-        {{pageContent}}
+  <button
+    class="accordion-header"
+    type="button"
+    aria-expanded="false"
+    aria-controls="{{contentId}}"
+    id="{{headerId}}"
+    onclick="toggleAccordion('{{contentId}}', '{{headerId}}')"
+  >
+    <div class="page-summary">
+      <div>
+        <h3 class="page-title">{{pageTitle}}</h3>
+        <div class="page-url">{{pageUrl}}</div>
+      </div>
+      <div class="page-stats">{{pageStats}}</div>
     </div>
+    <span class="accordion-toggle" aria-hidden="true">▶</span>
+  </button>
+  <div class="accordion-content" id="{{contentId}}" aria-labelledby="{{headerId}}">
+    {{pageContent}}
+  </div>
 </div>

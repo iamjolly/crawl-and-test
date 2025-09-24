@@ -1,5 +1,4 @@
 #!/usr/bin/env node
- 
 
 const fs = require('fs/promises');
 const path = require('path');
@@ -101,45 +100,45 @@ function buildAxeTags(wcagVersion, wcagLevel, customTags) {
 
   // Add WCAG version tags
   switch (wcagVersion) {
-  case '2.0':
-    if (wcagLevel === 'A' || wcagLevel === 'AA' || wcagLevel === 'AAA') {
-      tags.push('wcag2a');
-    }
-    if (wcagLevel === 'AA' || wcagLevel === 'AAA') {
-      tags.push('wcag2aa');
-    }
-    if (wcagLevel === 'AAA') {
-      tags.push('wcag2aaa');
-    }
-    break;
+    case '2.0':
+      if (wcagLevel === 'A' || wcagLevel === 'AA' || wcagLevel === 'AAA') {
+        tags.push('wcag2a');
+      }
+      if (wcagLevel === 'AA' || wcagLevel === 'AAA') {
+        tags.push('wcag2aa');
+      }
+      if (wcagLevel === 'AAA') {
+        tags.push('wcag2aaa');
+      }
+      break;
 
-  case '2.1':
-    if (wcagLevel === 'A' || wcagLevel === 'AA' || wcagLevel === 'AAA') {
-      tags.push('wcag2a', 'wcag21a');
-    }
-    if (wcagLevel === 'AA' || wcagLevel === 'AAA') {
-      tags.push('wcag2aa', 'wcag21aa');
-    }
-    if (wcagLevel === 'AAA') {
-      tags.push('wcag2aaa', 'wcag21aaa');
-    }
-    break;
+    case '2.1':
+      if (wcagLevel === 'A' || wcagLevel === 'AA' || wcagLevel === 'AAA') {
+        tags.push('wcag2a', 'wcag21a');
+      }
+      if (wcagLevel === 'AA' || wcagLevel === 'AAA') {
+        tags.push('wcag2aa', 'wcag21aa');
+      }
+      if (wcagLevel === 'AAA') {
+        tags.push('wcag2aaa', 'wcag21aaa');
+      }
+      break;
 
-  case '2.2':
-    if (wcagLevel === 'A' || wcagLevel === 'AA' || wcagLevel === 'AAA') {
-      tags.push('wcag2a', 'wcag21a', 'wcag22a');
-    }
-    if (wcagLevel === 'AA' || wcagLevel === 'AAA') {
-      tags.push('wcag2aa', 'wcag21aa', 'wcag22aa');
-    }
-    if (wcagLevel === 'AAA') {
-      tags.push('wcag2aaa', 'wcag21aaa', 'wcag22aaa');
-    }
-    break;
+    case '2.2':
+      if (wcagLevel === 'A' || wcagLevel === 'AA' || wcagLevel === 'AAA') {
+        tags.push('wcag2a', 'wcag21a', 'wcag22a');
+      }
+      if (wcagLevel === 'AA' || wcagLevel === 'AAA') {
+        tags.push('wcag2aa', 'wcag21aa', 'wcag22aa');
+      }
+      if (wcagLevel === 'AAA') {
+        tags.push('wcag2aaa', 'wcag21aaa', 'wcag22aaa');
+      }
+      break;
 
-  default:
-    console.warn(`⚠️ Unknown WCAG version: ${wcagVersion}, defaulting to 2.0 AA`);
-    tags.push('wcag2a', 'wcag2aa');
+    default:
+      console.warn(`⚠️ Unknown WCAG version: ${wcagVersion}, defaulting to 2.0 AA`);
+      tags.push('wcag2a', 'wcag2aa');
   }
 
   console.log(`🎯 Testing WCAG ${wcagVersion} Level ${wcagLevel}: ${tags.join(', ')}`);

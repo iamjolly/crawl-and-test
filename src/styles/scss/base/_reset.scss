@@ -61,7 +61,12 @@ footer {
 // Text Content
 // ==========================================================================
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin: 0 0 $spacing-lg 0;
   font-weight: $font-weight-semibold;
   line-height: $line-height-tight;
@@ -72,7 +77,8 @@ p {
   margin: 0 0 $spacing-lg 0;
 }
 
-ul, ol {
+ul,
+ol {
   margin: 0 0 $spacing-lg 0;
   padding-left: $spacing-xl;
 }
@@ -96,23 +102,25 @@ a {
   color: $color-primary;
   text-decoration: underline;
   background-color: transparent;
-  
+
   &:hover {
     color: $color-primary-dark;
     text-decoration: underline;
   }
-  
+
   &:focus {
     outline: $focus-outline-width $focus-outline-style $focus-outline-color;
     outline-offset: 2px;
   }
 }
 
-strong, b {
+strong,
+b {
   font-weight: $font-weight-bold;
 }
 
-em, i {
+em,
+i {
   font-style: italic;
 }
 
@@ -132,7 +140,7 @@ pre {
   border-radius: $border-radius-base;
   overflow-x: auto;
   margin: $spacing-xl 0;
-  
+
   code {
     background: none;
     padding: 0;
@@ -156,30 +164,30 @@ textarea {
 }
 
 button,
-[type="button"],
-[type="reset"],
-[type="submit"] {
+[type='button'],
+[type='reset'],
+[type='submit'] {
   appearance: button;
   -webkit-appearance: button;
   cursor: pointer;
-  
+
   &:focus {
     outline: $focus-outline-width $focus-outline-style $focus-outline-color;
     outline-offset: 2px;
   }
 }
 
-input[type="text"],
-input[type="email"],
-input[type="url"],
-input[type="search"],
+input[type='text'],
+input[type='email'],
+input[type='url'],
+input[type='search'],
 select,
 textarea {
   padding: $spacing-sm;
   border: 1px solid $color-border;
   border-radius: $border-radius-base;
   background-color: $color-background-white;
-  
+
   &:focus {
     outline: $focus-outline-width $focus-outline-style $focus-outline-color;
     outline-offset: 2px;

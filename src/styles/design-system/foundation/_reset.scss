@@ -25,15 +25,15 @@ html {
   -webkit-text-size-adjust: 100%;
   -moz-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  
+
   // Better font rendering
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  
+
   // Smooth scrolling
   scroll-behavior: smooth;
-  
+
   // Set baseline typography
   font-family: var(--font-family-primary);
   font-size: var(--font-size-base);
@@ -45,7 +45,7 @@ body {
   color: var(--color-text-primary);
   background-color: var(--color-background-primary);
   font-weight: var(--font-weight-body);
-  
+
   // Prevent horizontal scrolling
   overflow-x: hidden;
 }
@@ -55,29 +55,66 @@ body {
 // ==========================================================================
 
 // Remove default margins for common elements
-h1, h2, h3, h4, h5, h6, h7, h8,
-p, blockquote, pre,
-dl, dd, ol, ul,
-figure, hr,
-fieldset, legend {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+h7,
+h8,
+p,
+blockquote,
+pre,
+dl,
+dd,
+ol,
+ul,
+figure,
+hr,
+fieldset,
+legend {
   margin: 0;
 }
 
 // Headings
-h1, h2, h3, h4, h5, h6, h7, h8 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+h7,
+h8 {
   font-weight: var(--font-weight-heading);
   line-height: var(--line-height-tight);
   color: var(--color-text-primary);
 }
 
-h1 { font-size: var(--text-heading-1); }
-h2 { font-size: var(--text-heading-2); }
-h3 { font-size: var(--text-heading-3); }
-h4 { font-size: var(--text-heading-4); }
-h5 { font-size: var(--text-heading-5); }
-h6 { font-size: var(--text-heading-5); }
-h7 { font-size: var(--text-heading-5); }
-h8 { font-size: var(--text-heading-5); }
+h1 {
+  font-size: var(--text-heading-1);
+}
+h2 {
+  font-size: var(--text-heading-2);
+}
+h3 {
+  font-size: var(--text-heading-3);
+}
+h4 {
+  font-size: var(--text-heading-4);
+}
+h5 {
+  font-size: var(--text-heading-5);
+}
+h6 {
+  font-size: var(--text-heading-5);
+}
+h7 {
+  font-size: var(--text-heading-5);
+}
+h8 {
+  font-size: var(--text-heading-5);
+}
 
 // Paragraphs
 p {
@@ -85,7 +122,8 @@ p {
 }
 
 // Lists
-ol, ul {
+ol,
+ul {
   padding-left: var(--space-6);
 }
 
@@ -94,8 +132,8 @@ li {
 }
 
 // Remove list styles where semantically appropriate
-ol[role="list"],
-ul[role="list"] {
+ol[role='list'],
+ul[role='list'] {
   list-style: none;
   padding: 0;
 }
@@ -104,16 +142,16 @@ ul[role="list"] {
 a {
   color: var(--color-primary);
   text-decoration: underline;
-  
+
   &:hover {
     color: var(--color-primary-hover);
   }
-  
+
   &:focus {
     outline: 2px solid var(--color-primary-focus);
     outline-offset: 2px;
   }
-  
+
   // Remove visited link styling for consistency
   &:visited {
     color: inherit;
@@ -131,12 +169,20 @@ a:not([href]) {
 // Media Elements
 // ==========================================================================
 
-img, svg, video, canvas, audio, iframe, embed, object {
+img,
+svg,
+video,
+canvas,
+audio,
+iframe,
+embed,
+object {
   display: block;
   max-width: 100%;
 }
 
-img, svg {
+img,
+svg {
   height: auto;
 }
 
@@ -144,7 +190,10 @@ img, svg {
 // Form Elements
 // ==========================================================================
 
-input, button, textarea, select {
+input,
+button,
+textarea,
+select {
   font: inherit;
   color: inherit;
 }
@@ -158,9 +207,9 @@ button {
 
 // Remove default button styles in Safari
 button,
-[type="button"],
-[type="reset"],
-[type="submit"] {
+[type='button'],
+[type='reset'],
+[type='submit'] {
   -webkit-appearance: button;
   appearance: button;
 }
@@ -197,7 +246,8 @@ table {
   width: 100%;
 }
 
-th, td {
+th,
+td {
   text-align: left;
   vertical-align: top;
   padding: var(--space-2) var(--space-3);
@@ -226,7 +276,7 @@ th {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  
+
   html {
     scroll-behavior: auto;
   }
@@ -263,7 +313,7 @@ textarea,
 a {
   min-height: 44px;
   min-width: 44px;
-  
+
   @media (pointer: fine) {
     min-height: auto;
     min-width: auto;

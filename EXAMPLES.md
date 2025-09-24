@@ -1,6 +1,7 @@
 # CLI & Usage Examples
 
-This document contains comprehensive command line and dashboard usage examples for CATS.
+This document contains comprehensive command line and dashboard usage examples
+for CATS.
 
 ## Command Line Examples
 

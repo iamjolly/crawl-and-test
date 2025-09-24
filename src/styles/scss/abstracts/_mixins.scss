@@ -87,7 +87,7 @@
   text-align: center;
   cursor: pointer;
   transition: all $transition-base;
-  
+
   &:focus {
     outline: $focus-outline-width $focus-outline-style $focus-outline-color;
     outline-offset: 2px;
@@ -99,11 +99,11 @@
   @include button-base();
   background-color: $color-primary;
   color: $color-white;
-  
+
   &:hover {
     background-color: $color-primary-dark;
   }
-  
+
   &:active {
     background-color: $color-primary-darker;
   }
@@ -114,12 +114,12 @@
   color: $color-primary;
   text-decoration: none;
   transition: color $transition-fast;
-  
+
   &:hover {
     color: $color-primary-dark;
     text-decoration: underline;
   }
-  
+
   &:focus {
     outline: $focus-outline-width $focus-outline-style $focus-outline-color;
     outline-offset: 2px;
@@ -134,16 +134,24 @@
 @mixin impact-level($level) {
   @if $level == 'critical' {
     border-left-color: $color-impact-critical;
-    .impact-critical { color: $color-impact-critical; }
+    .impact-critical {
+      color: $color-impact-critical;
+    }
   } @else if $level == 'serious' {
     border-left-color: $color-impact-serious;
-    .impact-serious { color: $color-impact-serious; }
+    .impact-serious {
+      color: $color-impact-serious;
+    }
   } @else if $level == 'moderate' {
     border-left-color: $color-impact-moderate;
-    .impact-moderate { color: $color-impact-moderate; }
+    .impact-moderate {
+      color: $color-impact-moderate;
+    }
   } @else if $level == 'minor' {
     border-left-color: $color-impact-minor;
-    .impact-minor { color: $color-impact-minor; }
+    .impact-minor {
+      color: $color-impact-minor;
+    }
   }
 }
 
@@ -197,7 +205,12 @@
 }
 
 // Focus mixin with more control for specific components
-@mixin focus-custom($width: $focus-outline-width, $style: $focus-outline-style, $color: $focus-outline-color, $offset: 2px) {
+@mixin focus-custom(
+  $width: $focus-outline-width,
+  $style: $focus-outline-style,
+  $color: $focus-outline-color,
+  $offset: 2px
+) {
   &:focus {
     outline: $width $style $color;
     outline-offset: $offset;

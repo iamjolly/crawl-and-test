@@ -10,28 +10,28 @@
   // ==========================================================================
   // Breakpoint Values
   // ==========================================================================
-  
+
   --breakpoint-xs: 0;
   --breakpoint-sm: 576px;
   --breakpoint-md: 768px;
   --breakpoint-lg: 992px;
   --breakpoint-xl: 1200px;
   --breakpoint-xxl: 1400px;
-  
+
   // ==========================================================================
   // Container Max Widths
   // ==========================================================================
-  
+
   --container-max-width-sm: 540px;
   --container-max-width-md: 720px;
   --container-max-width-lg: 960px;
   --container-max-width-xl: 1140px;
   --container-max-width-xxl: 1320px;
-  
+
   // ==========================================================================
   // Common Viewport Sizes
   // ==========================================================================
-  
+
   --viewport-mobile-portrait: 320px;
   --viewport-mobile-landscape: 568px;
   --viewport-tablet-portrait: 768px;
@@ -52,7 +52,7 @@ $grid-breakpoints: (
   md: 768px,
   lg: 992px,
   xl: 1200px,
-  xxl: 1400px
+  xxl: 1400px,
 );
 
 $container-max-widths: (
@@ -60,7 +60,7 @@ $container-max-widths: (
   md: 720px,
   lg: 960px,
   xl: 1140px,
-  xxl: 1320px
+  xxl: 1320px,
 );
 
 // Individual breakpoint variables
@@ -152,17 +152,17 @@ $breakpoint-xxl: 1400px;
 
 // Custom media query mixin
 @mixin media-custom($min: null, $max: null) {
-  $query: "";
-  
+  $query: '';
+
   @if $min != null and $max != null {
-    $query: "(min-width: #{$min}) and (max-width: #{$max - 1px})";
+    $query: '(min-width: #{$min}) and (max-width: #{$max - 1px})';
   } @else if $min != null {
-    $query: "(min-width: #{$min})";
+    $query: '(min-width: #{$min})';
   } @else if $max != null {
-    $query: "(max-width: #{$max - 1px})";
+    $query: '(max-width: #{$max - 1px})';
   }
-  
-  @if $query != "" {
+
+  @if $query != '' {
     @media #{$query} {
       @content;
     }

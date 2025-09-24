@@ -49,14 +49,14 @@ module.exports = [
       // Error Prevention
       'no-console': 'warn',
       'no-debugger': 'error',
-      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       'no-undef': 'error',
 
       // Code Quality
       'prefer-const': 'error',
       'no-var': 'error',
-      'eqeqeq': ['error', 'always'],
-      'curly': ['error', 'all'],
+      eqeqeq: ['error', 'always'],
+      curly: ['error', 'all'],
 
       // Accessibility specific rules
       'no-restricted-syntax': [
@@ -68,9 +68,9 @@ module.exports = [
       ],
 
       // Style consistency
-      'indent': ['error', 2],
-      'quotes': ['error', 'single'],
-      'semi': ['error', 'always'],
+      indent: ['error', 2],
+      quotes: ['error', 'single'],
+      semi: ['error', 'always'],
       'comma-dangle': ['error', 'only-multiline'],
       'object-curly-spacing': ['error', 'always'],
       'array-bracket-spacing': ['error', 'never'],

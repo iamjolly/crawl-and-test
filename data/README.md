@@ -1,6 +1,7 @@
 # Data Directory
 
-This directory contains reference data files used by the accessibility testing application.
+This directory contains reference data files used by the accessibility testing
+application.
 
 ## Files
 
@@ -9,9 +10,12 @@ This directory contains reference data files used by the accessibility testing a
 - **Source**: [tenon-io/wcag-as-json](https://github.com/tenon-io/wcag-as-json)
 - **Version**: WCAG 2.2
 - **Purpose**: Maps WCAG Success Criteria to W3C documentation links
-- **Usage**: Used by `WcagLinkMapper` to provide "How to Meet" and "Understanding" links in accessibility reports
-- **Structure**: JSON array containing WCAG principles, guidelines, and success criteria with reference URLs
-- **Configuration**: Path configurable via `CATS_WCAG_DATA_FILE` environment variable (defaults to `data/wcag.json`)
+- **Usage**: Used by `WcagLinkMapper` to provide "How to Meet" and
+  "Understanding" links in accessibility reports
+- **Structure**: JSON array containing WCAG principles, guidelines, and success
+  criteria with reference URLs
+- **Configuration**: Path configurable via `CATS_WCAG_DATA_FILE` environment
+  variable (defaults to `data/wcag.json`)
 
 ## Configuration
 

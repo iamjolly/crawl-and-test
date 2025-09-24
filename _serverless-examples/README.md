@@ -1,9 +1,11 @@
-# Serverless Examples 
+# Serverless Examples
 
 ## ⚠️ Important Notes
 
-These serverless examples have been updated to reflect the current project structure with:
-- ✅ Modular architecture (`src/` directory organization)  
+These serverless examples have been updated to reflect the current project
+structure with:
+
+- ✅ Modular architecture (`src/` directory organization)
 - ✅ Configuration system with dotenv support
 - ✅ Updated template paths and asset locations
 - ✅ Current WCAG version options (2.0, 2.1, 2.2)
@@ -12,14 +14,15 @@ These serverless examples have been updated to reflect the current project struc
 
 ### 1. **Code Modularization Required**
 
-The current `src/core/crawler.js` is a monolithic script. For serverless deployment, you'll need to:
+The current `src/core/crawler.js` is a monolithic script. For serverless
+deployment, you'll need to:
 
 ```bash
 # Extract core crawling logic into reusable modules:
 src/core/
 ├── crawler.js           # Main CLI script (current)
 ├── crawler-engine.js    # ← Extract core crawling logic here
-├── sitemap-parser.js    # ← Extract sitemap logic here  
+├── sitemap-parser.js    # ← Extract sitemap logic here
 ├── page-analyzer.js     # ← Extract accessibility analysis here
 └── report-builder.js    # ← Extract report building here
 ```
@@ -56,13 +59,13 @@ CATS_MAX_PAGES=50
 
 ## 📁 File Status
 
-| File | Status | Notes |
-|------|--------|-------|
-| `lambda-crawler.js` | ✅ Updated | Now uses config system, needs modularization |
-| `lambda-report-generator.js` | ✅ Updated | References new template/asset paths |
-| `eleventy-dashboard.njk` | ✅ Updated | Fixed WCAG version dropdown |
-| `eleventy-reports.js` | ✅ Current | No changes needed |
-| `serverless.yml` | ✅ Updated | Added config environment variables |
+| File                         | Status     | Notes                                        |
+| ---------------------------- | ---------- | -------------------------------------------- |
+| `lambda-crawler.js`          | ✅ Updated | Now uses config system, needs modularization |
+| `lambda-report-generator.js` | ✅ Updated | References new template/asset paths          |
+| `eleventy-dashboard.njk`     | ✅ Updated | Fixed WCAG version dropdown                  |
+| `eleventy-reports.js`        | ✅ Current | No changes needed                            |
+| `serverless.yml`             | ✅ Updated | Added config environment variables           |
 
 ## 🛠️ Deployment Steps
 
@@ -75,9 +78,11 @@ CATS_MAX_PAGES=50
 ## 🔗 Integration Points
 
 These examples integrate with:
+
 - **S3**: For report storage and static asset serving
 - **Lambda**: For crawling and report generation
 - **Eleventy/Static Sites**: For dashboard generation
 - **Build Hooks**: For triggering static site rebuilds
 
-The examples now properly reflect the current modular project structure and configuration system!
+The examples now properly reflect the current modular project structure and
+configuration system!
