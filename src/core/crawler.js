@@ -360,10 +360,23 @@ async function validateDomain(url) {
 
   } catch (error) {
     // Check for DNS/network errors vs HTTP errors
-    if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' ||
-        error.message.includes('getaddrinfo') || error.message.includes('DNS')) {
+    // Modern Node.js fetch may wrap DNS errors differently
+    const isDnsError = error.code === 'ENOTFOUND' ||
+                      error.code === 'ECONNREFUSED' ||
+                      error.message.includes('getaddrinfo') ||
+                      error.message.includes('DNS') ||
+                      error.message.includes('fetch failed') ||  // Common Node.js fetch DNS error
+                      (error.cause && (
+                        error.cause.code === 'ENOTFOUND' ||
+                        error.cause.message?.includes('getaddrinfo')
+                      ));
+
+    if (isDnsError) {
       console.error(`❌ Domain validation failed: ${url} does not exist or is not accessible`);
       console.error(`   Network error: ${error.message}`);
+      if (error.cause) {
+        console.error(`   Root cause: ${error.cause.code} - ${error.cause.message}`);
+      }
       throw new Error(`Domain "${new URL(url).hostname}" does not exist or is not accessible. Please check the URL and try again.`);
     }
 
