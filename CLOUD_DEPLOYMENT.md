@@ -117,21 +117,35 @@ gcloud logs read --service=cats-accessibility-crawler
 
 ### Scale Configuration
 
-Current settings (optimized for accessibility crawling):
-- **Memory**: 4GB (required for Playwright)
-- **CPU**: 2 vCPU
+**Optimized settings for government site accessibility testing:**
+- **Memory**: 8GB (increased for browser stability)
+- **CPU**: 4 vCPU (improved parallel processing)
 - **Timeout**: 60 minutes (for large crawls)
-- **Concurrency**: 10 requests per instance
-- **Max Instances**: 5 (adjustable)
+- **Concurrency**: 5 requests per instance (reduced for stability)
+- **Max Instances**: 3 (reduced for cost efficiency)
+- **Min Instances**: 1 (eliminates cold starts)
+
+**Performance Optimizations:**
+- 🚀 Page timeout: 90 seconds (3x longer for slow sites)
+- 🔄 Retry logic: 3 attempts with exponential backoff
+- ⚡ Wait strategy: `domcontentloaded` (faster loading)
+- 🧠 Browser pooling: Reuse browser instances
+- 📷 Images disabled: Faster scanning (accessibility-focused)
+- 💾 Memory management: Automatic browser cleanup
 
 ### Update Scaling
 
 ```bash
+# Apply performance optimizations
 gcloud run services update cats-accessibility-crawler \
   --region=us-central1 \
   --memory=8Gi \
   --cpu=4 \
-  --max-instances=10
+  --concurrency=5 \
+  --max-instances=3 \
+  --min-instances=1 \
+  --no-cpu-throttling \
+  --set-env-vars="CATS_MAX_CONCURRENT_JOBS=1,CATS_DEFAULT_CRAWLER_CONCURRENCY=2,CATS_PAGE_TIMEOUT=90000"
 ```
 
 ## 💰 Cost Optimization

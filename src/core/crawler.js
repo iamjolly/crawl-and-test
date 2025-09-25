@@ -337,8 +337,42 @@ async function tryLoadSitemap(seedUrl, canonicalUrl) {
 }
 
 // ------------------------------------------------------------------
-// Domain resolution (follow redirects to get canonical domain)
+// Domain validation and resolution
 // ------------------------------------------------------------------
+async function validateDomain(url) {
+  console.log(`🔍 Validating domain accessibility for ${url}...`);
+
+  try {
+    // Try a simple HEAD request to verify the domain exists and is accessible
+    const response = await fetch(url, {
+      method: 'HEAD',
+      redirect: 'follow',
+      timeout: 30000  // 30 second timeout for domain validation
+    });
+
+    // Check if we got a reasonable response
+    if (response.status >= 200 && response.status < 600) {
+      console.log(`✅ Domain validation successful (HTTP ${response.status})`);
+      return true;
+    }
+
+    throw new Error(`HTTP ${response.status} ${response.statusText}`);
+
+  } catch (error) {
+    // Check for DNS/network errors vs HTTP errors
+    if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' ||
+        error.message.includes('getaddrinfo') || error.message.includes('DNS')) {
+      console.error(`❌ Domain validation failed: ${url} does not exist or is not accessible`);
+      console.error(`   Network error: ${error.message}`);
+      throw new Error(`Domain "${new URL(url).hostname}" does not exist or is not accessible. Please check the URL and try again.`);
+    }
+
+    // For other errors (timeouts, HTTP errors), log but don't fail validation
+    console.warn(`⚠️ Domain validation warning for ${url}: ${error.message}`);
+    return true; // Allow crawling to proceed
+  }
+}
+
 async function getCanonicalDomain(url) {
   try {
     // First try with fetch for HTTP-level redirects (faster)
@@ -370,7 +404,14 @@ async function getCanonicalDomain(url) {
       return new URL(fetchFinalUrl).hostname;
     }
   } catch (error) {
-    // Fallback to original URL if all redirect checks fail
+    // Check for DNS/network errors that indicate domain doesn't exist
+    if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' ||
+        error.message.includes('getaddrinfo') || error.message.includes('DNS') ||
+        error.message.includes('ENOTFOUND') || error.message.includes('net::ERR_NAME_NOT_RESOLVED')) {
+      throw new Error(`Domain "${new URL(url).hostname}" does not exist or is not accessible. Network error: ${error.message}`);
+    }
+
+    // For other errors (timeouts, etc.), fall back to original URL
     console.warn(`Could not check redirects for ${url}: ${error.message}`);
     return new URL(url).hostname;
   }
@@ -521,6 +562,9 @@ async function main() {
   }
   const limit = pLimit(concurrency);
 
+  // First, validate that the domain exists and is accessible
+  await validateDomain(seed);
+
   // Get canonical domain for proper sitemap filtering
   console.log(`🔍 Checking canonical domain for ${seed}...`);
   const canonicalDomain = await getCanonicalDomain(seed);
@@ -577,6 +621,28 @@ async function main() {
 
     if (batch.length > 0) {
       await Promise.all(batch);
+
+      // Check for early exit conditions - if all recent pages are failing with network errors
+      if (results.length >= 3) { // Only check after we have some results
+        const recentResults = results.slice(-3); // Check last 3 results
+        const networkErrors = recentResults.filter(result =>
+          result.error && (
+            result.error.includes('ENOTFOUND') ||
+            result.error.includes('does not exist') ||
+            result.error.includes('DNS') ||
+            result.error.includes('net::ERR_NAME_NOT_RESOLVED') ||
+            result.error.includes('getaddrinfo')
+          )
+        );
+
+        // If all recent results are network errors, exit early
+        if (networkErrors.length === recentResults.length && networkErrors.length > 0) {
+          console.error(`🛑 Stopping crawl: All recent pages are failing with network errors`);
+          console.error(`   This suggests the domain may not exist or be accessible`);
+          break;
+        }
+      }
+
       const progressMsg = isUnlimited
         ? `📊 Progress: ${results.length} pages scanned, ${queue.length} remaining`
         : `📊 Progress: ${results.length} pages scanned, ${queue.length} remaining (max: ${maxPagesNum})`;
@@ -630,7 +696,18 @@ async function main() {
 }
 
 main().catch(async err => {
-  console.error(err);
+  console.error('💥 Crawl failed:', err.message);
+
+  // If it's a domain validation error, provide helpful guidance
+  if (err.message.includes('does not exist or is not accessible')) {
+    console.error('');
+    console.error('🔧 Troubleshooting tips:');
+    console.error('   • Check that the domain name is spelled correctly');
+    console.error('   • Verify the domain exists by visiting it in a browser');
+    console.error('   • Try with "www" prefix if the domain redirects (e.g., www.example.com)');
+    console.error('   • Ensure the domain is publicly accessible (not behind VPN/firewall)');
+  }
+
   await browserPool.cleanup();
   process.exit(1);
 });
