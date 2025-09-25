@@ -127,6 +127,91 @@ node src/core/crawler.js -s https://large-site.com -p 100 -d 3 -c 2 --html
 node src/core/crawler.js -s https://example.com --wcag-version 2.2 --wcag-level AA --html
 ```
 
+## ⚡ High-Performance Examples
+
+### Enterprise-Scale Crawl (250+ pages)
+
+**Command Line:**
+```bash
+# High-performance crawl with optimized settings
+node src/core/crawler.js \
+  -s https://large-enterprise.com \
+  --max-pages 250 \
+  --concurrency 8 \
+  --html
+```
+
+**With Environment Variables:**
+```bash
+# Set performance optimizations
+export CATS_PAGE_TIMEOUT=90000
+export CATS_BROWSER_POOL_SIZE=4
+export CATS_MAX_RETRIES=3
+export CATS_DISABLE_IMAGES=true
+
+# Run enterprise crawl
+npm start -- -s https://gov-site.com --max-pages 500 -c 8 --html
+```
+
+### Government Site Optimization
+
+```bash
+# Optimized for slow government websites
+CATS_PAGE_TIMEOUT=120000 \
+CATS_WAIT_STRATEGY=domcontentloaded \
+CATS_DISABLE_IMAGES=true \
+CATS_MAX_RETRIES=5 \
+  node src/core/crawler.js -s https://state.gov.us --max-pages 100 -c 4 --html
+```
+
+### Memory-Optimized for Limited Resources
+
+```bash
+# Reduced memory footprint
+CATS_BROWSER_POOL_SIZE=1 \
+CATS_DEFAULT_CRAWLER_CONCURRENCY=2 \
+CATS_BROWSER_MEMORY_LIMIT_MB=512 \
+  node src/core/crawler.js -s https://example.com --max-pages 50 -c 2 --html
+```
+
+### Domain Validation Examples
+
+**Valid Domain:**
+```bash
+# Will proceed with crawl
+node src/core/crawler.js -s https://github.com --max-pages 10
+```
+
+**Invalid Domain (shows proper error):**
+```bash
+# Will fail with helpful error message
+node src/core/crawler.js -s https://invalid-domain-that-does-not-exist.com
+# Output: ❌ Domain "invalid-domain-that-does-not-exist.com" does not exist...
+```
+
+### Cloud Run Performance Testing
+
+**Local simulation of Cloud Run performance:**
+```bash
+# Simulate Cloud Run environment locally
+CATS_SERVER_HOST=0.0.0.0 \
+CATS_MAX_CONCURRENT_JOBS=1 \
+CATS_DEFAULT_CRAWLER_CONCURRENCY=2 \
+CATS_PAGE_TIMEOUT=90000 \
+CATS_BROWSER_POOL_SIZE=2 \
+  npm run serve
+```
+
+### Performance Monitoring
+
+**Enable detailed logging:**
+```bash
+# Run with performance logging
+NODE_ENV=development \
+CATS_BROWSER_POOL_SIZE=4 \
+  node src/core/crawler.js -s https://example.com --max-pages 100 -c 6 --html
+```
+
 ## Advanced Usage
 
 - Regenerate HTML reports from JSON: `npm run build`
@@ -136,7 +221,22 @@ node src/core/crawler.js -s https://example.com --wcag-version 2.2 --wcag-level 
 
 ## Troubleshooting
 
+### Common Issues
+
 - **Failed to launch browser**: `npm run install-browsers`
 - **HTTPS required**: Use `https://` URLs
-- **Timeout errors**: Increase delay (`-t 2000`), reduce concurrency (`-c 2`)
+- **Timeout errors**: Increase `CATS_PAGE_TIMEOUT=120000`, reduce concurrency (`-c 2`)
 - **Large output files**: Limit pages (`-p 50`), reduce depth (`-d 1`)
+
+### Domain Validation Errors
+
+- **"Domain does not exist"**: Verify domain spelling, try with `www` prefix
+- **DNS resolution failed**: Check domain exists with `nslookup domain.com`
+- **Network timeout**: Increase `CATS_PAGE_TIMEOUT` for slow sites
+- **False-positive prevention**: Domain validation now prevents invalid crawls
+
+### Performance Issues
+
+- **Memory errors**: Reduce `CATS_BROWSER_POOL_SIZE=1` and concurrency
+- **Slow crawls**: Enable `CATS_DISABLE_IMAGES=true`, use `CATS_WAIT_STRATEGY=domcontentloaded`
+- **Retry failures**: Increase `CATS_MAX_RETRIES=5` for unreliable sites

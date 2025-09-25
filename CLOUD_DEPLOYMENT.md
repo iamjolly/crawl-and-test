@@ -132,6 +132,8 @@ gcloud logs read --service=cats-accessibility-crawler
 - 🧠 Browser pooling: Reuse browser instances
 - 📷 Images disabled: Faster scanning (accessibility-focused)
 - 💾 Memory management: Automatic browser cleanup
+- 🛡️ Domain validation: Prevents false-positive reports on invalid domains
+- 🔍 DNS error detection: Enhanced error handling for unreachable sites
 
 ### Update Scaling
 
@@ -209,6 +211,28 @@ jobs:
 ```
 
 ## 🆘 Troubleshooting
+
+### Domain Validation Issues
+
+**Error**: "Domain does not exist or is not accessible"
+```bash
+# Check if domain resolves
+nslookup example.com
+
+# Test domain accessibility
+curl -I https://example.com
+
+# Common solutions:
+# 1. Verify domain spelling and format (include https://)
+# 2. Try with www prefix: https://www.example.com
+# 3. Check if domain is behind authentication/VPN
+# 4. Verify domain exists by visiting in browser
+```
+
+**Error**: Job shows as "ERROR" instead of completing
+- This is expected behavior for invalid domains (prevents false reports)
+- Check logs for specific DNS/network error details
+- Ensure domain is publicly accessible
 
 ### Common Issues
 

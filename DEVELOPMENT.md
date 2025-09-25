@@ -127,6 +127,60 @@ CATS_SERVER_HOST=0.0.0.0          # Allow external connections
 PORT=3000                         # Container port mapping
 ```
 
+## ⚡ Performance Configuration
+
+### Browser Pool Settings
+```bash
+CATS_BROWSER_POOL_SIZE=2          # Number of browser instances to reuse
+CATS_BROWSER_MEMORY_LIMIT_MB=1024 # Memory limit per browser (MB)
+```
+
+### Timeout & Retry Configuration
+```bash
+CATS_PAGE_TIMEOUT=90000           # Page navigation timeout (90s for slow sites)
+CATS_SITEMAP_TIMEOUT=20000        # Sitemap parsing timeout (20s)
+CATS_MAX_RETRIES=3                # Retry attempts for failed pages
+CATS_RETRY_DELAY_MS=2000          # Base retry delay (2s, exponential backoff)
+```
+
+### Concurrency & Performance
+```bash
+CATS_MAX_CONCURRENT_JOBS=3        # Max simultaneous crawl jobs
+CATS_DEFAULT_CRAWLER_CONCURRENCY=4 # Parallel browsers per job
+CATS_WAIT_STRATEGY=domcontentloaded # Page wait strategy
+CATS_DISABLE_IMAGES=true          # Disable images for faster crawling
+CATS_DISABLE_CSS=false            # Keep CSS for layout (recommended)
+```
+
+### Performance Testing Configuration
+
+**High-Performance Local Testing (250+ pages):**
+```bash
+# Create performance testing environment
+cp .env.example .env.performance
+
+# Add performance optimizations
+CATS_MAX_PAGES=250
+CATS_DEFAULT_CRAWLER_CONCURRENCY=8
+CATS_PAGE_TIMEOUT=90000
+CATS_BROWSER_POOL_SIZE=4
+CATS_MAX_CONCURRENT_JOBS=2
+CATS_DISABLE_IMAGES=true
+CATS_WAIT_STRATEGY=domcontentloaded
+
+# Run performance test
+node src/core/crawler.js -s https://example.com --max-pages 250 -c 8
+```
+
+**Memory-Optimized Configuration:**
+```bash
+# For limited RAM environments
+CATS_BROWSER_POOL_SIZE=1
+CATS_DEFAULT_CRAWLER_CONCURRENCY=2
+CATS_MAX_CONCURRENT_JOBS=1
+CATS_BROWSER_MEMORY_LIMIT_MB=512
+```
+
 ### ☁️ Cloud Storage Variables
 ```bash
 CATS_USE_CLOUD_STORAGE=true       # Enable Google Cloud Storage
