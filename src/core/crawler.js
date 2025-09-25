@@ -2,7 +2,6 @@
 
 const fs = require('fs/promises');
 const path = require('path');
-const { chromium } = require('playwright');
 const { Command } = require('commander');
 // p-limit v7+ is ES module only, so we need dynamic import
 let pLimit;
@@ -11,6 +10,7 @@ const config = require('./config');
 const axe = require('axe-core');
 const xml2js = require('xml2js');
 const { generateHTMLReport } = require('../generators/html');
+const browserPool = require('../utils/browserPool');
 
 // Helper function to escape HTML (currently unused but kept for future use)
 // function escapeHtml(text) {
@@ -82,8 +82,39 @@ function normalizeUrl(u) {
   return parsed.toString();
 }
 
+async function retryWithDelay(fn, retries = config.MAX_RETRIES, delay = config.RETRY_DELAY_MS) {
+  for (let i = 0; i <= retries; i++) {
+    try {
+      return await fn();
+    } catch (error) {
+      if (i === retries) {
+        throw error; // Final attempt failed
+      }
+
+      const currentDelay = delay * Math.pow(1.5, i); // Exponential backoff
+      console.warn(
+        `⚠️  Attempt ${i + 1} failed: ${error.message}. Retrying in ${currentDelay}ms...`
+      );
+
+      await new Promise(resolve => setTimeout(resolve, currentDelay));
+    }
+  }
+}
+
 function isSameDomain(u1, u2) {
-  return new URL(u1).hostname === new URL(u2).hostname;
+  const hostname1 = new URL(u1).hostname.toLowerCase();
+  const hostname2 = new URL(u2).hostname.toLowerCase();
+
+  // Direct match
+  if (hostname1 === hostname2) {
+    return true;
+  }
+
+  // Handle www/non-www variations
+  const withoutWww1 = hostname1.replace(/^www\./, '');
+  const withoutWww2 = hostname2.replace(/^www\./, '');
+
+  return withoutWww1 === withoutWww2;
 }
 
 // ------------------------------------------------------------------
@@ -100,45 +131,45 @@ function buildAxeTags(wcagVersion, wcagLevel, customTags) {
 
   // Add WCAG version tags
   switch (wcagVersion) {
-  case '2.0':
-    if (wcagLevel === 'A' || wcagLevel === 'AA' || wcagLevel === 'AAA') {
-      tags.push('wcag2a');
-    }
-    if (wcagLevel === 'AA' || wcagLevel === 'AAA') {
-      tags.push('wcag2aa');
-    }
-    if (wcagLevel === 'AAA') {
-      tags.push('wcag2aaa');
-    }
-    break;
+    case '2.0':
+      if (wcagLevel === 'A' || wcagLevel === 'AA' || wcagLevel === 'AAA') {
+        tags.push('wcag2a');
+      }
+      if (wcagLevel === 'AA' || wcagLevel === 'AAA') {
+        tags.push('wcag2aa');
+      }
+      if (wcagLevel === 'AAA') {
+        tags.push('wcag2aaa');
+      }
+      break;
 
-  case '2.1':
-    if (wcagLevel === 'A' || wcagLevel === 'AA' || wcagLevel === 'AAA') {
-      tags.push('wcag2a', 'wcag21a');
-    }
-    if (wcagLevel === 'AA' || wcagLevel === 'AAA') {
-      tags.push('wcag2aa', 'wcag21aa');
-    }
-    if (wcagLevel === 'AAA') {
-      tags.push('wcag2aaa', 'wcag21aaa');
-    }
-    break;
+    case '2.1':
+      if (wcagLevel === 'A' || wcagLevel === 'AA' || wcagLevel === 'AAA') {
+        tags.push('wcag2a', 'wcag21a');
+      }
+      if (wcagLevel === 'AA' || wcagLevel === 'AAA') {
+        tags.push('wcag2aa', 'wcag21aa');
+      }
+      if (wcagLevel === 'AAA') {
+        tags.push('wcag2aaa', 'wcag21aaa');
+      }
+      break;
 
-  case '2.2':
-    if (wcagLevel === 'A' || wcagLevel === 'AA' || wcagLevel === 'AAA') {
-      tags.push('wcag2a', 'wcag21a', 'wcag22a');
-    }
-    if (wcagLevel === 'AA' || wcagLevel === 'AAA') {
-      tags.push('wcag2aa', 'wcag21aa', 'wcag22aa');
-    }
-    if (wcagLevel === 'AAA') {
-      tags.push('wcag2aaa', 'wcag21aaa', 'wcag22aaa');
-    }
-    break;
+    case '2.2':
+      if (wcagLevel === 'A' || wcagLevel === 'AA' || wcagLevel === 'AAA') {
+        tags.push('wcag2a', 'wcag21a', 'wcag22a');
+      }
+      if (wcagLevel === 'AA' || wcagLevel === 'AAA') {
+        tags.push('wcag2aa', 'wcag21aa', 'wcag22aa');
+      }
+      if (wcagLevel === 'AAA') {
+        tags.push('wcag2aaa', 'wcag21aaa', 'wcag22aaa');
+      }
+      break;
 
-  default:
-    console.warn(`⚠️ Unknown WCAG version: ${wcagVersion}, defaulting to 2.0 AA`);
-    tags.push('wcag2a', 'wcag2aa');
+    default:
+      console.warn(`⚠️ Unknown WCAG version: ${wcagVersion}, defaulting to 2.0 AA`);
+      tags.push('wcag2a', 'wcag2aa');
   }
 
   console.log(`🎯 Testing WCAG ${wcagVersion} Level ${wcagLevel}: ${tags.join(', ')}`);
@@ -210,15 +241,16 @@ async function fetchSitemap(sitemapUrl) {
       content = await response.text();
     } catch {
       // Fallback to Playwright for older Node.js versions
-      const browser = await chromium.launch({ headless: true });
-      const context = await browser.newContext();
+      const browser = await browserPool.getBrowser();
+      const context = await browserPool.createContext(browser);
       const page = await context.newPage();
 
       try {
-        const response = await page.goto(sitemapUrl, { timeout: 10000 });
+        const response = await page.goto(sitemapUrl, { timeout: config.SITEMAP_TIMEOUT });
         if (!response || !response.ok()) {
           console.log(`  Response: ${response?.status()} ${response?.statusText()}`);
-          await browser.close();
+          await context.close();
+          await browserPool.returnBrowser(browser);
           return null;
         }
 
@@ -227,7 +259,8 @@ async function fetchSitemap(sitemapUrl) {
         // Clean up HTML wrapper that browsers add to XML
         content = content.replace(/^.*?<\?xml/, '<?xml').replace(/<\/html>.*$/, '');
       } finally {
-        await browser.close();
+        await context.close();
+        await browserPool.returnBrowser(browser);
       }
     }
 
@@ -267,8 +300,8 @@ async function fetchSitemap(sitemapUrl) {
   }
 }
 
-async function tryLoadSitemap(seedUrl) {
-  const parsed = new URL(seedUrl);
+async function tryLoadSitemap(seedUrl, canonicalUrl) {
+  const parsed = new URL(canonicalUrl || seedUrl);
   const sitemapUrls = [
     `${parsed.origin}/sitemap.xml`,
     `${parsed.origin}/sitemap_index.xml`,
@@ -280,8 +313,22 @@ async function tryLoadSitemap(seedUrl) {
     const urls = await fetchSitemap(sitemapUrl);
     if (urls && urls.length > 0) {
       console.log(`✓ Found sitemap with ${urls.length} URLs`);
-      const filteredUrls = urls.filter(u => isSameDomain(seedUrl, u));
-      return filteredUrls;
+      console.log(
+        `🔍 Filtering URLs using canonical domain: ${new URL(canonicalUrl || seedUrl).hostname}`
+      );
+
+      const filteredUrls = urls.filter(u => {
+        const matches = isSameDomain(canonicalUrl || seedUrl, u);
+        if (!matches) {
+          console.log(`  ❌ Filtered out: ${u} (domain mismatch)`);
+        } else {
+          console.log(`  ✅ Included: ${u}`);
+        }
+        return matches;
+      });
+
+      console.log(`📊 Sitemap filtering result: ${filteredUrls.length}/${urls.length} URLs kept`);
+      return filteredUrls.length > 0 ? filteredUrls : null;
     }
   }
 
@@ -299,18 +346,23 @@ async function getCanonicalDomain(url) {
     const fetchFinalUrl = response.url;
 
     // Use Playwright to handle meta refresh and JavaScript redirects
-    const browser = await chromium.launch({ headless: true });
-    const context = await browser.newContext();
+    const browser = await browserPool.getBrowser();
+    const context = await browserPool.createContext(browser);
     const page = await context.newPage();
 
     try {
-      await page.goto(fetchFinalUrl, { waitUntil: 'networkidle', timeout: 10000 });
+      await page.goto(fetchFinalUrl, {
+        waitUntil: config.WAIT_STRATEGY,
+        timeout: config.SITEMAP_TIMEOUT,
+      });
       const playwrightFinalUrl = page.url();
-      await browser.close();
+      await context.close();
+      await browserPool.returnBrowser(browser);
 
       return new URL(playwrightFinalUrl).hostname;
     } catch (playwrightError) {
-      await browser.close();
+      await context.close();
+      await browserPool.returnBrowser(browser);
       // Fall back to fetch result if Playwright fails
       console.warn(
         `Playwright redirect check failed, using fetch result: ${playwrightError.message}`
@@ -369,8 +421,8 @@ async function crawlPage(pageUrl, currentDepth) {
 
   await politePause(domain);
 
-  const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext();
+  const browser = await browserPool.getBrowser();
+  const context = await browserPool.createContext(browser);
   const page = await context.newPage();
 
   // Respect robots.txt
@@ -391,21 +443,32 @@ async function crawlPage(pageUrl, currentDepth) {
   }
 
   try {
-    await page.goto(pageUrl, { waitUntil: 'networkidle', timeout: 30000 });
+    // Use retry logic for page scanning
+    const scanResult = await retryWithDelay(async () => {
+      await page.goto(pageUrl, {
+        waitUntil: config.WAIT_STRATEGY,
+        timeout: config.PAGE_NAVIGATION_TIMEOUT,
+      });
 
-    // Inject axe
-    await page.addScriptTag({ content: axe.source });
+      // Inject axe
+      await page.addScriptTag({ content: axe.source });
 
-    // Get page title
-    const pageTitle = await page.title();
+      // Get page title
+      const pageTitle = await page.title();
 
-    const axeResult = await page.evaluate(options => axe.run(document, options), axeConfig);
+      const axeResult = await page.evaluate(options => axe.run(document, options), axeConfig);
+
+      return {
+        pageTitle: pageTitle || '',
+        axeResult,
+      };
+    });
 
     results.push({
       pageUrl,
-      pageTitle: pageTitle || '', // Add page title to results
+      pageTitle: scanResult.pageTitle,
       timestamp: new Date().toISOString(),
-      ...axeResult,
+      ...scanResult.axeResult,
     });
 
     // Extract and enqueue new links (only in discovery mode)
@@ -420,10 +483,30 @@ async function crawlPage(pageUrl, currentDepth) {
         }
       }
     }
-  } catch (e) {
-    console.error(`Failed ${pageUrl}: ${e.message}`);
+
+    console.log(
+      `✅ ${pageUrl} - ${scanResult.axeResult.violations?.length || 0} violations, ${
+        scanResult.axeResult.passes?.length || 0
+      } passes`
+    );
+  } catch (error) {
+    console.error(
+      `❌ Failed to scan ${pageUrl} after ${config.MAX_RETRIES} retries:`,
+      error.message
+    );
+    results.push({
+      pageUrl,
+      pageTitle: '',
+      timestamp: new Date().toISOString(),
+      violations: [],
+      passes: [],
+      incomplete: [],
+      inapplicable: [],
+      error: `Failed after ${config.MAX_RETRIES} retries: ${error.message}`,
+    });
   } finally {
-    await browser.close();
+    await context.close();
+    await browserPool.returnBrowser(browser);
   }
 }
 
@@ -447,7 +530,7 @@ async function main() {
   // Initialize queue based on mode
   if (useSitemap) {
     console.log('🗺️  Mixed mode: Attempting to load sitemap...');
-    const sitemapUrls = await tryLoadSitemap(canonicalSeed);
+    const sitemapUrls = await tryLoadSitemap(seed, canonicalSeed);
 
     if (sitemapUrls && sitemapUrls.length > 0) {
       // Sitemap found - use sitemap URLs (limit to maxPages unless unlimited)
@@ -541,9 +624,13 @@ async function main() {
     console.log(`📊 HTML report: ${htmlOutput}`);
   }
   console.log(`📁 Reports directory: ${reportsDir}`);
+
+  // Clean up browser pool
+  await browserPool.cleanup();
 }
 
-main().catch(err => {
+main().catch(async err => {
   console.error(err);
+  await browserPool.cleanup();
   process.exit(1);
 });
