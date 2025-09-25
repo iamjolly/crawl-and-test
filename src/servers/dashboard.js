@@ -6,11 +6,178 @@ const { spawn } = require('child_process');
 const config = require('../core/config');
 const { generateIndexHTML } = require('../generators/index');
 const { parseTimestampFromFilename } = require('../scripts/utils');
+const browserPool = require('../utils/browserPool');
 
 const app = express();
 
-// Store active crawl jobs
+// Store active crawl jobs and queue
 const activeJobs = new Map();
+const queuedJobs = new Map();
+
+// Job status constants
+const JOB_STATUS = {
+  QUEUED: 'queued',
+  RUNNING: 'running',
+  COMPLETED: 'completed',
+  ERROR: 'error',
+  CANCELLED: 'cancelled',
+  TIMEOUT: 'timeout',
+};
+
+// Job management utilities
+function getRunningJobsCount() {
+  return Array.from(activeJobs.values()).filter(job => job.status === JOB_STATUS.RUNNING).length;
+}
+
+function canStartNewJob() {
+  return getRunningJobsCount() < config.MAX_CONCURRENT_JOBS;
+}
+
+function processJobQueue() {
+  if (!canStartNewJob() || queuedJobs.size === 0) {
+    return;
+  }
+
+  // Get the oldest queued job
+  const [jobId, jobData] = queuedJobs.entries().next().value;
+  queuedJobs.delete(jobId);
+
+  // Move job to active jobs and start it
+  jobData.status = JOB_STATUS.RUNNING;
+  activeJobs.set(jobId, jobData);
+  startJobProcess(jobId, jobData);
+
+  console.log(`🚀 Job ${jobId} started from queue`);
+}
+
+function cleanupCompletedJobs() {
+  const now = Date.now();
+
+  for (const [jobId, job] of activeJobs.entries()) {
+    const shouldCleanup =
+      ((job.status === JOB_STATUS.COMPLETED ||
+        job.status === JOB_STATUS.ERROR ||
+        job.status === JOB_STATUS.CANCELLED) &&
+        job.endTime &&
+        now - new Date(job.endTime).getTime() > config.JOB_CLEANUP_DELAY_MS) ||
+      (job.status === JOB_STATUS.RUNNING &&
+        now - new Date(job.startTime).getTime() > config.MAX_JOB_RUNTIME_MS);
+
+    if (shouldCleanup) {
+      if (job.status === JOB_STATUS.RUNNING) {
+        // Timeout the job
+        job.status = JOB_STATUS.TIMEOUT;
+        job.endTime = new Date().toISOString();
+        job.error = 'Job exceeded maximum runtime limit';
+
+        // Kill the process if it exists
+        if (job.process && !job.process.killed) {
+          job.process.kill('SIGTERM');
+        }
+      }
+
+      activeJobs.delete(jobId);
+      console.log(`🧹 Cleaned up job ${jobId} (${job.status})`);
+    }
+  }
+
+  // Process queue after cleanup to start any waiting jobs
+  processJobQueue();
+}
+
+// Periodic cleanup every 30 seconds
+setInterval(cleanupCompletedJobs, 30000);
+
+// Start a job process
+function startJobProcess(jobId, _jobData) {
+  const job = activeJobs.get(jobId);
+  if (!job) {
+    console.error(`❌ Job ${jobId} not found in activeJobs`);
+    return;
+  }
+
+  // Update job status to running
+  job.status = JOB_STATUS.RUNNING;
+  job.startTime = new Date().toISOString();
+
+  // Start crawl process
+  const domain = new URL(job.url).hostname;
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const outputFilename = `${domain}_wcag${job.wcagVersion}_${job.wcagLevel}_${timestamp}.json`;
+
+  const args = [
+    '--seed',
+    job.url,
+    '--depth',
+    job.maxDepth.toString(),
+    '--max-pages',
+    job.maxPages.toString(),
+    '--concurrency',
+    (job.crawlerConcurrency || config.DEFAULT_CRAWLER_CONCURRENCY).toString(),
+    '--wcag-version',
+    job.wcagVersion,
+    '--wcag-level',
+    job.wcagLevel,
+    '--output',
+    outputFilename,
+    '--html', // Generate HTML report
+  ];
+
+  const crawlProcess = spawn('node', ['src/core/crawler.js', ...args], {
+    cwd: process.cwd(),
+    stdio: 'pipe',
+  });
+
+  // Store process reference for potential cancellation
+  job.process = crawlProcess;
+
+  // Log process output for debugging
+  crawlProcess.stdout.on('data', data => {
+    console.log(`Crawl ${jobId}: ${data}`);
+  });
+
+  crawlProcess.stderr.on('data', data => {
+    console.error(`Crawl ${jobId} error: ${data}`);
+  });
+
+  // Handle process completion
+  crawlProcess.on('close', code => {
+    const currentJob = activeJobs.get(jobId);
+    if (currentJob) {
+      currentJob.status = code === 0 ? JOB_STATUS.COMPLETED : JOB_STATUS.ERROR;
+      currentJob.endTime = new Date().toISOString();
+
+      // Regenerate index.html if crawl was successful
+      if (code === 0) {
+        try {
+          generateIndexHTML();
+        } catch (error) {
+          console.error('Error regenerating index.html:', error);
+        }
+      }
+
+      console.log(`✅ Job ${jobId} completed with status: ${currentJob.status}`);
+    }
+
+    // Process next job in queue
+    processJobQueue();
+  });
+
+  crawlProcess.on('error', error => {
+    console.error('Crawl process error:', error);
+    const currentJob = activeJobs.get(jobId);
+    if (currentJob) {
+      currentJob.status = JOB_STATUS.ERROR;
+      currentJob.error = error.message;
+      currentJob.endTime = new Date().toISOString();
+    }
+
+    // Process next job in queue
+    processJobQueue();
+  });
+
+  console.log(`🚀 Started job ${jobId} for ${job.url}`);
+}
 
 // Template loading utilities
 function loadTemplate(templateName) {
@@ -194,11 +361,36 @@ app.get('/browse/:domain', (req, res) => {
 
 // API endpoint to get active jobs
 app.get('/api/jobs', (req, res) => {
-  const jobs = Array.from(activeJobs.entries()).map(([jobId, job]) => ({
+  const activeJobsList = Array.from(activeJobs.entries()).map(([jobId, job]) => ({
     jobId,
     ...job,
   }));
-  res.json(jobs);
+
+  const queuedJobsList = Array.from(queuedJobs.entries()).map(([jobId, job]) => ({
+    jobId,
+    ...job,
+    status: JOB_STATUS.QUEUED,
+  }));
+
+  res.json({
+    active: activeJobsList,
+    queued: queuedJobsList,
+    stats: {
+      running: getRunningJobsCount(),
+      maxConcurrent: config.MAX_CONCURRENT_JOBS,
+      canStartNew: canStartNewJob(),
+      totalActive: activeJobs.size,
+      totalQueued: queuedJobs.size,
+    },
+    browserPool: browserPool.getStatus(),
+    performance: {
+      environment: config.IS_CLOUD_RUN ? 'Cloud Run' : 'Local',
+      pageTimeout: config.PAGE_NAVIGATION_TIMEOUT,
+      maxRetries: config.MAX_RETRIES,
+      waitStrategy: config.WAIT_STRATEGY,
+      disableImages: config.DISABLE_IMAGES,
+    },
+  });
 });
 
 // API endpoint to get current reports
@@ -209,97 +401,103 @@ app.get('/api/reports', (req, res) => {
 
 // Start a new crawl
 app.post('/crawl', (req, res) => {
-  const { url, wcagVersion = '2.1', wcagLevel = 'AA', maxDepth = '2', maxPages = '50' } = req.body;
+  const {
+    url,
+    wcagVersion = '2.1',
+    wcagLevel = 'AA',
+    maxDepth = '2',
+    maxPages = '50',
+    crawlerConcurrency,
+  } = req.body;
 
   if (!url) {
     return res.status(400).json({ success: false, error: 'URL is required' });
   }
 
   const jobId = uuidv4();
-  const startTime = new Date().toISOString();
+  const createdTime = new Date().toISOString();
 
-  // Store job info
-  activeJobs.set(jobId, {
+  // Create job data
+  const jobData = {
     url,
     wcagVersion,
     wcagLevel,
     maxDepth: parseInt(maxDepth),
     maxPages: parseInt(maxPages),
-    status: 'running',
-    startTime,
+    crawlerConcurrency: crawlerConcurrency
+      ? parseInt(crawlerConcurrency)
+      : config.DEFAULT_CRAWLER_CONCURRENCY,
+    createdTime,
+    status: canStartNewJob() ? JOB_STATUS.RUNNING : JOB_STATUS.QUEUED,
+  };
+
+  if (canStartNewJob()) {
+    // Start immediately - only add to activeJobs
+    activeJobs.set(jobId, jobData);
+    startJobProcess(jobId, jobData);
+    console.log(`🚀 Job ${jobId} started immediately`);
+  } else {
+    // Add to queue only - will be moved to activeJobs when ready
+    jobData.status = JOB_STATUS.QUEUED;
+    queuedJobs.set(jobId, jobData);
+    console.log(
+      `📋 Job ${jobId} queued (${getRunningJobsCount()}/${config.MAX_CONCURRENT_JOBS} slots used)`
+    );
+  }
+
+  res.json({
+    success: true,
+    jobId,
+    status: jobData.status,
+    queuePosition: jobData.status === JOB_STATUS.QUEUED ? queuedJobs.size : 0,
   });
+});
 
-  // Start crawl process
-  const domain = new URL(url).hostname;
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const outputFilename = `${domain}_wcag${wcagVersion}_${wcagLevel}_${timestamp}.json`;
+// Cancel a job
+app.delete('/api/jobs/:jobId', (req, res) => {
+  const { jobId } = req.params;
 
-  const args = [
-    '--seed',
-    url,
-    '--depth',
-    maxDepth,
-    '--max-pages',
-    maxPages,
-    '--wcag-version',
-    wcagVersion,
-    '--wcag-level',
-    wcagLevel,
-    '--output',
-    outputFilename,
-    '--html', // Generate HTML report
-  ];
+  // Check if job exists in active jobs
+  const job = activeJobs.get(jobId);
+  if (!job) {
+    return res.status(404).json({ success: false, error: 'Job not found' });
+  }
 
-  const crawlProcess = spawn('node', ['src/core/crawler.js', ...args], {
-    cwd: process.cwd(),
-    stdio: 'pipe',
-  });
+  // Check if job is in queue
+  if (queuedJobs.has(jobId)) {
+    // Remove from queue
+    queuedJobs.delete(jobId);
+    job.status = JOB_STATUS.CANCELLED;
+    job.endTime = new Date().toISOString();
+    console.log(`🚫 Cancelled queued job ${jobId}`);
 
-  // Log process output for debugging
-  crawlProcess.stdout.on('data', data => {
-    console.log(`Crawl ${jobId}: ${data}`);
-  });
+    return res.json({ success: true, message: 'Queued job cancelled' });
+  }
 
-  crawlProcess.stderr.on('data', data => {
-    console.error(`Crawl ${jobId} error: ${data}`);
-  });
-
-  // Handle process completion
-  crawlProcess.on('close', code => {
-    const job = activeJobs.get(jobId);
-    if (job) {
-      job.status = code === 0 ? 'completed' : 'error';
+  // Check if job is running
+  if (job.status === JOB_STATUS.RUNNING && job.process) {
+    // Kill the process
+    try {
+      job.process.kill('SIGTERM');
+      job.status = JOB_STATUS.CANCELLED;
       job.endTime = new Date().toISOString();
+      console.log(`🚫 Cancelled running job ${jobId}`);
 
-      // Remove job after 5 minutes
-      setTimeout(
-        () => {
-          activeJobs.delete(jobId);
-        },
-        5 * 60 * 1000
-      );
+      // Process next job in queue
+      processJobQueue();
 
-      // Regenerate index.html if crawl was successful
-      if (code === 0) {
-        try {
-          generateIndexHTML();
-        } catch (error) {
-          console.error('Error regenerating index.html:', error);
-        }
-      }
+      return res.json({ success: true, message: 'Running job cancelled' });
+    } catch (error) {
+      console.error(`❌ Failed to cancel job ${jobId}:`, error);
+      return res.status(500).json({ success: false, error: 'Failed to cancel job' });
     }
-  });
+  }
 
-  crawlProcess.on('error', error => {
-    console.error('Crawl process error:', error);
-    const job = activeJobs.get(jobId);
-    if (job) {
-      job.status = 'error';
-      job.error = error.message;
-    }
+  // Job is already completed or in error state
+  return res.status(400).json({
+    success: false,
+    error: 'Job cannot be cancelled (already completed or in error state)',
   });
-
-  res.json({ success: true, jobId });
 });
 
 // Start the server
@@ -308,9 +506,36 @@ app.listen(PORT, () => {
   console.log(`🚀 CATS Dashboard running at http://localhost:${PORT}`);
   console.log(`📊 View your dashboard: http://localhost:${PORT}`);
   console.log(`📁 Reports directory: ${config.REPORTS_DIR}`);
+  console.log(`⚡ Job Management:`);
+  console.log(`   • Max concurrent jobs: ${config.MAX_CONCURRENT_JOBS}`);
+  console.log(`   • Default crawler concurrency: ${config.DEFAULT_CRAWLER_CONCURRENCY} browsers`);
+  console.log(`   • Job timeout: ${Math.floor(config.MAX_JOB_RUNTIME_MS / 60000)} minutes`);
+  console.log('');
+  console.log('🚀 Performance Configuration:');
+  console.log(`   • Environment: ${config.IS_CLOUD_RUN ? '☁️  Cloud Run' : '💻 Local'}`);
+  console.log(`   • Page timeout: ${config.PAGE_NAVIGATION_TIMEOUT / 1000}s`);
+  console.log(`   • Wait strategy: ${config.WAIT_STRATEGY}`);
+  console.log(`   • Max retries: ${config.MAX_RETRIES}`);
+  console.log(`   • Browser pool: ${config.BROWSER_POOL_SIZE} instances`);
+  console.log(`   • Images disabled: ${config.DISABLE_IMAGES ? '✅' : '❌'}`);
+  console.log(`   • CSS disabled: ${config.DISABLE_CSS ? '✅' : '❌'}`);
+  console.log(`   • Cleanup delay: ${Math.floor(config.JOB_CLEANUP_DELAY_MS / 60000)} minutes`);
 
   // Always regenerate index.html on server startup
   console.log('🔄 Regenerating dashboard index.html...');
   generateIndexHTML();
   console.log('✅ Dashboard index.html regenerated');
+});
+
+// Graceful shutdown handling
+process.on('SIGTERM', async () => {
+  console.log('🛑 SIGTERM received, shutting down gracefully...');
+  await browserPool.cleanup();
+  process.exit(0);
+});
+
+process.on('SIGINT', async () => {
+  console.log('🛑 SIGINT received, shutting down gracefully...');
+  await browserPool.cleanup();
+  process.exit(0);
 });

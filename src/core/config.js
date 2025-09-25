@@ -48,6 +48,34 @@ class CATSConfig {
     this.DEFAULT_WCAG_VERSION = process.env.CATS_WCAG_VERSION || '2.1';
     this.DEFAULT_WCAG_LEVEL = process.env.CATS_WCAG_LEVEL || 'AA';
 
+    // Job concurrency configuration
+    this.MAX_CONCURRENT_JOBS = parseInt(process.env.CATS_MAX_CONCURRENT_JOBS || '3', 10);
+    this.DEFAULT_CRAWLER_CONCURRENCY = parseInt(process.env.CATS_DEFAULT_CRAWLER_CONCURRENCY || '4', 10);
+    this.JOB_CLEANUP_DELAY_MS = parseInt(process.env.CATS_JOB_CLEANUP_DELAY_MS || '300000', 10); // 5 minutes
+    this.MAX_JOB_RUNTIME_MS = parseInt(process.env.CATS_MAX_JOB_RUNTIME_MS || '3600000', 10); // 1 hour
+
+    // Performance and timeout configuration
+    this.PAGE_NAVIGATION_TIMEOUT = parseInt(process.env.CATS_PAGE_TIMEOUT || '90000', 10); // 90 seconds (was 30s)
+    this.SITEMAP_TIMEOUT = parseInt(process.env.CATS_SITEMAP_TIMEOUT || '20000', 10); // 20 seconds (was 10s)
+    this.ROBOTS_TIMEOUT = parseInt(process.env.CATS_ROBOTS_TIMEOUT || '10000', 10); // 10 seconds
+    this.MAX_RETRIES = parseInt(process.env.CATS_MAX_RETRIES || '3', 10); // Retry failed pages
+    this.RETRY_DELAY_MS = parseInt(process.env.CATS_RETRY_DELAY_MS || '2000', 10); // 2 second base delay
+    this.WAIT_STRATEGY = process.env.CATS_WAIT_STRATEGY || 'domcontentloaded'; // 'networkidle' or 'domcontentloaded'
+
+    // Browser optimization settings
+    this.BROWSER_POOL_SIZE = parseInt(process.env.CATS_BROWSER_POOL_SIZE || '2', 10); // Shared browser instances
+    this.BROWSER_MEMORY_LIMIT_MB = parseInt(process.env.CATS_BROWSER_MEMORY_LIMIT_MB || '1024', 10); // 1GB per browser
+    this.DISABLE_IMAGES = process.env.CATS_DISABLE_IMAGES !== 'false'; // Default: true (faster loading)
+    this.DISABLE_CSS = process.env.CATS_DISABLE_CSS === 'true'; // Default: false (keep CSS for layout)
+
+    // Cloud environment detection
+    this.IS_CLOUD_RUN = !!process.env.K_SERVICE || process.env.NODE_ENV === 'production';
+
+    // Cloud Storage configuration
+    this.USE_CLOUD_STORAGE = process.env.CATS_USE_CLOUD_STORAGE === 'true';
+    this.GOOGLE_CLOUD_PROJECT = process.env.GOOGLE_CLOUD_PROJECT || process.env.GCLOUD_PROJECT;
+    this.STORAGE_BUCKET = process.env.CATS_STORAGE_BUCKET;
+
     // Application branding
     this.APP_NAME = process.env.CATS_APP_NAME || 'CATS';
     this.APP_FULL_NAME = process.env.CATS_APP_FULL_NAME || 'CATS (Crawl and Test System)';
@@ -102,6 +130,12 @@ class CATSConfig {
     console.log(`   SERVER: ${this.getServerUrl()}`);
     console.log(`   MAX_PAGES: ${this.MAX_PAGES}`);
     console.log(`   WCAG: ${this.DEFAULT_WCAG_VERSION} Level ${this.DEFAULT_WCAG_LEVEL}`);
+    console.log(`   CONCURRENCY: ${this.MAX_CONCURRENT_JOBS} jobs, ${this.DEFAULT_CRAWLER_CONCURRENCY} browsers/job`);
+    console.log(`   STORAGE: ${this.USE_CLOUD_STORAGE ? `GCS (${this.STORAGE_BUCKET})` : 'Local'}`);
+    console.log(`   TIMEOUTS: Page=${this.PAGE_NAVIGATION_TIMEOUT}ms, Sitemap=${this.SITEMAP_TIMEOUT}ms`);
+    console.log(`   RETRIES: Max=${this.MAX_RETRIES}, Delay=${this.RETRY_DELAY_MS}ms`);
+    console.log(`   BROWSER: Strategy=${this.WAIT_STRATEGY}, Pool=${this.BROWSER_POOL_SIZE}, Images=${!this.DISABLE_IMAGES}`);
+    console.log(`   ENVIRONMENT: ${this.IS_CLOUD_RUN ? 'Cloud Run' : 'Local'}`);
   }
 
   /**

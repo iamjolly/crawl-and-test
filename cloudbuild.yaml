@@ -1,0 +1,78 @@
+# Google Cloud Build configuration for CATS (Crawl and Test System)
+# Builds and deploys the container to Cloud Run
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/cats-images/cats-accessibility-crawler:${_TAG}'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/cats-images/cats-accessibility-crawler:latest'
+      - '.'
+
+  # Push the container image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/cats-images/cats-accessibility-crawler:${_TAG}'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/cats-images/cats-accessibility-crawler:latest'
+
+  # Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'cats-accessibility-crawler'
+      - '--image'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/cats-images/cats-accessibility-crawler:${_TAG}'
+      - '--region'
+      - '${_REGION}'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '3000'
+      - '--memory'
+      - '8Gi'
+      - '--cpu'
+      - '4'
+      - '--timeout'
+      - '3600'
+      - '--concurrency'
+      - '5'
+      - '--max-instances'
+      - '3'
+      - '--min-instances'
+      - '1'
+      - '--no-cpu-throttling'
+      - '--set-env-vars'
+      - 'CATS_USE_CLOUD_STORAGE=true,CATS_SERVER_HOST=0.0.0.0,CATS_STORAGE_BUCKET=${_STORAGE_BUCKET},GOOGLE_CLOUD_PROJECT=$PROJECT_ID,CATS_MAX_CONCURRENT_JOBS=1,CATS_DEFAULT_CRAWLER_CONCURRENCY=2,CATS_PAGE_TIMEOUT=90000,CATS_BROWSER_POOL_SIZE=2,CATS_DISABLE_IMAGES=true,NODE_ENV=production'
+
+# Configuration for substitutions (can be set in Cloud Build trigger)
+substitutions:
+  _REGION: 'us-central1'  # Change to your preferred region
+  _STORAGE_BUCKET: 'cats-reports-${PROJECT_ID}'  # Default bucket name
+  _TAG: 'manual-build'  # Default tag for manual builds
+
+# Build configuration
+options:
+  # Use high-performance machine for faster builds (Playwright is large)
+  machineType: 'E2_HIGHCPU_8'
+  # Increase disk size for large dependencies
+  diskSizeGb: '100'
+  # Use newer Docker buildx for better caching
+  logging: CLOUD_LOGGING_ONLY
+
+# Build timeout (Playwright installation can be slow)
+timeout: '1800s'  # 30 minutes
+
+# Build images
+images:
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/cats-images/cats-accessibility-crawler:${_TAG}'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/cats-images/cats-accessibility-crawler:latest'

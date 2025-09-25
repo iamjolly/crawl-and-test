@@ -1,0 +1,43 @@
+# Simplified Cloud Build configuration for debugging
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/cats-accessibility-crawler:latest', '.']
+
+  # Deploy to Cloud Run using the latest tag
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'cats-accessibility-crawler'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/cats-accessibility-crawler:latest'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '3000'
+      - '--memory'
+      - '4Gi'
+      - '--cpu'
+      - '2'
+      - '--timeout'
+      - '3600'
+      - '--set-env-vars'
+      - 'CATS_USE_CLOUD_STORAGE=true,CATS_SERVER_HOST=0.0.0.0,CATS_STORAGE_BUCKET=${_STORAGE_BUCKET},GOOGLE_CLOUD_PROJECT=$PROJECT_ID'
+
+substitutions:
+  _STORAGE_BUCKET: 'cats-reports-${PROJECT_ID}'
+
+options:
+  machineType: 'E2_HIGHCPU_8'
+  diskSizeGb: '100'
+  logging: CLOUD_LOGGING_ONLY
+
+timeout: '1800s'
+
+images:
+  - 'gcr.io/$PROJECT_ID/cats-accessibility-crawler:latest'

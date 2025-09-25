@@ -1,0 +1,61 @@
+# Node modules (will be installed in container)
+node_modules
+npm-debug.log*
+
+# Development files
+.git
+.gitignore
+README.md
+DEVELOPMENT.md
+EXAMPLES.md
+.github
+.husky
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+coverage
+*.test.js
+*.spec.js
+tests
+__tests__
+
+# Development tools
+.eslintrc*
+.prettierrc*
+jest.config*
+
+# Environment files (will be set via Cloud Run)
+.env
+.env.*
+
+# Build artifacts (will be generated in container)
+public/styles/*.css
+public/reports/*
+
+# Docker files (not needed in container)
+docker-compose.yml
+Dockerfile
+
+# Serverless examples (not needed for Cloud Run)
+_serverless-examples
+
+# Logs
+logs
+*.log
+
+# Temporary files
+tmp
+temp
+*.tmp
+
+# Development dependencies package-lock
+package-lock.json

@@ -2,7 +2,6 @@
 
 const fs = require('fs/promises');
 const path = require('path');
-const { chromium } = require('playwright');
 const { Command } = require('commander');
 // p-limit v7+ is ES module only, so we need dynamic import
 let pLimit;
@@ -11,6 +10,7 @@ const config = require('./config');
 const axe = require('axe-core');
 const xml2js = require('xml2js');
 const { generateHTMLReport } = require('../generators/html');
+const browserPool = require('../utils/browserPool');
 
 // Helper function to escape HTML (currently unused but kept for future use)
 // function escapeHtml(text) {
@@ -82,8 +82,39 @@ function normalizeUrl(u) {
   return parsed.toString();
 }
 
+async function retryWithDelay(fn, retries = config.MAX_RETRIES, delay = config.RETRY_DELAY_MS) {
+  for (let i = 0; i <= retries; i++) {
+    try {
+      return await fn();
+    } catch (error) {
+      if (i === retries) {
+        throw error; // Final attempt failed
+      }
+
+      const currentDelay = delay * Math.pow(1.5, i); // Exponential backoff
+      console.warn(
+        `⚠️  Attempt ${i + 1} failed: ${error.message}. Retrying in ${currentDelay}ms...`
+      );
+
+      await new Promise(resolve => setTimeout(resolve, currentDelay));
+    }
+  }
+}
+
 function isSameDomain(u1, u2) {
-  return new URL(u1).hostname === new URL(u2).hostname;
+  const hostname1 = new URL(u1).hostname.toLowerCase();
+  const hostname2 = new URL(u2).hostname.toLowerCase();
+
+  // Direct match
+  if (hostname1 === hostname2) {
+    return true;
+  }
+
+  // Handle www/non-www variations
+  const withoutWww1 = hostname1.replace(/^www\./, '');
+  const withoutWww2 = hostname2.replace(/^www\./, '');
+
+  return withoutWww1 === withoutWww2;
 }
 
 // ------------------------------------------------------------------
@@ -100,45 +131,45 @@ function buildAxeTags(wcagVersion, wcagLevel, customTags) {
 
   // Add WCAG version tags
   switch (wcagVersion) {
-  case '2.0':
-    if (wcagLevel === 'A' || wcagLevel === 'AA' || wcagLevel === 'AAA') {
-      tags.push('wcag2a');
-    }
-    if (wcagLevel === 'AA' || wcagLevel === 'AAA') {
-      tags.push('wcag2aa');
-    }
-    if (wcagLevel === 'AAA') {
-      tags.push('wcag2aaa');
-    }
-    break;
+    case '2.0':
+      if (wcagLevel === 'A' || wcagLevel === 'AA' || wcagLevel === 'AAA') {
+        tags.push('wcag2a');
+      }
+      if (wcagLevel === 'AA' || wcagLevel === 'AAA') {
+        tags.push('wcag2aa');
+      }
+      if (wcagLevel === 'AAA') {
+        tags.push('wcag2aaa');
+      }
+      break;
 
-  case '2.1':
-    if (wcagLevel === 'A' || wcagLevel === 'AA' || wcagLevel === 'AAA') {
-      tags.push('wcag2a', 'wcag21a');
-    }
-    if (wcagLevel === 'AA' || wcagLevel === 'AAA') {
-      tags.push('wcag2aa', 'wcag21aa');
-    }
-    if (wcagLevel === 'AAA') {
-      tags.push('wcag2aaa', 'wcag21aaa');
-    }
-    break;
+    case '2.1':
+      if (wcagLevel === 'A' || wcagLevel === 'AA' || wcagLevel === 'AAA') {
+        tags.push('wcag2a', 'wcag21a');
+      }
+      if (wcagLevel === 'AA' || wcagLevel === 'AAA') {
+        tags.push('wcag2aa', 'wcag21aa');
+      }
+      if (wcagLevel === 'AAA') {
+        tags.push('wcag2aaa', 'wcag21aaa');
+      }
+      break;
 
-  case '2.2':
-    if (wcagLevel === 'A' || wcagLevel === 'AA' || wcagLevel === 'AAA') {
-      tags.push('wcag2a', 'wcag21a', 'wcag22a');
-    }
-    if (wcagLevel === 'AA' || wcagLevel === 'AAA') {
-      tags.push('wcag2aa', 'wcag21aa', 'wcag22aa');
-    }
-    if (wcagLevel === 'AAA') {
-      tags.push('wcag2aaa', 'wcag21aaa', 'wcag22aaa');
-    }
-    break;
+    case '2.2':
+      if (wcagLevel === 'A' || wcagLevel === 'AA' || wcagLevel === 'AAA') {
+        tags.push('wcag2a', 'wcag21a', 'wcag22a');
+      }
+      if (wcagLevel === 'AA' || wcagLevel === 'AAA') {
+        tags.push('wcag2aa', 'wcag21aa', 'wcag22aa');
+      }
+      if (wcagLevel === 'AAA') {
+        tags.push('wcag2aaa', 'wcag21aaa', 'wcag22aaa');
+      }
+      break;
 
-  default:
-    console.warn(`⚠️ Unknown WCAG version: ${wcagVersion}, defaulting to 2.0 AA`);
-    tags.push('wcag2a', 'wcag2aa');
+    default:
+      console.warn(`⚠️ Unknown WCAG version: ${wcagVersion}, defaulting to 2.0 AA`);
+      tags.push('wcag2a', 'wcag2aa');
   }
 
   console.log(`🎯 Testing WCAG ${wcagVersion} Level ${wcagLevel}: ${tags.join(', ')}`);
@@ -210,15 +241,16 @@ async function fetchSitemap(sitemapUrl) {
       content = await response.text();
     } catch {
       // Fallback to Playwright for older Node.js versions
-      const browser = await chromium.launch({ headless: true });
-      const context = await browser.newContext();
+      const browser = await browserPool.getBrowser();
+      const context = await browserPool.createContext(browser);
       const page = await context.newPage();
 
       try {
-        const response = await page.goto(sitemapUrl, { timeout: 10000 });
+        const response = await page.goto(sitemapUrl, { timeout: config.SITEMAP_TIMEOUT });
         if (!response || !response.ok()) {
           console.log(`  Response: ${response?.status()} ${response?.statusText()}`);
-          await browser.close();
+          await context.close();
+          await browserPool.returnBrowser(browser);
           return null;
         }
 
@@ -227,7 +259,8 @@ async function fetchSitemap(sitemapUrl) {
         // Clean up HTML wrapper that browsers add to XML
         content = content.replace(/^.*?<\?xml/, '<?xml').replace(/<\/html>.*$/, '');
       } finally {
-        await browser.close();
+        await context.close();
+        await browserPool.returnBrowser(browser);
       }
     }
 
@@ -267,8 +300,8 @@ async function fetchSitemap(sitemapUrl) {
   }
 }
 
-async function tryLoadSitemap(seedUrl) {
-  const parsed = new URL(seedUrl);
+async function tryLoadSitemap(seedUrl, canonicalUrl) {
+  const parsed = new URL(canonicalUrl || seedUrl);
   const sitemapUrls = [
     `${parsed.origin}/sitemap.xml`,
     `${parsed.origin}/sitemap_index.xml`,
@@ -280,8 +313,22 @@ async function tryLoadSitemap(seedUrl) {
     const urls = await fetchSitemap(sitemapUrl);
     if (urls && urls.length > 0) {
       console.log(`✓ Found sitemap with ${urls.length} URLs`);
-      const filteredUrls = urls.filter(u => isSameDomain(seedUrl, u));
-      return filteredUrls;
+      console.log(
+        `🔍 Filtering URLs using canonical domain: ${new URL(canonicalUrl || seedUrl).hostname}`
+      );
+
+      const filteredUrls = urls.filter(u => {
+        const matches = isSameDomain(canonicalUrl || seedUrl, u);
+        if (!matches) {
+          console.log(`  ❌ Filtered out: ${u} (domain mismatch)`);
+        } else {
+          console.log(`  ✅ Included: ${u}`);
+        }
+        return matches;
+      });
+
+      console.log(`📊 Sitemap filtering result: ${filteredUrls.length}/${urls.length} URLs kept`);
+      return filteredUrls.length > 0 ? filteredUrls : null;
     }
   }
 
@@ -290,8 +337,55 @@ async function tryLoadSitemap(seedUrl) {
 }
 
 // ------------------------------------------------------------------
-// Domain resolution (follow redirects to get canonical domain)
+// Domain validation and resolution
 // ------------------------------------------------------------------
+async function validateDomain(url) {
+  console.log(`🔍 Validating domain accessibility for ${url}...`);
+
+  try {
+    // Try a simple HEAD request to verify the domain exists and is accessible
+    const response = await fetch(url, {
+      method: 'HEAD',
+      redirect: 'follow',
+      timeout: 30000  // 30 second timeout for domain validation
+    });
+
+    // Check if we got a reasonable response
+    if (response.status >= 200 && response.status < 600) {
+      console.log(`✅ Domain validation successful (HTTP ${response.status})`);
+      return true;
+    }
+
+    throw new Error(`HTTP ${response.status} ${response.statusText}`);
+
+  } catch (error) {
+    // Check for DNS/network errors vs HTTP errors
+    // Modern Node.js fetch may wrap DNS errors differently
+    const isDnsError = error.code === 'ENOTFOUND' ||
+                      error.code === 'ECONNREFUSED' ||
+                      error.message.includes('getaddrinfo') ||
+                      error.message.includes('DNS') ||
+                      error.message.includes('fetch failed') ||  // Common Node.js fetch DNS error
+                      (error.cause && (
+                        error.cause.code === 'ENOTFOUND' ||
+                        error.cause.message?.includes('getaddrinfo')
+                      ));
+
+    if (isDnsError) {
+      console.error(`❌ Domain validation failed: ${url} does not exist or is not accessible`);
+      console.error(`   Network error: ${error.message}`);
+      if (error.cause) {
+        console.error(`   Root cause: ${error.cause.code} - ${error.cause.message}`);
+      }
+      throw new Error(`Domain "${new URL(url).hostname}" does not exist or is not accessible. Please check the URL and try again.`);
+    }
+
+    // For other errors (timeouts, HTTP errors), log but don't fail validation
+    console.warn(`⚠️ Domain validation warning for ${url}: ${error.message}`);
+    return true; // Allow crawling to proceed
+  }
+}
+
 async function getCanonicalDomain(url) {
   try {
     // First try with fetch for HTTP-level redirects (faster)
@@ -299,18 +393,23 @@ async function getCanonicalDomain(url) {
     const fetchFinalUrl = response.url;
 
     // Use Playwright to handle meta refresh and JavaScript redirects
-    const browser = await chromium.launch({ headless: true });
-    const context = await browser.newContext();
+    const browser = await browserPool.getBrowser();
+    const context = await browserPool.createContext(browser);
     const page = await context.newPage();
 
     try {
-      await page.goto(fetchFinalUrl, { waitUntil: 'networkidle', timeout: 10000 });
+      await page.goto(fetchFinalUrl, {
+        waitUntil: config.WAIT_STRATEGY,
+        timeout: config.SITEMAP_TIMEOUT,
+      });
       const playwrightFinalUrl = page.url();
-      await browser.close();
+      await context.close();
+      await browserPool.returnBrowser(browser);
 
       return new URL(playwrightFinalUrl).hostname;
     } catch (playwrightError) {
-      await browser.close();
+      await context.close();
+      await browserPool.returnBrowser(browser);
       // Fall back to fetch result if Playwright fails
       console.warn(
         `Playwright redirect check failed, using fetch result: ${playwrightError.message}`
@@ -318,7 +417,14 @@ async function getCanonicalDomain(url) {
       return new URL(fetchFinalUrl).hostname;
     }
   } catch (error) {
-    // Fallback to original URL if all redirect checks fail
+    // Check for DNS/network errors that indicate domain doesn't exist
+    if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' ||
+        error.message.includes('getaddrinfo') || error.message.includes('DNS') ||
+        error.message.includes('ENOTFOUND') || error.message.includes('net::ERR_NAME_NOT_RESOLVED')) {
+      throw new Error(`Domain "${new URL(url).hostname}" does not exist or is not accessible. Network error: ${error.message}`);
+    }
+
+    // For other errors (timeouts, etc.), fall back to original URL
     console.warn(`Could not check redirects for ${url}: ${error.message}`);
     return new URL(url).hostname;
   }
@@ -369,8 +475,8 @@ async function crawlPage(pageUrl, currentDepth) {
 
   await politePause(domain);
 
-  const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext();
+  const browser = await browserPool.getBrowser();
+  const context = await browserPool.createContext(browser);
   const page = await context.newPage();
 
   // Respect robots.txt
@@ -391,21 +497,32 @@ async function crawlPage(pageUrl, currentDepth) {
   }
 
   try {
-    await page.goto(pageUrl, { waitUntil: 'networkidle', timeout: 30000 });
+    // Use retry logic for page scanning
+    const scanResult = await retryWithDelay(async () => {
+      await page.goto(pageUrl, {
+        waitUntil: config.WAIT_STRATEGY,
+        timeout: config.PAGE_NAVIGATION_TIMEOUT,
+      });
 
-    // Inject axe
-    await page.addScriptTag({ content: axe.source });
+      // Inject axe
+      await page.addScriptTag({ content: axe.source });
 
-    // Get page title
-    const pageTitle = await page.title();
+      // Get page title
+      const pageTitle = await page.title();
 
-    const axeResult = await page.evaluate(options => axe.run(document, options), axeConfig);
+      const axeResult = await page.evaluate(options => axe.run(document, options), axeConfig);
+
+      return {
+        pageTitle: pageTitle || '',
+        axeResult,
+      };
+    });
 
     results.push({
       pageUrl,
-      pageTitle: pageTitle || '', // Add page title to results
+      pageTitle: scanResult.pageTitle,
       timestamp: new Date().toISOString(),
-      ...axeResult,
+      ...scanResult.axeResult,
     });
 
     // Extract and enqueue new links (only in discovery mode)
@@ -420,10 +537,30 @@ async function crawlPage(pageUrl, currentDepth) {
         }
       }
     }
-  } catch (e) {
-    console.error(`Failed ${pageUrl}: ${e.message}`);
+
+    console.log(
+      `✅ ${pageUrl} - ${scanResult.axeResult.violations?.length || 0} violations, ${
+        scanResult.axeResult.passes?.length || 0
+      } passes`
+    );
+  } catch (error) {
+    console.error(
+      `❌ Failed to scan ${pageUrl} after ${config.MAX_RETRIES} retries:`,
+      error.message
+    );
+    results.push({
+      pageUrl,
+      pageTitle: '',
+      timestamp: new Date().toISOString(),
+      violations: [],
+      passes: [],
+      incomplete: [],
+      inapplicable: [],
+      error: `Failed after ${config.MAX_RETRIES} retries: ${error.message}`,
+    });
   } finally {
-    await browser.close();
+    await context.close();
+    await browserPool.returnBrowser(browser);
   }
 }
 
@@ -438,6 +575,9 @@ async function main() {
   }
   const limit = pLimit(concurrency);
 
+  // First, validate that the domain exists and is accessible
+  await validateDomain(seed);
+
   // Get canonical domain for proper sitemap filtering
   console.log(`🔍 Checking canonical domain for ${seed}...`);
   const canonicalDomain = await getCanonicalDomain(seed);
@@ -447,7 +587,7 @@ async function main() {
   // Initialize queue based on mode
   if (useSitemap) {
     console.log('🗺️  Mixed mode: Attempting to load sitemap...');
-    const sitemapUrls = await tryLoadSitemap(canonicalSeed);
+    const sitemapUrls = await tryLoadSitemap(seed, canonicalSeed);
 
     if (sitemapUrls && sitemapUrls.length > 0) {
       // Sitemap found - use sitemap URLs (limit to maxPages unless unlimited)
@@ -494,6 +634,28 @@ async function main() {
 
     if (batch.length > 0) {
       await Promise.all(batch);
+
+      // Check for early exit conditions - if all recent pages are failing with network errors
+      if (results.length >= 3) { // Only check after we have some results
+        const recentResults = results.slice(-3); // Check last 3 results
+        const networkErrors = recentResults.filter(result =>
+          result.error && (
+            result.error.includes('ENOTFOUND') ||
+            result.error.includes('does not exist') ||
+            result.error.includes('DNS') ||
+            result.error.includes('net::ERR_NAME_NOT_RESOLVED') ||
+            result.error.includes('getaddrinfo')
+          )
+        );
+
+        // If all recent results are network errors, exit early
+        if (networkErrors.length === recentResults.length && networkErrors.length > 0) {
+          console.error(`🛑 Stopping crawl: All recent pages are failing with network errors`);
+          console.error(`   This suggests the domain may not exist or be accessible`);
+          break;
+        }
+      }
+
       const progressMsg = isUnlimited
         ? `📊 Progress: ${results.length} pages scanned, ${queue.length} remaining`
         : `📊 Progress: ${results.length} pages scanned, ${queue.length} remaining (max: ${maxPagesNum})`;
@@ -541,9 +703,24 @@ async function main() {
     console.log(`📊 HTML report: ${htmlOutput}`);
   }
   console.log(`📁 Reports directory: ${reportsDir}`);
+
+  // Clean up browser pool
+  await browserPool.cleanup();
 }
 
-main().catch(err => {
-  console.error(err);
+main().catch(async err => {
+  console.error('💥 Crawl failed:', err.message);
+
+  // If it's a domain validation error, provide helpful guidance
+  if (err.message.includes('does not exist or is not accessible')) {
+    console.error('');
+    console.error('🔧 Troubleshooting tips:');
+    console.error('   • Check that the domain name is spelled correctly');
+    console.error('   • Verify the domain exists by visiting it in a browser');
+    console.error('   • Try with "www" prefix if the domain redirects (e.g., www.example.com)');
+    console.error('   • Ensure the domain is publicly accessible (not behind VPN/firewall)');
+  }
+
+  await browserPool.cleanup();
   process.exit(1);
 });
