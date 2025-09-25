@@ -6,6 +6,7 @@ const { spawn } = require('child_process');
 const config = require('../core/config');
 const { generateIndexHTML } = require('../generators/index');
 const { parseTimestampFromFilename } = require('../scripts/utils');
+const browserPool = require('../utils/browserPool');
 
 const app = express();
 
@@ -41,8 +42,12 @@ function processJobQueue() {
   const [jobId, jobData] = queuedJobs.entries().next().value;
   queuedJobs.delete(jobId);
 
-  // Start the job
+  // Move job to active jobs and start it
+  jobData.status = JOB_STATUS.RUNNING;
+  activeJobs.set(jobId, jobData);
   startJobProcess(jobId, jobData);
+
+  console.log(`🚀 Job ${jobId} started from queue`);
 }
 
 function cleanupCompletedJobs() {
@@ -76,7 +81,7 @@ function cleanupCompletedJobs() {
     }
   }
 
-  // Process queue after cleanup
+  // Process queue after cleanup to start any waiting jobs
   processJobQueue();
 }
 
@@ -377,6 +382,14 @@ app.get('/api/jobs', (req, res) => {
       totalActive: activeJobs.size,
       totalQueued: queuedJobs.size,
     },
+    browserPool: browserPool.getStatus(),
+    performance: {
+      environment: config.IS_CLOUD_RUN ? 'Cloud Run' : 'Local',
+      pageTimeout: config.PAGE_NAVIGATION_TIMEOUT,
+      maxRetries: config.MAX_RETRIES,
+      waitStrategy: config.WAIT_STRATEGY,
+      disableImages: config.DISABLE_IMAGES,
+    },
   });
 });
 
@@ -418,15 +431,14 @@ app.post('/crawl', (req, res) => {
     status: canStartNewJob() ? JOB_STATUS.RUNNING : JOB_STATUS.QUEUED,
   };
 
-  // Store job info
-  activeJobs.set(jobId, jobData);
-
   if (canStartNewJob()) {
-    // Start immediately
+    // Start immediately - only add to activeJobs
+    activeJobs.set(jobId, jobData);
     startJobProcess(jobId, jobData);
     console.log(`🚀 Job ${jobId} started immediately`);
   } else {
-    // Add to queue
+    // Add to queue only - will be moved to activeJobs when ready
+    jobData.status = JOB_STATUS.QUEUED;
     queuedJobs.set(jobId, jobData);
     console.log(
       `📋 Job ${jobId} queued (${getRunningJobsCount()}/${config.MAX_CONCURRENT_JOBS} slots used)`
@@ -482,12 +494,10 @@ app.delete('/api/jobs/:jobId', (req, res) => {
   }
 
   // Job is already completed or in error state
-  return res
-    .status(400)
-    .json({
-      success: false,
-      error: 'Job cannot be cancelled (already completed or in error state)',
-    });
+  return res.status(400).json({
+    success: false,
+    error: 'Job cannot be cancelled (already completed or in error state)',
+  });
 });
 
 // Start the server
@@ -500,10 +510,32 @@ app.listen(PORT, () => {
   console.log(`   • Max concurrent jobs: ${config.MAX_CONCURRENT_JOBS}`);
   console.log(`   • Default crawler concurrency: ${config.DEFAULT_CRAWLER_CONCURRENCY} browsers`);
   console.log(`   • Job timeout: ${Math.floor(config.MAX_JOB_RUNTIME_MS / 60000)} minutes`);
+  console.log('');
+  console.log('🚀 Performance Configuration:');
+  console.log(`   • Environment: ${config.IS_CLOUD_RUN ? '☁️  Cloud Run' : '💻 Local'}`);
+  console.log(`   • Page timeout: ${config.PAGE_NAVIGATION_TIMEOUT / 1000}s`);
+  console.log(`   • Wait strategy: ${config.WAIT_STRATEGY}`);
+  console.log(`   • Max retries: ${config.MAX_RETRIES}`);
+  console.log(`   • Browser pool: ${config.BROWSER_POOL_SIZE} instances`);
+  console.log(`   • Images disabled: ${config.DISABLE_IMAGES ? '✅' : '❌'}`);
+  console.log(`   • CSS disabled: ${config.DISABLE_CSS ? '✅' : '❌'}`);
   console.log(`   • Cleanup delay: ${Math.floor(config.JOB_CLEANUP_DELAY_MS / 60000)} minutes`);
 
   // Always regenerate index.html on server startup
   console.log('🔄 Regenerating dashboard index.html...');
   generateIndexHTML();
   console.log('✅ Dashboard index.html regenerated');
+});
+
+// Graceful shutdown handling
+process.on('SIGTERM', async () => {
+  console.log('🛑 SIGTERM received, shutting down gracefully...');
+  await browserPool.cleanup();
+  process.exit(0);
+});
+
+process.on('SIGINT', async () => {
+  console.log('🛑 SIGINT received, shutting down gracefully...');
+  await browserPool.cleanup();
+  process.exit(0);
 });
