@@ -347,7 +347,7 @@ async function validateDomain(url) {
     const response = await fetch(url, {
       method: 'HEAD',
       redirect: 'follow',
-      timeout: 30000  // 30 second timeout for domain validation
+      timeout: 30000, // 30 second timeout for domain validation
     });
 
     // Check if we got a reasonable response
@@ -357,19 +357,27 @@ async function validateDomain(url) {
     }
 
     throw new Error(`HTTP ${response.status} ${response.statusText}`);
-
   } catch (error) {
+    // Check for SSL certificate errors
+    const isSslError =
+      error.message.includes('UNABLE_TO_VERIFY_LEAF_SIGNATURE') ||
+      error.message.includes('certificate') ||
+      error.message.includes('SSL') ||
+      error.message.includes('TLS') ||
+      (error.cause &&
+        (error.cause.code === 'UNABLE_TO_VERIFY_LEAF_SIGNATURE' ||
+          error.cause.message?.includes('certificate')));
+
     // Check for DNS/network errors vs HTTP errors
     // Modern Node.js fetch may wrap DNS errors differently
-    const isDnsError = error.code === 'ENOTFOUND' ||
-                      error.code === 'ECONNREFUSED' ||
-                      error.message.includes('getaddrinfo') ||
-                      error.message.includes('DNS') ||
-                      error.message.includes('fetch failed') ||  // Common Node.js fetch DNS error
-                      (error.cause && (
-                        error.cause.code === 'ENOTFOUND' ||
-                        error.cause.message?.includes('getaddrinfo')
-                      ));
+    const isDnsError =
+      error.code === 'ENOTFOUND' ||
+      error.code === 'ECONNREFUSED' ||
+      error.message.includes('getaddrinfo') ||
+      error.message.includes('DNS') ||
+      (error.message.includes('fetch failed') && !isSslError) || // DNS errors, not SSL
+      (error.cause &&
+        (error.cause.code === 'ENOTFOUND' || error.cause.message?.includes('getaddrinfo')));
 
     if (isDnsError) {
       console.error(`❌ Domain validation failed: ${url} does not exist or is not accessible`);
@@ -377,7 +385,18 @@ async function validateDomain(url) {
       if (error.cause) {
         console.error(`   Root cause: ${error.cause.code} - ${error.cause.message}`);
       }
-      throw new Error(`Domain "${new URL(url).hostname}" does not exist or is not accessible. Please check the URL and try again.`);
+      throw new Error(
+        `Domain "${new URL(url).hostname}" does not exist or is not accessible. Please check the URL and try again.`
+      );
+    }
+
+    if (isSslError) {
+      console.warn(`⚠️ SSL certificate validation issue for ${url}: ${error.message}`);
+      console.warn(
+        `   This is usually due to incomplete certificate chain configuration on the server.`
+      );
+      console.warn(`   The crawl will proceed, but the browser may handle SSL differently.`);
+      return true; // Allow crawling to proceed - Playwright handles SSL differently
     }
 
     // For other errors (timeouts, HTTP errors), log but don't fail validation
@@ -418,10 +437,17 @@ async function getCanonicalDomain(url) {
     }
   } catch (error) {
     // Check for DNS/network errors that indicate domain doesn't exist
-    if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' ||
-        error.message.includes('getaddrinfo') || error.message.includes('DNS') ||
-        error.message.includes('ENOTFOUND') || error.message.includes('net::ERR_NAME_NOT_RESOLVED')) {
-      throw new Error(`Domain "${new URL(url).hostname}" does not exist or is not accessible. Network error: ${error.message}`);
+    if (
+      error.code === 'ENOTFOUND' ||
+      error.code === 'ECONNREFUSED' ||
+      error.message.includes('getaddrinfo') ||
+      error.message.includes('DNS') ||
+      error.message.includes('ENOTFOUND') ||
+      error.message.includes('net::ERR_NAME_NOT_RESOLVED')
+    ) {
+      throw new Error(
+        `Domain "${new URL(url).hostname}" does not exist or is not accessible. Network error: ${error.message}`
+      );
     }
 
     // For other errors (timeouts, etc.), fall back to original URL
@@ -636,16 +662,17 @@ async function main() {
       await Promise.all(batch);
 
       // Check for early exit conditions - if all recent pages are failing with network errors
-      if (results.length >= 3) { // Only check after we have some results
+      if (results.length >= 3) {
+        // Only check after we have some results
         const recentResults = results.slice(-3); // Check last 3 results
-        const networkErrors = recentResults.filter(result =>
-          result.error && (
-            result.error.includes('ENOTFOUND') ||
-            result.error.includes('does not exist') ||
-            result.error.includes('DNS') ||
-            result.error.includes('net::ERR_NAME_NOT_RESOLVED') ||
-            result.error.includes('getaddrinfo')
-          )
+        const networkErrors = recentResults.filter(
+          result =>
+            result.error &&
+            (result.error.includes('ENOTFOUND') ||
+              result.error.includes('does not exist') ||
+              result.error.includes('DNS') ||
+              result.error.includes('net::ERR_NAME_NOT_RESOLVED') ||
+              result.error.includes('getaddrinfo'))
         );
 
         // If all recent results are network errors, exit early
