@@ -11,6 +11,7 @@ const axe = require('axe-core');
 const xml2js = require('xml2js');
 const { generateHTMLReport } = require('../generators/html');
 const browserPool = require('../utils/browserPool');
+const storage = require('../utils/storage');
 
 // Helper function to escape HTML (currently unused but kept for future use)
 // function escapeHtml(text) {
@@ -710,8 +711,15 @@ async function main() {
     jsonOutput = path.join(reportsDir, output);
   }
 
-  // Write JSON report
-  await fs.writeFile(jsonOutput, JSON.stringify(results, null, 2), 'utf-8');
+  // Write JSON report using enhanced storage system
+  const jsonRelativePath = path.relative(config.PUBLIC_DIR, jsonOutput);
+  const saveResult = await storage.saveFile(jsonRelativePath, JSON.stringify(results, null, 2), {
+    contentType: 'application/json',
+  });
+
+  if (saveResult.fallback) {
+    console.warn(`⚠️  JSON report saved to local storage (fallback): ${saveResult.error}`);
+  }
 
   // Generate HTML report if requested
   let htmlOutput = null;
@@ -720,7 +728,16 @@ async function main() {
     htmlOutput = path.join(reportsDir, htmlFilename);
     // Use modern template system from src/generators/html.js
     const htmlContent = generateHTMLReport(results, htmlFilename);
-    await fs.writeFile(htmlOutput, htmlContent, 'utf-8');
+
+    // Save HTML report using enhanced storage system
+    const htmlRelativePath = path.relative(config.PUBLIC_DIR, htmlOutput);
+    const htmlSaveResult = await storage.saveFile(htmlRelativePath, htmlContent, {
+      contentType: 'text/html',
+    });
+
+    if (htmlSaveResult.fallback) {
+      console.warn(`⚠️  HTML report saved to local storage (fallback): ${htmlSaveResult.error}`);
+    }
   }
 
   const mode = usingSitemap ? 'sitemap' : 'discovery';

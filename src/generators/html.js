@@ -18,6 +18,7 @@ const fs = require('fs');
 const path = require('path');
 const config = require('../core/config');
 const WcagLinkMapper = require('../utils/wcag-link-mapper');
+const storage = require('../utils/storage');
 
 // Initialize WCAG Link Mapper for W3C documentation links
 const wcagMapper = new WcagLinkMapper();
@@ -592,7 +593,7 @@ function findAllJSONReports(reportsDir, targetDomain = null) {
 }
 
 // Regenerate HTML from JSON data
-function regenerateHTML(jsonPath, htmlPath) {
+async function regenerateHTML(jsonPath, htmlPath) {
   try {
     console.log(`🔄 Processing: ${path.basename(jsonPath)}`);
 
@@ -615,17 +616,33 @@ function regenerateHTML(jsonPath, htmlPath) {
       fs.mkdirSync(publicDomainDir, { recursive: true });
     }
 
-    // Copy JSON file to public directory for download access
+    // Copy JSON file using enhanced storage system
     const publicJsonPath = path.join(publicDomainDir, path.basename(jsonPath));
-    fs.copyFileSync(jsonPath, publicJsonPath);
+    const jsonContent = fs.readFileSync(jsonPath, 'utf8');
+    const jsonRelativePath = path.relative(config.PUBLIC_DIR, publicJsonPath);
 
-    // Update HTML path to point to public directory
+    const jsonSaveResult = await storage.saveFile(jsonRelativePath, jsonContent, {
+      contentType: 'application/json',
+    });
+
+    if (jsonSaveResult.fallback) {
+      console.warn(`⚠️  JSON file saved to local storage (fallback): ${jsonSaveResult.error}`);
+    }
+
+    // Generate and save HTML report using enhanced storage system
     const publicHtmlPath = path.join(publicDomainDir, path.basename(htmlPath));
-
-    const jsonData = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+    const jsonData = JSON.parse(jsonContent);
     const htmlContent = generateHTMLReport(jsonData, path.basename(jsonPath));
 
-    fs.writeFileSync(publicHtmlPath, htmlContent, 'utf8');
+    const htmlRelativePath = path.relative(config.PUBLIC_DIR, publicHtmlPath);
+    const htmlSaveResult = await storage.saveFile(htmlRelativePath, htmlContent, {
+      contentType: 'text/html',
+    });
+
+    if (htmlSaveResult.fallback) {
+      console.warn(`⚠️  HTML file saved to local storage (fallback): ${htmlSaveResult.error}`);
+    }
+
     console.log(`✅ Generated: ${path.relative(__dirname, publicHtmlPath)}`);
     console.log(`📄 JSON data: ${path.relative(__dirname, publicJsonPath)}`);
     return true;
@@ -636,7 +653,7 @@ function regenerateHTML(jsonPath, htmlPath) {
 }
 
 // Main function
-function main() {
+async function main() {
   const args = process.argv.slice(2);
   const reportsDir = config.LEGACY_REPORTS_DIR;
 
@@ -704,7 +721,7 @@ function main() {
       process.exit(1);
     }
 
-    const success = regenerateHTML(jsonPath, htmlPath);
+    const success = await regenerateHTML(jsonPath, htmlPath);
     process.exit(success ? 0 : 1);
   }
 
@@ -763,18 +780,18 @@ function main() {
   let totalSuccess = 0;
 
   // Process each domain
-  Object.entries(reportsByDomain).forEach(([domain, reports]) => {
+  for (const [domain, reports] of Object.entries(reportsByDomain)) {
     console.log(`\n📂 Domain: ${domain} (${reports.length} reports)`);
     console.log('─'.repeat(50));
 
-    reports.forEach(report => {
+    for (const report of reports) {
       totalProcessed++;
-      const success = regenerateHTML(report.jsonPath, report.htmlPath);
+      const success = await regenerateHTML(report.jsonPath, report.htmlPath);
       if (success) {
         totalSuccess++;
       }
-    });
-  });
+    }
+  }
 
   console.log('\n' + '='.repeat(50));
   console.log(`📊 Summary: ${totalSuccess}/${totalProcessed} HTML reports generated successfully`);
@@ -789,7 +806,10 @@ function main() {
 
 // Run the script
 if (require.main === module) {
-  main();
+  main().catch(error => {
+    console.error('❌ HTML generator failed:', error.message);
+    process.exit(1);
+  });
 }
 
 module.exports = { generateHTMLReport, findMissingHTMLReports, regenerateHTML };
