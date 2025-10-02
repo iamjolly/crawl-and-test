@@ -1,32 +1,67 @@
 const fs = require('fs');
 const path = require('path');
 const config = require('../core/config');
+const storage = require('../utils/storage');
 
 // Utility function to get all report directories
-function getReportDirectories() {
-  const reportsDir = config.REPORTS_DIR;
-  if (!fs.existsSync(reportsDir)) {
-    return [];
-  }
+async function getReportDirectories() {
+  try {
+    if (config.USE_CLOUD_STORAGE) {
+      // Get reports from cloud storage
+      const files = await storage.listFiles('reports/');
+      const domainMap = new Map();
 
-  return fs
-    .readdirSync(reportsDir, { withFileTypes: true })
-    .filter(dirent => dirent.isDirectory())
-    .map(dirent => {
-      const dirPath = path.join(reportsDir, dirent.name);
-      const files = fs.readdirSync(dirPath);
-      const reports = files.filter(file => file.endsWith('.html'));
-      return {
-        domain: dirent.name,
+      files.forEach(filePath => {
+        // Extract domain from path like "reports/example.com/report.html"
+        const parts = filePath.split('/');
+        if (parts.length >= 3 && parts[0] === 'reports') {
+          const domain = parts[1];
+          const fileName = parts[parts.length - 1];
+
+          if (fileName.endsWith('.html')) {
+            if (!domainMap.has(domain)) {
+              domainMap.set(domain, []);
+            }
+            domainMap.get(domain).push(fileName);
+          }
+        }
+      });
+
+      return Array.from(domainMap.entries()).map(([domain, reports]) => ({
+        domain,
         reportCount: reports.length,
         lastReport: reports.length > 0 ? reports.sort().pop() : null,
-      };
-    });
+      }));
+    } else {
+      // Fallback to local filesystem
+      const reportsDir = config.REPORTS_DIR;
+      if (!fs.existsSync(reportsDir)) {
+        return [];
+      }
+
+      return fs
+        .readdirSync(reportsDir, { withFileTypes: true })
+        .filter(dirent => dirent.isDirectory())
+        .map(dirent => {
+          const dirPath = path.join(reportsDir, dirent.name);
+          const files = fs.readdirSync(dirPath);
+          const reports = files.filter(file => file.endsWith('.html'));
+          return {
+            domain: dirent.name,
+            reportCount: reports.length,
+            lastReport: reports.length > 0 ? reports.sort().pop() : null,
+          };
+        });
+    }
+  } catch (error) {
+    console.error('❌ Failed to get report directories:', error.message);
+    return [];
+  }
 }
 
 // Generate reports list HTML
-function generateReportsListHTML() {
-  const reportDirs = getReportDirectories();
+async function generateReportsListHTML() {
+  const reportDirs = await getReportDirectories();
 
   if (reportDirs.length === 0) {
     return '<p class="no-reports">No reports generated yet. Start a crawl to create your first report!</p>';
@@ -40,13 +75,13 @@ function generateReportsListHTML() {
                 <h3>${dir.domain}</h3>
                 <p>${dir.reportCount} report(s) available</p>
                 ${
-  dir.lastReport
-    ? `
+                  dir.lastReport
+                    ? `
                     <a href="${lastReportUrl}" class="btn btn-view">View Latest Report</a>
                     <a href="/browse/${dir.domain}" class="btn btn-browse">Browse All</a>
                 `
-    : '<p class="no-reports">No reports yet</p>'
-}
+                    : '<p class="no-reports">No reports yet</p>'
+                }
             </div>
         `;
     })
@@ -54,7 +89,7 @@ function generateReportsListHTML() {
 }
 
 // Generate index.html from template
-function generateIndexHTML() {
+async function generateIndexHTML() {
   console.log('🏠 Generating dashboard index.html...');
 
   // Read the dashboard template
@@ -66,7 +101,7 @@ function generateIndexHTML() {
   const template = fs.readFileSync(templatePath, 'utf8');
 
   // Generate dynamic content
-  const reportsListHTML = generateReportsListHTML();
+  const reportsListHTML = await generateReportsListHTML();
 
   // Replace placeholders
   const html = template

@@ -7,6 +7,7 @@ const config = require('../core/config');
 const { generateIndexHTML } = require('../generators/index');
 const { parseTimestampFromFilename } = require('../scripts/utils');
 const browserPool = require('../utils/browserPool');
+const storage = require('../utils/storage');
 
 const app = express();
 
@@ -141,7 +142,7 @@ function startJobProcess(jobId, _jobData) {
   });
 
   // Handle process completion
-  crawlProcess.on('close', code => {
+  crawlProcess.on('close', async code => {
     const currentJob = activeJobs.get(jobId);
     if (currentJob) {
       currentJob.status = code === 0 ? JOB_STATUS.COMPLETED : JOB_STATUS.ERROR;
@@ -150,7 +151,7 @@ function startJobProcess(jobId, _jobData) {
       // Regenerate index.html if crawl was successful
       if (code === 0) {
         try {
-          generateIndexHTML();
+          await generateIndexHTML();
         } catch (error) {
           console.error('Error regenerating index.html:', error);
         }
@@ -202,36 +203,113 @@ function renderTemplate(templateContent, data) {
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use('/reports', express.static(config.REPORTS_DIR));
+
+// Custom reports middleware - serves from cloud storage or local filesystem
+app.get('/reports/*', async (req, res) => {
+  try {
+    const filePath = req.params[0]; // Gets everything after /reports/
+    const reportPath = `reports/${filePath}`;
+
+    if (config.USE_CLOUD_STORAGE) {
+      // Serve from cloud storage
+      const fileExists = await storage.fileExists(reportPath);
+      if (!fileExists) {
+        return res.status(404).send('Report not found');
+      }
+
+      const content = await storage.readFile(reportPath);
+
+      // Set appropriate content type based on file extension
+      const ext = path.extname(filePath).toLowerCase();
+      if (ext === '.html') {
+        res.setHeader('Content-Type', 'text/html');
+      } else if (ext === '.json') {
+        res.setHeader('Content-Type', 'application/json');
+      } else if (ext === '.css') {
+        res.setHeader('Content-Type', 'text/css');
+      } else if (ext === '.js') {
+        res.setHeader('Content-Type', 'application/javascript');
+      } else {
+        res.setHeader('Content-Type', 'application/octet-stream');
+      }
+
+      res.send(content);
+    } else {
+      // Fallback to local filesystem serving
+      const localPath = path.join(config.REPORTS_DIR, filePath);
+      res.sendFile(localPath);
+    }
+  } catch (error) {
+    console.error(`❌ Failed to serve report file ${req.path}:`, error.message);
+    res.status(500).send('Error loading report file');
+  }
+});
+
 app.use('/styles', express.static(config.PUBLIC_STYLES_DIR));
 app.use('/scripts', express.static(config.PUBLIC_SCRIPTS_DIR));
 app.use(express.static(config.PUBLIC_DIR)); // Serve static files from public directory
 
 // Utility function to get all report directories
-function getReportDirectories() {
-  const reportsDir = config.REPORTS_DIR;
-  if (!fs.existsSync(reportsDir)) {
-    return [];
-  }
+async function getReportDirectories() {
+  try {
+    if (config.USE_CLOUD_STORAGE) {
+      // Get reports from cloud storage
+      const files = await storage.listFiles('reports/');
+      const domainMap = new Map();
 
-  return fs
-    .readdirSync(reportsDir, { withFileTypes: true })
-    .filter(dirent => dirent.isDirectory())
-    .map(dirent => {
-      const dirPath = path.join(reportsDir, dirent.name);
-      const files = fs.readdirSync(dirPath);
-      const reports = files.filter(file => file.endsWith('.html'));
-      return {
-        domain: dirent.name,
+      files.forEach(filePath => {
+        // Extract domain from path like "reports/example.com/report.html"
+        const parts = filePath.split('/');
+        if (parts.length >= 3 && parts[0] === 'reports') {
+          const domain = parts[1];
+          const fileName = parts[parts.length - 1];
+
+          if (fileName.endsWith('.html')) {
+            if (!domainMap.has(domain)) {
+              domainMap.set(domain, []);
+            }
+            domainMap.get(domain).push(fileName);
+          }
+        }
+      });
+
+      return Array.from(domainMap.entries()).map(([domain, reports]) => ({
+        domain,
         reportCount: reports.length,
         lastReport: reports.length > 0 ? reports.sort().pop() : null,
-      };
-    });
+        reportFiles: reports.sort(),
+      }));
+    } else {
+      // Fallback to local filesystem
+      const reportsDir = config.REPORTS_DIR;
+      if (!fs.existsSync(reportsDir)) {
+        return [];
+      }
+
+      return fs
+        .readdirSync(reportsDir, { withFileTypes: true })
+        .filter(dirent => dirent.isDirectory())
+        .map(dirent => {
+          const dirPath = path.join(reportsDir, dirent.name);
+          const files = fs.readdirSync(dirPath);
+          const reports = files.filter(file => file.endsWith('.html'));
+          return {
+            domain: dirent.name,
+            reportCount: reports.length,
+            lastReport: reports.length > 0 ? reports.sort().pop() : null,
+            reportFiles: reports.sort(),
+          };
+        });
+    }
+  } catch (error) {
+    console.error('❌ Failed to get report directories:', error.message);
+    return [];
+  }
 }
 
 // Generate reports list HTML for reports index page
-function generateReportsListHTML() {
-  const reportDirs = getReportDirectories();
+async function generateReportsListHTML() {
+  const reportDirs = await getReportDirectories();
 
   if (reportDirs.length === 0) {
     return '<p class="no-reports">No reports generated yet. Start a crawl to create your first report!</p>';
@@ -239,9 +317,8 @@ function generateReportsListHTML() {
 
   return reportDirs
     .map(dir => {
-      const dirPath = path.join(config.REPORTS_DIR, dir.domain);
-      const files = fs.readdirSync(dirPath);
-      const reports = files.filter(file => file.endsWith('.html'));
+      // Get report files for this domain
+      const reports = dir.reportFiles || [];
 
       const reportItems = reports
         .map(reportFile => {
@@ -279,34 +356,51 @@ function generateReportsListHTML() {
 }
 
 // Generate domain-specific reports list HTML
-function generateDomainReportsListHTML(domain) {
-  const domainDir = path.join(config.REPORTS_DIR, domain);
-  const files = fs.readdirSync(domainDir);
-  const reports = files.filter(file => file.endsWith('.html'));
+async function generateDomainReportsListHTML(domain) {
+  try {
+    let reports = [];
 
-  if (reports.length === 0) {
-    return '<tr><td colspan="2" class="no-reports">No reports found for this domain.</td></tr>';
-  }
+    if (config.USE_CLOUD_STORAGE) {
+      // Get reports from cloud storage for this specific domain
+      const files = await storage.listFiles(`reports/${domain}/`);
+      reports = files
+        .map(filePath => path.basename(filePath))
+        .filter(fileName => fileName.endsWith('.html'))
+        .sort();
+    } else {
+      // Fallback to local filesystem
+      const domainDir = path.join(config.REPORTS_DIR, domain);
+      const files = fs.readdirSync(domainDir);
+      reports = files.filter(file => file.endsWith('.html'));
+    }
 
-  return reports
-    .map(reportFile => {
-      const reportPath = `/reports/${domain}/${reportFile}`;
-      const displayDate = parseTimestampFromFilename(reportFile);
+    if (reports.length === 0) {
+      return '<tr><td colspan="2" class="no-reports">No reports found for this domain.</td></tr>';
+    }
 
-      return `
+    return reports
+      .map(reportFile => {
+        const reportPath = `/reports/${domain}/${reportFile}`;
+        const displayDate = parseTimestampFromFilename(reportFile);
+
+        return `
             <tr>
                 <td><a href="${reportPath}" class="report-link">${reportFile.replace('.html', '')}</a></td>
                 <td>${displayDate}</td>
             </tr>
         `;
-    })
-    .join('');
+      })
+      .join('');
+  } catch (error) {
+    console.error(`❌ Failed to get domain reports for ${domain}:`, error.message);
+    return '<tr><td colspan="2" class="no-reports">Error loading reports for this domain.</td></tr>';
+  }
 }
 
 // Generate reports index HTML using template
-function generateReportsIndexHTML() {
+async function generateReportsIndexHTML() {
   const template = loadTemplate('reports-index');
-  const reportsList = generateReportsListHTML();
+  const reportsList = await generateReportsListHTML();
 
   return renderTemplate(template, {
     reportsList,
@@ -314,19 +408,37 @@ function generateReportsIndexHTML() {
 }
 
 // Generate HTML for domain-specific reports page using template
-function generateDomainReportsHTML(domain) {
-  const domainDir = path.join(config.REPORTS_DIR, domain);
-  const files = fs.readdirSync(domainDir);
-  const reports = files.filter(file => file.endsWith('.html'));
+async function generateDomainReportsHTML(domain) {
+  try {
+    let reportCount = 0;
 
-  const template = loadTemplate('domain-reports');
-  const reportsList = generateDomainReportsListHTML(domain);
+    if (config.USE_CLOUD_STORAGE) {
+      // Get report count from cloud storage
+      const files = await storage.listFiles(`reports/${domain}/`);
+      reportCount = files.filter(filePath => path.basename(filePath).endsWith('.html')).length;
+    } else {
+      // Fallback to local filesystem
+      const domainDir = path.join(config.REPORTS_DIR, domain);
+      const files = fs.readdirSync(domainDir);
+      reportCount = files.filter(file => file.endsWith('.html')).length;
+    }
 
-  return renderTemplate(template, {
-    domain,
-    reportCount: reports.length,
-    reportsList,
-  });
+    const template = loadTemplate('domain-reports');
+    const reportsList = await generateDomainReportsListHTML(domain);
+
+    return renderTemplate(template, {
+      domain,
+      reportCount,
+      reportsList,
+    });
+  } catch (error) {
+    console.error(`❌ Failed to generate domain reports HTML for ${domain}:`, error.message);
+    const template = loadTemplate('error-404');
+    return renderTemplate(template, {
+      errorTitle: 'Error Loading Reports',
+      errorMessage: `Failed to load reports for domain: ${domain}`,
+    });
+  }
 }
 
 // Routes
@@ -337,26 +449,47 @@ app.get('/', (req, res) => {
 });
 
 // Reports index page
-app.get('/reports/', (req, res) => {
-  res.send(generateReportsIndexHTML());
+app.get('/reports/', async (req, res) => {
+  try {
+    const html = await generateReportsIndexHTML();
+    res.send(html);
+  } catch (error) {
+    console.error('❌ Failed to generate reports index:', error.message);
+    res.status(500).send('Error loading reports page');
+  }
 });
 
 // Domain-specific reports page
-app.get('/browse/:domain', (req, res) => {
+app.get('/browse/:domain', async (req, res) => {
   const domain = req.params.domain;
-  const domainDir = path.join(config.REPORTS_DIR, domain);
 
-  // Check if domain directory exists
-  if (!fs.existsSync(domainDir)) {
-    const template = loadTemplate('error-404');
-    const errorHTML = renderTemplate(template, {
-      errorTitle: 'Domain Not Found',
-      errorMessage: `No reports found for domain: ${domain}`,
-    });
-    return res.status(404).send(errorHTML);
+  try {
+    // Check if domain has reports
+    let hasReports = false;
+
+    if (config.USE_CLOUD_STORAGE) {
+      const files = await storage.listFiles(`reports/${domain}/`);
+      hasReports = files.some(filePath => path.basename(filePath).endsWith('.html'));
+    } else {
+      const domainDir = path.join(config.REPORTS_DIR, domain);
+      hasReports = fs.existsSync(domainDir);
+    }
+
+    if (!hasReports) {
+      const template = loadTemplate('error-404');
+      const errorHTML = renderTemplate(template, {
+        errorTitle: 'Domain Not Found',
+        errorMessage: `No reports found for domain: ${domain}`,
+      });
+      return res.status(404).send(errorHTML);
+    }
+
+    const html = await generateDomainReportsHTML(domain);
+    res.send(html);
+  } catch (error) {
+    console.error(`❌ Failed to load domain reports for ${domain}:`, error.message);
+    res.status(500).send('Error loading domain reports');
   }
-
-  res.send(generateDomainReportsHTML(domain));
 });
 
 // API endpoint to get active jobs
@@ -394,9 +527,14 @@ app.get('/api/jobs', (req, res) => {
 });
 
 // API endpoint to get current reports
-app.get('/api/reports', (req, res) => {
-  const reportDirs = getReportDirectories();
-  res.json(reportDirs);
+app.get('/api/reports', async (req, res) => {
+  try {
+    const reportDirs = await getReportDirectories();
+    res.json(reportDirs);
+  } catch (error) {
+    console.error('❌ Failed to get reports for API:', error.message);
+    res.status(500).json({ error: 'Failed to load reports' });
+  }
 });
 
 // Start a new crawl
@@ -502,7 +640,7 @@ app.delete('/api/jobs/:jobId', (req, res) => {
 
 // Start the server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🚀 CATS Dashboard running at http://localhost:${PORT}`);
   console.log(`📊 View your dashboard: http://localhost:${PORT}`);
   console.log(`📁 Reports directory: ${config.REPORTS_DIR}`);
@@ -523,8 +661,12 @@ app.listen(PORT, () => {
 
   // Always regenerate index.html on server startup
   console.log('🔄 Regenerating dashboard index.html...');
-  generateIndexHTML();
-  console.log('✅ Dashboard index.html regenerated');
+  try {
+    await generateIndexHTML();
+    console.log('✅ Dashboard index.html regenerated');
+  } catch (error) {
+    console.error('❌ Failed to regenerate index.html:', error.message);
+  }
 });
 
 // Graceful shutdown handling
