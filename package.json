@@ -4,7 +4,8 @@
   "description": "CATS (Crawl and Test System) - A web crawler that performs accessibility scans using axe-core",
   "main": "src/core/crawler.js",
   "bin": {
-    "cats-crawl": "./src/core/crawler.js"
+    "cats-crawl": "./src/core/crawler.js",
+    "cats-storage": "./src/utils/storage-cli.js"
   },
   "scripts": {
     "start": "node src/core/crawler.js",
@@ -42,7 +43,13 @@
     "regenerate-html": "node src/generators/html.js",
     "generate-index": "node src/generators/index.js",
     "clean": "rm -rf public/reports/* public/styles/*.css",
-    "cleanup-old-html": "node src/utils/cleanup.js"
+    "cleanup-old-html": "node src/utils/cleanup.js",
+    "storage": "node src/utils/storage-cli.js",
+    "storage:health": "node src/utils/storage-cli.js health check",
+    "storage:test": "node src/utils/test-storage.js",
+    "storage:migrate": "node src/utils/storage-cli.js migrate all --dry-run",
+    "storage:backup": "node src/utils/storage-cli.js backup create",
+    "storage:integrity": "node src/utils/storage-cli.js integrity check"
   },
   "keywords": [
     "accessibility",
