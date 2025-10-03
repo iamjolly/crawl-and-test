@@ -482,7 +482,7 @@ async function generateReportsIndexHTML(navContext = {}) {
 }
 
 // Generate HTML for domain-specific reports page using template
-async function generateDomainReportsHTML(domain) {
+async function generateDomainReportsHTML(domain, navContext = {}) {
   try {
     let reportCount = 0;
 
@@ -501,6 +501,7 @@ async function generateDomainReportsHTML(domain) {
     const reportsList = await generateDomainReportsListHTML(domain);
 
     return renderTemplate(template, {
+      ...navContext,
       domain,
       reportCount,
       reportsList,
@@ -509,6 +510,7 @@ async function generateDomainReportsHTML(domain) {
     console.error(`❌ Failed to generate domain reports HTML for ${domain}:`, error.message);
     const template = loadTemplate('error-404');
     return renderTemplate(template, {
+      ...navContext,
       errorTitle: 'Error Loading Reports',
       errorMessage: `Failed to load reports for domain: ${domain}`,
     });
@@ -544,15 +546,18 @@ app.get('/browse/:domain', async (req, res) => {
     }
 
     if (!hasReports) {
+      const navContext = getNavContext('reports');
       const template = loadTemplate('error-404');
       const errorHTML = renderTemplate(template, {
+        ...navContext,
         errorTitle: 'Domain Not Found',
         errorMessage: `No reports found for domain: ${domain}`,
       });
       return res.status(404).send(errorHTML);
     }
 
-    const html = await generateDomainReportsHTML(domain);
+    const navContext = getNavContext('reports');
+    const html = await generateDomainReportsHTML(domain, navContext);
     res.send(html);
   } catch (error) {
     console.error(`❌ Failed to load domain reports for ${domain}:`, error.message);
