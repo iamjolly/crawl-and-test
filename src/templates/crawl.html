@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start New Crawl - CATS Accessibility Testing</title>
+    <link rel="stylesheet" href="/styles/design-system.css">
+    <style>
+        /* Job management styles */
+        .job-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .job-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-cancel {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+
+        .btn-cancel:hover {
+            background: #c82333;
+        }
+
+        .queue-indicator {
+            color: #6c757d;
+            font-style: italic;
+            margin-left: 0.5rem;
+        }
+
+        .job-status.queued {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .job-status.timeout {
+            background-color: #fd7e14;
+            color: white;
+        }
+
+        .job-status.cancelled {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .job-stats {
+            font-size: 0.9rem;
+        }
+
+        .resource-warning {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .resource-warning.warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .resource-warning.danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f1b2b5;
+        }
+
+        .crawl-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 968px) {
+            .crawl-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="page-container">
+    <!-- Skip Links -->
+    <div class="skip-links">
+        <a href="#main-content" class="skip-links__link">Skip to main content</a>
+    </div>
+
+    <!-- Site Header -->
+    <header class="site-header" role="banner">
+        <div class="site-header__container">
+            <a href="/" class="site-header__brand" aria-label="CATS Home">
+                <div class="site-header__logo">
+                    <span>C</span>
+                </div>
+                <div class="site-header__title">
+                    CATS
+                    <span class="site-header__subtitle">Accessibility Testing</span>
+                </div>
+            </a>
+
+            <nav class="site-header__nav">
+                <div id="nav-main" class="main-nav main-nav--horizontal" role="navigation" aria-label="Main navigation">
+                    <ul class="main-nav__list">
+                        <li class="main-nav__item">
+                            <a href="/" class="main-nav__link">Home</a>
+                        </li>
+                        <li class="main-nav__item">
+                            <a href="/crawl" class="main-nav__link main-nav__link--active" aria-current="page">Crawl</a>
+                        </li>
+                        <li class="main-nav__item">
+                            <a href="/reports/" class="main-nav__link">Reports</a>
+                        </li>
+                        <li class="main-nav__item">
+                            <a href="/dashboard" class="main-nav__link">Dashboard</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <div class="site-header__utilities">
+                <!-- Future: user menu, settings, etc. -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="page-main">
+        <div class="page-main__container">
+
+            <!-- Page Header -->
+            <header class="content-section__header">
+                <h1 class="content-section__title">Start New Accessibility Crawl</h1>
+                <p class="content-section__description">Configure and launch an automated accessibility scan of your website</p>
+            </header>
+
+            <!-- Crawl Content -->
+            <div class="crawl-layout">
+
+                <!-- Start New Crawl Form -->
+                <section aria-labelledby="crawl-form-title">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 id="crawl-form-title" class="card-title">Crawl Configuration</h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="crawl-form" action="/crawl" method="POST" novalidate>
+                                <div class="form-group">
+                                    <label for="url" class="form-label">Website URL (required)</label>
+                                    <small id="url-help" class="form-text">Enter the full URL of the website you want to test for accessibility</small>
+                                    <div id="url-error" class="error-message" tabindex="-1" style="display: none;"></div>
+                                    <input type="url" id="url" name="url" class="form-control" required placeholder="https://example.com" aria-describedby="url-help url-error">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="wcagVersion" class="form-label">WCAG Version</label>
+                                    <select id="wcagVersion" name="wcagVersion" class="form-control" aria-describedby="wcag-version-help">
+                                        <option value="2.1" selected>WCAG 2.1 (Default)</option>
+                                        <option value="2.0">WCAG 2.0</option>
+                                        <option value="2.2">WCAG 2.2 (Latest)</option>
+                                    </select>
+                                    <small id="wcag-version-help" class="form-text">Choose the WCAG version for accessibility evaluation</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="wcagLevel" class="form-label">WCAG Level</label>
+                                    <select id="wcagLevel" name="wcagLevel" class="form-control" aria-describedby="wcag-level-help">
+                                        <option value="A">Level A (Basic)</option>
+                                        <option value="AA" selected>Level AA (Standard)</option>
+                                        <option value="AAA">Level AAA (Enhanced)</option>
+                                    </select>
+                                    <small id="wcag-level-help" class="form-text">AA is recommended for most websites</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="maxDepth" class="form-label">Crawl Depth</label>
+                                    <select id="maxDepth" name="maxDepth" class="form-control" aria-describedby="depth-help">
+                                        <option value="1">1 - Homepage only</option>
+                                        <option value="2" selected>2 - Homepage + linked pages</option>
+                                        <option value="3">3 - Deep crawl (recommended)</option>
+                                        <option value="4">4 - Very deep crawl</option>
+                                        <option value="5">5 - Maximum depth</option>
+                                    </select>
+                                    <small id="depth-help" class="form-text">How many levels deep to follow links</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="maxPages" class="form-label">Max Pages to Scan</label>
+                                    <select id="maxPages" name="maxPages" class="form-control" aria-describedby="pages-help">
+                                        <option value="5">5 - Quick test</option>
+                                        <option value="10">10 - Small site</option>
+                                        <option value="25">25 - Medium site</option>
+                                        <option value="50" selected>50 - Default</option>
+                                        <option value="100">100 - Large site</option>
+                                        <option value="250">250 - Very large site</option>
+                                        <option value="0">Unlimited - Scan all pages</option>
+                                    </select>
+                                    <small id="pages-help" class="form-text">Limit the number of pages to scan</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="crawlerConcurrency" class="form-label">Crawler Concurrency</label>
+                                    <select id="crawlerConcurrency" name="crawlerConcurrency" class="form-control" aria-describedby="concurrency-help">
+                                        <option value="1">1 - Conservative (low resource usage)</option>
+                                        <option value="2">2 - Slow and steady</option>
+                                        <option value="3">3 - Moderate</option>
+                                        <option value="4" selected>4 - Default (balanced)</option>
+                                        <option value="6">6 - Fast</option>
+                                        <option value="8">8 - Very fast (high resource usage)</option>
+                                    </select>
+                                    <small id="concurrency-help" class="form-text">Number of parallel browser instances for this crawl</small>
+                                </div>
+
+                                <button type="submit" class="btn-primary">Start Crawl</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Active Jobs Section -->
+                <section aria-labelledby="jobs-title">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 id="jobs-title" class="card-title">Active & Queued Jobs</h2>
+                        </div>
+                        <div class="card-body">
+                            <div id="jobsSection" class="jobs-section" role="region" aria-live="polite" aria-label="Active crawling jobs">
+                                <div id="jobsList"></div>
+                                <p id="noJobsMessage" class="no-reports">No active crawls</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script src="/scripts/crawl.js"></script>
+</body>
+</html>

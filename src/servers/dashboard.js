@@ -260,6 +260,32 @@ app.use('/reports', async (req, res, next) => {
   }
 });
 
+// ==============================================================================
+// ROUTES - Must come BEFORE static middleware to take precedence
+// ==============================================================================
+
+// Home page (public landing page)
+app.get('/', (req, res) => {
+  const template = loadTemplate('home');
+  res.send(template);
+});
+
+// Crawl page (dedicated crawl interface)
+app.get('/crawl', (req, res) => {
+  const template = loadTemplate('crawl');
+  res.send(template);
+});
+
+// Dashboard overview page
+app.get('/dashboard', (req, res) => {
+  const template = loadTemplate('dashboard-overview');
+  res.send(template);
+});
+
+// ==============================================================================
+// STATIC FILE MIDDLEWARE - Must come AFTER specific routes
+// ==============================================================================
+
 app.use('/styles', express.static(config.PUBLIC_STYLES_DIR));
 app.use('/scripts', express.static(config.PUBLIC_SCRIPTS_DIR));
 app.use(express.static(config.PUBLIC_DIR)); // Serve static files from public directory
@@ -455,13 +481,6 @@ async function generateDomainReportsHTML(domain) {
     });
   }
 }
-
-// Routes
-app.get('/', (req, res) => {
-  // Serve the dashboard index.html (regenerated on server startup)
-  const indexPath = path.join(config.PUBLIC_DIR, 'index.html');
-  res.sendFile(indexPath);
-});
 
 // Reports index page
 app.get('/reports/', async (req, res) => {
