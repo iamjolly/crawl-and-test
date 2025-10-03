@@ -4,7 +4,7 @@ services:
   cats-app:
     build: .
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       - NODE_ENV=development
       - PORT=3000
@@ -18,10 +18,9 @@ services:
     volumes:
       # Mount reports directory for local development
       - ./public/reports:/app/public/reports
-      - ./public/styles:/app/public/styles
       - ./public/scripts:/app/public/scripts
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -31,7 +30,7 @@ services:
   gcs-emulator:
     image: fsouza/fake-gcs-server:latest
     ports:
-      - "4443:4443"
-    command: ["-scheme", "http", "-host", "0.0.0.0", "-port", "4443"]
+      - '4443:4443'
+    command: ['-scheme', 'http', '-host', '0.0.0.0', '-port', '4443']
     profiles:
       - gcs-testing

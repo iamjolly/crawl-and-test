@@ -191,13 +191,39 @@ function loadTemplate(templateName) {
   }
 }
 
-function renderTemplate(templateContent, data) {
+function renderTemplate(templateContent, data = {}) {
   let rendered = templateContent;
+
+  // First, process template includes ({{>include:template-name}})
+  const includePattern = /\{\{>include:([^}]+)\}\}/g;
+  let match;
+  while ((match = includePattern.exec(rendered)) !== null) {
+    const includeName = match[1];
+    const includeContent = loadTemplate(includeName);
+    rendered = rendered.replace(match[0], includeContent);
+  }
+
+  // Then, replace all placeholders with data
   for (const [key, value] of Object.entries(data)) {
     const placeholder = new RegExp(`{{${key}}}`, 'g');
     rendered = rendered.replace(placeholder, value || '');
   }
+
   return rendered;
+}
+
+// Generate navigation context for active states
+function getNavContext(currentPage) {
+  const pages = ['home', 'crawl', 'reports', 'dashboard'];
+  const context = {};
+
+  pages.forEach(page => {
+    const isActive = page === currentPage;
+    context[`${page}Active`] = isActive ? 'main-nav__link--active' : '';
+    context[`${page}Aria`] = isActive ? 'aria-current="page"' : '';
+  });
+
+  return context;
 }
 
 // Middleware
@@ -267,19 +293,25 @@ app.use('/reports', async (req, res, next) => {
 // Home page (public landing page)
 app.get('/', (req, res) => {
   const template = loadTemplate('home');
-  res.send(template);
+  const navContext = getNavContext('home');
+  const rendered = renderTemplate(template, navContext);
+  res.send(rendered);
 });
 
 // Crawl page (dedicated crawl interface)
 app.get('/crawl', (req, res) => {
   const template = loadTemplate('crawl');
-  res.send(template);
+  const navContext = getNavContext('crawl');
+  const rendered = renderTemplate(template, navContext);
+  res.send(rendered);
 });
 
 // Dashboard overview page
 app.get('/dashboard', (req, res) => {
   const template = loadTemplate('dashboard-overview');
-  res.send(template);
+  const navContext = getNavContext('dashboard');
+  const rendered = renderTemplate(template, navContext);
+  res.send(rendered);
 });
 
 // ==============================================================================
@@ -439,11 +471,12 @@ async function generateDomainReportsListHTML(domain) {
 }
 
 // Generate reports index HTML using template
-async function generateReportsIndexHTML() {
+async function generateReportsIndexHTML(navContext = {}) {
   const template = loadTemplate('reports-index');
   const reportsList = await generateReportsListHTML();
 
   return renderTemplate(template, {
+    ...navContext,
     reportsList,
   });
 }
@@ -485,7 +518,8 @@ async function generateDomainReportsHTML(domain) {
 // Reports index page
 app.get('/reports/', async (req, res) => {
   try {
-    const html = await generateReportsIndexHTML();
+    const navContext = getNavContext('reports');
+    const html = await generateReportsIndexHTML(navContext);
     res.send(html);
   } catch (error) {
     console.error('❌ Failed to generate reports index:', error.message);

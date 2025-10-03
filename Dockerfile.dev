@@ -1,0 +1,62 @@
+# Development image: keep devDependencies so watcher and dev tooling are available
+FROM node:22-slim
+
+# Install system deps needed for Playwright
+RUN apt-get update && \
+    apt-get install -y \
+    wget \
+    curl \
+    gnupg \
+    ca-certificates \
+    fonts-liberation \
+    libappindicator3-1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libdrm2 \
+    libgtk-3-0 \
+    libnspr4 \
+    libnss3 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    xdg-utils \
+    libxss1 \
+    libgconf-2-4 \
+    --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy package.json and install (includes devDependencies)
+COPY package*.json ./
+RUN npm install && npm cache clean --force
+
+# Copy source
+COPY . .
+
+# Create output directories
+RUN mkdir -p public/reports public/styles public/scripts
+
+# Build CSS assets (for initial image)
+RUN npm run sass:build
+
+# Playwright deps and browser
+RUN npx playwright install-deps chromium
+
+# Create non-root user
+RUN useradd --create-home --shell /bin/bash app && \
+    chown -R app:app /app && \
+    chmod -R 755 /app
+
+USER app
+RUN npx playwright install chromium
+
+# Expose a distinct dev port
+ENV PORT=3333
+EXPOSE 3333
+
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3333/ || exit 1
+
+# Start watcher and server in the container for one-command dev
+CMD /bin/sh -c "npm run sass:watch:local & node src/servers/dashboard.js"

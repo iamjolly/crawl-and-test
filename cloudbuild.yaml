@@ -56,9 +56,9 @@ steps:
 
 # Configuration for substitutions (can be set in Cloud Build trigger)
 substitutions:
-  _REGION: 'us-central1'  # Change to your preferred region
-  _STORAGE_BUCKET: 'cats-reports-${PROJECT_ID}'  # Default bucket name
-  _TAG: 'manual-build'  # Default tag for manual builds
+  _REGION: 'us-central1' # Change to your preferred region
+  _STORAGE_BUCKET: 'cats-reports-${PROJECT_ID}' # Default bucket name
+  _TAG: 'manual-build' # Default tag for manual builds
 
 # Build configuration
 options:
@@ -70,7 +70,7 @@ options:
   logging: CLOUD_LOGGING_ONLY
 
 # Build timeout (Playwright installation can be slow)
-timeout: '1800s'  # 30 minutes
+timeout: '1800s' # 30 minutes
 
 # Build images
 images:

@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  cats-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - '3333:3333'
+    environment:
+      - PORT=3333
+    volumes:
+      - ./public/reports:/app/public/reports
+      - ./public/scripts:/app/public/scripts
+      # Mount source so in-container watcher sees local edits
+      - ./src:/app/src
+      - ./public/styles:/app/public/styles
+    # The dev image includes devDependencies so it can run the SASS watcher
+    # in-container for a one-command dev start.
+    command: /bin/sh -c "npm run sass:watch:local & node src/servers/dashboard.js"

@@ -25,6 +25,7 @@
 @use 'components/molecules' as molecules;
 @use 'components/organisms' as organisms;
 @use 'components/layouts' as layouts;
+@use 'components/pages' as pages;
 
 // ==========================================================================
 // Public API Exports
@@ -37,6 +38,7 @@
 @forward 'components/molecules';
 @forward 'components/organisms';
 @forward 'components/layouts';
+@forward 'components/pages';
 
 // ==========================================================================
 // Global Design System Initialization
