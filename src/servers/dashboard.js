@@ -205,16 +205,25 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Custom reports middleware - serves from cloud storage or local filesystem
-app.get('/reports/*', async (req, res) => {
+app.use('/reports', async (req, res, next) => {
+  if (req.method !== 'GET') {
+    return next();
+  }
+
+  // Skip middleware for routes that should be handled by specific handlers
+  if (req.path === '/' || req.path === '') {
+    return next(); // Let /reports/ route handle this
+  }
+
   try {
-    const filePath = req.params[0]; // Gets everything after /reports/
+    const filePath = req.path.substring(1); // Remove leading slash to get path after /reports/
     const reportPath = `reports/${filePath}`;
 
     if (config.USE_CLOUD_STORAGE) {
       // Serve from cloud storage
       const fileExists = await storage.fileExists(reportPath);
       if (!fileExists) {
-        return res.status(404).send('Report not found');
+        return next(); // Let other routes handle it
       }
 
       const content = await storage.readFile(reportPath);
@@ -237,11 +246,17 @@ app.get('/reports/*', async (req, res) => {
     } else {
       // Fallback to local filesystem serving
       const localPath = path.join(config.REPORTS_DIR, filePath);
+
+      // Check if local file exists first
+      if (!fs.existsSync(localPath)) {
+        return next(); // Let other routes handle it
+      }
+
       res.sendFile(localPath);
     }
   } catch (error) {
     console.error(`❌ Failed to serve report file ${req.path}:`, error.message);
-    res.status(500).send('Error loading report file');
+    next(); // Let other routes handle it
   }
 });
 
@@ -640,7 +655,7 @@ app.delete('/api/jobs/:jobId', (req, res) => {
 
 // Start the server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, async () => {
+app.listen(PORT, () => {
   console.log(`🚀 CATS Dashboard running at http://localhost:${PORT}`);
   console.log(`📊 View your dashboard: http://localhost:${PORT}`);
   console.log(`📁 Reports directory: ${config.REPORTS_DIR}`);
@@ -659,14 +674,17 @@ app.listen(PORT, async () => {
   console.log(`   • CSS disabled: ${config.DISABLE_CSS ? '✅' : '❌'}`);
   console.log(`   • Cleanup delay: ${Math.floor(config.JOB_CLEANUP_DELAY_MS / 60000)} minutes`);
 
-  // Always regenerate index.html on server startup
-  console.log('🔄 Regenerating dashboard index.html...');
-  try {
-    await generateIndexHTML();
-    console.log('✅ Dashboard index.html regenerated');
-  } catch (error) {
-    console.error('❌ Failed to regenerate index.html:', error.message);
-  }
+  // Regenerate index.html asynchronously after server starts
+  // eslint-disable-next-line no-undef
+  setImmediate(async () => {
+    console.log('🔄 Regenerating dashboard index.html...');
+    try {
+      await generateIndexHTML();
+      console.log('✅ Dashboard index.html regenerated');
+    } catch (error) {
+      console.error('❌ Failed to regenerate index.html:', error.message);
+    }
+  });
 });
 
 // Graceful shutdown handling
