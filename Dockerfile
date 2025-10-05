@@ -1,7 +1,7 @@
 # Multi-stage build for optimized Google Cloud Run deployment
 FROM node:22-slim AS base
 
-# Install system dependencies needed for Playwright
+# Install system dependencies needed for Playwright and PostgreSQL client
 RUN apt-get update && \
     apt-get install -y \
     wget \
@@ -22,6 +22,7 @@ RUN apt-get update && \
     xdg-utils \
     libxss1 \
     libgconf-2-4 \
+    postgresql-client \
     --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
@@ -36,6 +37,10 @@ RUN npm install && npm cache clean --force
 
 # Copy application code
 COPY . .
+
+# Copy and set entrypoint script permissions
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Create necessary directories
 RUN mkdir -p public/reports public/styles public/scripts
@@ -55,8 +60,8 @@ RUN useradd --create-home --shell /bin/bash app && \
 USER app
 RUN npx playwright install chromium
 
-# Remove devDependencies to reduce image size (as app user)
-RUN npm prune --production
+# Don't prune devDependencies - we need sequelize-cli for migrations
+# RUN npm prune --production
 
 # Expose port (Cloud Run will override this)
 EXPOSE 3000
@@ -65,5 +70,6 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:3000/ || exit 1
 
-# Start the application
+# Set entrypoint and default command
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["npm", "run", "serve"]

@@ -23,9 +23,8 @@ services:
       # - CATS_STORAGE_BUCKET=your-bucket-name
       # - CATS_USE_CLOUD_STORAGE=true
     volumes:
-      # Mount reports directory for local development
+      # Mount reports directory for local development (persists across rebuilds)
       - ./public/reports:/app/public/reports
-      - ./public/scripts:/app/public/scripts
     depends_on:
       postgres:
         condition: service_healthy
@@ -34,7 +33,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 60s
 
   postgres:
     image: postgres:16-alpine
