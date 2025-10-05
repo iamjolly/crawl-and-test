@@ -8,13 +8,45 @@ services:
     ports:
       - '3333:3333'
     environment:
+      - NODE_ENV=development
       - PORT=3333
+      # Database configuration
+      - CATS_DB_HOST=postgres
+      - CATS_DB_PORT=5432
+      - CATS_DB_NAME=cats_dev
+      - CATS_DB_USER=cats_user
+      - CATS_DB_PASSWORD=cats_password
+      - CATS_DB_SSL=false
     volumes:
       - ./public/reports:/app/public/reports
       - ./public/scripts:/app/public/scripts
       # Mount source so in-container watcher sees local edits
       - ./src:/app/src
       - ./public/styles:/app/public/styles
+      # Mount SCSS source for live recompilation
+      - ./src/styles:/app/src/styles
+    depends_on:
+      postgres:
+        condition: service_healthy
     # The dev image includes devDependencies so it can run the SASS watcher
     # in-container for a one-command dev start.
     command: /bin/sh -c "npm run sass:watch:local & node src/servers/dashboard.js"
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=cats_dev
+      - POSTGRES_USER=cats_user
+      - POSTGRES_PASSWORD=cats_password
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U cats_user -d cats_dev']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-dev-data:

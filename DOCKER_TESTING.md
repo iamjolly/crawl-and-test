@@ -1,8 +1,14 @@
 # Docker Testing Guide - Phase 1A
 
-## One-Command Setup
+## Two Environments Available
 
-Everything runs with a single command! The Docker setup will automatically:
+CATS now has **two Docker environments**:
+
+1. **Production-like** (`docker-compose.yml`) - Port 3000
+2. **Development** (`docker-compose.dev.yml`) - Port 3333 with live code
+   reloading
+
+Both environments automatically:
 
 - Start PostgreSQL database
 - Wait for PostgreSQL to be ready
@@ -10,7 +16,11 @@ Everything runs with a single command! The Docker setup will automatically:
 - Seed admin user (if database is empty)
 - Start the CATS application
 
-## Quick Start
+---
+
+## Production-like Environment (Port 3000)
+
+Best for testing the production build.
 
 ```bash
 # Start everything (will build on first run)
@@ -25,6 +35,41 @@ docker-compose logs -f
 # Stop everything
 docker-compose down
 ```
+
+**Access:** http://localhost:3000
+
+---
+
+## Development Environment (Port 3333)
+
+Best for active development with **live code reloading**:
+
+- ✅ SASS watcher (CSS changes rebuild automatically)
+- ✅ Source code mounted (restart container to see changes)
+- ✅ All devDependencies available
+
+```bash
+# Start dev environment
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+# Or run in background
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+
+# View logs
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml logs -f
+
+# Stop everything
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml down
+```
+
+**Access:** http://localhost:3333
+
+**Benefits:**
+
+- Edit SCSS files → CSS rebuilds automatically
+- Edit JS files → restart container (faster than full rebuild)
+- Same database as production environment
+- Test with real PostgreSQL
 
 ## First Run
 
@@ -41,9 +86,10 @@ On first run, you'll see:
 🚀 Starting CATS application...
 ```
 
-## Access the Application
+---
 
-- **URL:** http://localhost:3000
+## Admin Credentials (Both Environments)
+
 - **Admin Email:** admin@example.com
 - **Admin Password:** admin123
 
