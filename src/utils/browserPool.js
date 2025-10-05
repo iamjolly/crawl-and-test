@@ -39,7 +39,7 @@ class BrowserPool {
         '--memory-pressure-off', // Disable memory pressure signals
         '--max_old_space_size=' + this.memoryLimitMB, // Set V8 memory limit
         '--disable-features=TranslateUI', // Reduce memory usage
-        '--disable-ipc-flooding-protection', // Improve performance
+        '--disable-ipc-flooding-protection' // Improve performance
       );
     }
 
@@ -57,7 +57,8 @@ class BrowserPool {
   getContextOptions() {
     const options = {
       viewport: { width: 1280, height: 720 }, // Standard desktop size
-      userAgent: 'Mozilla/5.0 (compatible; CATS-Crawler/1.0; +https://github.com/iamjolly/crawl-and-test)',
+      userAgent:
+        'Mozilla/5.0 (compatible; CATS-Crawler/1.0; +https://github.com/iamjolly/crawl-and-test)',
       ignoreHTTPSErrors: true, // Handle self-signed certificates
       reducedMotion: 'reduce', // Improve performance
     };
@@ -71,7 +72,9 @@ class BrowserPool {
    * Launch a new browser instance
    */
   async launchBrowser() {
-    console.log(`🚀 Launching new browser instance (pool size: ${this.pool.length}/${this.maxPoolSize})`);
+    console.log(
+      `🚀 Launching new browser instance (pool size: ${this.pool.length}/${this.maxPoolSize})`
+    );
 
     try {
       const browser = await chromium.launch({
@@ -136,7 +139,9 @@ class BrowserPool {
         pageCount > 50; // 50 pages
 
       if (shouldClose) {
-        console.log(`🗑️  Closing browser (runtime: ${Math.floor(runtime/1000)}s, pages: ${pageCount})`);
+        console.log(
+          `🗑️  Closing browser (runtime: ${Math.floor(runtime / 1000)}s, pages: ${pageCount})`
+        );
         await browser.close();
         return;
       }
@@ -207,7 +212,7 @@ class BrowserPool {
   async cleanup() {
     console.log(`🧹 Cleaning up browser pool (${this.pool.length} browsers)`);
 
-    const closePromises = this.pool.map(async (browser) => {
+    const closePromises = this.pool.map(async browser => {
       try {
         await browser.close();
       } catch (error) {

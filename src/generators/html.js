@@ -50,6 +50,28 @@ function _loadJS() {
   return combinedJS;
 }
 
+// Template rendering with include support
+function renderTemplate(templateContent, data = {}) {
+  let rendered = templateContent;
+
+  // First, process template includes ({{>include:template-name}})
+  const includePattern = /\{\{>include:([^}]+)\}\}/g;
+  let match;
+  while ((match = includePattern.exec(rendered)) !== null) {
+    const includeName = match[1];
+    const includeContent = loadTemplate(includeName);
+    rendered = rendered.replace(match[0], includeContent);
+  }
+
+  // Then, replace all placeholders with data
+  for (const [key, value] of Object.entries(data)) {
+    const placeholder = new RegExp(`{{${key}}}`, 'g');
+    rendered = rendered.replace(placeholder, value || '');
+  }
+
+  return rendered;
+}
+
 // HTML escaping utility function
 function escapeHtml(text) {
   if (typeof text !== 'string') {
@@ -503,14 +525,15 @@ function generateHTMLReport(data, filename) {
     hour12: true,
   });
 
-  const html = baseTemplate
-    .replace(/{{title}}/g, `Accessibility Report: ${domain} (${reportDateTime}) - CATS`)
-    .replace(/{{domain}}/g, domain)
-    .replace(/{{timestamp}}/g, timestamp)
-    .replace(/{{wcagInfo}}/g, wcagInfo)
-    .replace(/{{jsonFilename}}/g, jsonFilename)
-    .replace(/{{summaryCards}}/g, summaryCards)
-    .replace(/{{content}}/g, pagesContent);
+  const html = renderTemplate(baseTemplate, {
+    title: `Accessibility Report: ${domain} (${reportDateTime}) - CATS`,
+    domain,
+    timestamp,
+    wcagInfo,
+    jsonFilename,
+    summaryCards,
+    content: pagesContent,
+  });
 
   return html;
 }

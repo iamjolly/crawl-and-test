@@ -5,7 +5,9 @@
 
 // Escape HTML to prevent XSS
 function escapeHtml(text) {
-  if (!text) {return '';}
+  if (!text) {
+    return '';
+  }
   return text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -16,8 +18,10 @@ function escapeHtml(text) {
 
 // Format timestamp for display
 function formatTimestamp(timestamp) {
-  if (!timestamp) {return new Date().toLocaleString();}
-    
+  if (!timestamp) {
+    return new Date().toLocaleString();
+  }
+
   try {
     const date = new Date(timestamp);
     return date.toLocaleString();
@@ -83,7 +87,7 @@ function showNotification(message, type = 'info') {
   notification.setAttribute('role', 'alert');
   notification.setAttribute('aria-live', 'polite');
   notification.textContent = message;
-    
+
   // Style the notification
   notification.style.cssText = `
         position: fixed;
@@ -97,14 +101,14 @@ function showNotification(message, type = 'info') {
         opacity: 0;
         transition: opacity 0.3s ease;
     `;
-    
+
   document.body.appendChild(notification);
-    
+
   // Animate in
   setTimeout(() => {
     notification.style.opacity = '1';
   }, 10);
-    
+
   // Remove after delay
   setTimeout(() => {
     notification.style.opacity = '0';
@@ -130,6 +134,29 @@ function setButtonLoading(button, loading = true) {
   }
 }
 
+// Parse timestamp from report filename and format for display
+function parseTimestampFromFilename(filename) {
+  // Handle multiple timestamp formats in filenames
+  const reportDate = filename.match(/(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}(?:-\d{3}Z|-\d{3})?)/);
+
+  if (!reportDate) {
+    return 'Unknown';
+  }
+
+  // Convert filename timestamp format to ISO format
+  let isoTimestamp = reportDate[1];
+
+  // Handle format with milliseconds: 2025-09-16T18-42-30-245Z or similar
+  if (isoTimestamp.match(/-\d{3}Z?$/)) {
+    isoTimestamp = isoTimestamp.replace(/T(\d{2})-(\d{2})-(\d{2})-(\d{3})(Z?)/, 'T$1:$2:$3.$4$5');
+  } else {
+    // Handle standard format: 2025-09-14T11-35-12
+    isoTimestamp = isoTimestamp.replace(/T(\d{2})-(\d{2})-(\d{2})/, 'T$1:$2:$3');
+  }
+
+  return formatTimestamp(isoTimestamp);
+}
+
 // Export functions for potential module use
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
@@ -140,6 +167,7 @@ if (typeof module !== 'undefined' && module.exports) {
     debounce,
     copyToClipboard,
     showNotification,
-    setButtonLoading
+    setButtonLoading,
+    parseTimestampFromFilename,
   };
 }

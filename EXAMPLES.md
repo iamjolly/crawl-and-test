@@ -6,6 +6,7 @@ environments: Docker, local development, and Google Cloud Run.
 ## 🐳 Docker Examples
 
 ### Start Development Environment
+
 ```bash
 # Quick start with Docker
 docker-compose up --build
@@ -15,6 +16,7 @@ docker-compose up --build
 ```
 
 ### Docker with Custom Configuration
+
 ```bash
 # Create custom environment file
 cp .env.example .env
@@ -29,6 +31,7 @@ docker-compose up --build
 ```
 
 ### Run CLI Commands in Docker
+
 ```bash
 # Execute crawler inside Docker container
 docker-compose exec cats-app node src/core/crawler.js -s https://example.com --html
@@ -40,6 +43,7 @@ docker-compose exec cats-app bash
 ## ☁️ Google Cloud Run Examples
 
 ### Deploy to Production
+
 ```bash
 # Set your project
 export PROJECT_ID=your-gcp-project
@@ -54,6 +58,7 @@ gcloud run services describe cats-accessibility-crawler \
 ```
 
 ### Update Environment Variables
+
 ```bash
 # Update crawler configuration
 gcloud run services update cats-accessibility-crawler \
@@ -67,6 +72,7 @@ gcloud run services update cats-accessibility-crawler \
 ```
 
 ### Scale Cloud Run Service
+
 ```bash
 # Increase capacity for high traffic
 gcloud run services update cats-accessibility-crawler \
@@ -132,6 +138,7 @@ node src/core/crawler.js -s https://example.com --wcag-version 2.2 --wcag-level 
 ### Enterprise-Scale Crawl (250+ pages)
 
 **Command Line:**
+
 ```bash
 # High-performance crawl with optimized settings
 node src/core/crawler.js \
@@ -142,6 +149,7 @@ node src/core/crawler.js \
 ```
 
 **With Environment Variables:**
+
 ```bash
 # Set performance optimizations
 export CATS_PAGE_TIMEOUT=90000
@@ -177,12 +185,14 @@ CATS_BROWSER_MEMORY_LIMIT_MB=512 \
 ### Domain Validation Examples
 
 **Valid Domain:**
+
 ```bash
 # Will proceed with crawl
 node src/core/crawler.js -s https://github.com --max-pages 10
 ```
 
 **Invalid Domain (shows proper error):**
+
 ```bash
 # Will fail with helpful error message
 node src/core/crawler.js -s https://invalid-domain-that-does-not-exist.com
@@ -192,6 +202,7 @@ node src/core/crawler.js -s https://invalid-domain-that-does-not-exist.com
 ### Cloud Run Performance Testing
 
 **Local simulation of Cloud Run performance:**
+
 ```bash
 # Simulate Cloud Run environment locally
 CATS_SERVER_HOST=0.0.0.0 \
@@ -205,6 +216,7 @@ CATS_BROWSER_POOL_SIZE=2 \
 ### Performance Monitoring
 
 **Enable detailed logging:**
+
 ```bash
 # Run with performance logging
 NODE_ENV=development \
@@ -225,7 +237,8 @@ CATS_BROWSER_POOL_SIZE=4 \
 
 - **Failed to launch browser**: `npm run install-browsers`
 - **HTTPS required**: Use `https://` URLs
-- **Timeout errors**: Increase `CATS_PAGE_TIMEOUT=120000`, reduce concurrency (`-c 2`)
+- **Timeout errors**: Increase `CATS_PAGE_TIMEOUT=120000`, reduce concurrency
+  (`-c 2`)
 - **Large output files**: Limit pages (`-p 50`), reduce depth (`-d 1`)
 
 ### Domain Validation Errors
@@ -238,5 +251,6 @@ CATS_BROWSER_POOL_SIZE=4 \
 ### Performance Issues
 
 - **Memory errors**: Reduce `CATS_BROWSER_POOL_SIZE=1` and concurrency
-- **Slow crawls**: Enable `CATS_DISABLE_IMAGES=true`, use `CATS_WAIT_STRATEGY=domcontentloaded`
+- **Slow crawls**: Enable `CATS_DISABLE_IMAGES=true`, use
+  `CATS_WAIT_STRATEGY=domcontentloaded`
 - **Retry failures**: Increase `CATS_MAX_RETRIES=5` for unreliable sites

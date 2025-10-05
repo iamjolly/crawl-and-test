@@ -13,47 +13,7 @@
       <a href="#main-content" class="skip-links__link">Skip to main content</a>
     </div>
 
-    <!-- Site Header -->
-    <header class="site-header" role="banner">
-      <div class="site-header__container">
-        <a href="/" class="site-header__brand" aria-label="CATS Home">
-          <div class="site-header__logo">
-            <span>C</span>
-          </div>
-          <h1 class="site-header__title">
-            CATS
-            <span class="site-header__subtitle">Accessibility Testing</span>
-          </h1>
-        </a>
-
-        <nav class="site-header__nav">
-          <div
-            id="nav-main"
-            class="main-nav main-nav--horizontal"
-            role="navigation"
-            aria-label="Main navigation"
-          >
-            <ul class="main-nav__list">
-              <li class="main-nav__item">
-                <a href="/" class="main-nav__link">Dashboard</a>
-              </li>
-              <li class="main-nav__item">
-                <a
-                  href="/reports/"
-                  class="main-nav__link main-nav__link--active"
-                  aria-current="page"
-                  >Reports</a
-                >
-              </li>
-            </ul>
-          </div>
-        </nav>
-
-        <div class="site-header__utilities">
-          <!-- Future: user menu, settings, etc. -->
-        </div>
-      </div>
-    </header>
+    {{>include:nav-main}}
 
     <!-- Breadcrumb Navigation -->
     <nav class="main-nav main-nav--breadcrumb" aria-label="Breadcrumb">

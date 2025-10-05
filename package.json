@@ -19,7 +19,7 @@
     "type-check": "echo \"Type checking not implemented yet\"",
     "prepare": "husky install",
     "install-browsers": "npx playwright install chromium",
-    "dev": "npm-run-all --parallel sass:watch serve",
+    "dev": "npm-run-all --parallel sass:watch:local serve",
     "serve": "node src/servers/dashboard.js",
     "serve:reports": "node src/servers/dashboard.js",
     "serve:dashboard": "node src/servers/dashboard.js",
@@ -28,6 +28,7 @@
     "build:prod": "NODE_ENV=production npm-run-all sass:build css:optimize html:build",
     "sass:build": "npm-run-all --parallel sass:design-system sass:legacy-compat sass:report",
     "sass:watch": "npm-run-all --parallel sass:design-system:watch sass:legacy-compat:watch sass:report:watch",
+    "sass:watch:local": "npm-run-all --parallel sass:design-system:watch sass:legacy-compat:watch sass:report:watch",
     "sass:design-system": "sass src/styles/design-system/_index.scss public/styles/design-system.css --style compressed",
     "sass:design-system:watch": "sass src/styles/design-system/_index.scss public/styles/design-system.css --watch --style expanded",
     "sass:legacy-compat": "sass src/styles/scss/shared.scss public/styles/shared.css --style compressed",
@@ -49,7 +50,10 @@
     "storage:test": "node src/utils/test-storage.js",
     "storage:migrate": "node src/utils/storage-cli.js migrate all --dry-run",
     "storage:backup": "node src/utils/storage-cli.js backup create",
-    "storage:integrity": "node src/utils/storage-cli.js integrity check"
+    "storage:integrity": "node src/utils/storage-cli.js integrity check",
+    "compose:dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build",
+    "compose:dev:down": "docker compose -f docker-compose.yml -f docker-compose.dev.yml down",
+    "dev:all": "npm-run-all --parallel sass:watch:local compose:dev"
   },
   "keywords": [
     "accessibility",

@@ -50,7 +50,10 @@ class CATSConfig {
 
     // Job concurrency configuration
     this.MAX_CONCURRENT_JOBS = parseInt(process.env.CATS_MAX_CONCURRENT_JOBS || '3', 10);
-    this.DEFAULT_CRAWLER_CONCURRENCY = parseInt(process.env.CATS_DEFAULT_CRAWLER_CONCURRENCY || '4', 10);
+    this.DEFAULT_CRAWLER_CONCURRENCY = parseInt(
+      process.env.CATS_DEFAULT_CRAWLER_CONCURRENCY || '4',
+      10
+    );
     this.JOB_CLEANUP_DELAY_MS = parseInt(process.env.CATS_JOB_CLEANUP_DELAY_MS || '300000', 10); // 5 minutes
     this.MAX_JOB_RUNTIME_MS = parseInt(process.env.CATS_MAX_JOB_RUNTIME_MS || '3600000', 10); // 1 hour
 
@@ -130,11 +133,17 @@ class CATSConfig {
     console.log(`   SERVER: ${this.getServerUrl()}`);
     console.log(`   MAX_PAGES: ${this.MAX_PAGES}`);
     console.log(`   WCAG: ${this.DEFAULT_WCAG_VERSION} Level ${this.DEFAULT_WCAG_LEVEL}`);
-    console.log(`   CONCURRENCY: ${this.MAX_CONCURRENT_JOBS} jobs, ${this.DEFAULT_CRAWLER_CONCURRENCY} browsers/job`);
+    console.log(
+      `   CONCURRENCY: ${this.MAX_CONCURRENT_JOBS} jobs, ${this.DEFAULT_CRAWLER_CONCURRENCY} browsers/job`
+    );
     console.log(`   STORAGE: ${this.USE_CLOUD_STORAGE ? `GCS (${this.STORAGE_BUCKET})` : 'Local'}`);
-    console.log(`   TIMEOUTS: Page=${this.PAGE_NAVIGATION_TIMEOUT}ms, Sitemap=${this.SITEMAP_TIMEOUT}ms`);
+    console.log(
+      `   TIMEOUTS: Page=${this.PAGE_NAVIGATION_TIMEOUT}ms, Sitemap=${this.SITEMAP_TIMEOUT}ms`
+    );
     console.log(`   RETRIES: Max=${this.MAX_RETRIES}, Delay=${this.RETRY_DELAY_MS}ms`);
-    console.log(`   BROWSER: Strategy=${this.WAIT_STRATEGY}, Pool=${this.BROWSER_POOL_SIZE}, Images=${!this.DISABLE_IMAGES}`);
+    console.log(
+      `   BROWSER: Strategy=${this.WAIT_STRATEGY}, Pool=${this.BROWSER_POOL_SIZE}, Images=${!this.DISABLE_IMAGES}`
+    );
     console.log(`   ENVIRONMENT: ${this.IS_CLOUD_RUN ? 'Cloud Run' : 'Local'}`);
   }
 

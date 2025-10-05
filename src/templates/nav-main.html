@@ -1,0 +1,37 @@
+<!-- Main Site Header Navigation -->
+<header class="site-header" role="banner">
+    <div class="site-header__container">
+        <a href="/" class="site-header__brand" aria-label="CATS Home">
+            <div class="site-header__logo">
+                <span>C</span>
+            </div>
+            <div class="site-header__title">
+                CATS
+                <span class="site-header__subtitle">Accessibility Testing</span>
+            </div>
+        </a>
+
+        <nav class="site-header__nav">
+            <div id="nav-main" class="main-nav main-nav--horizontal" role="navigation" aria-label="Main navigation">
+                <ul class="main-nav__list">
+                    <li class="main-nav__item">
+                        <a href="/" class="main-nav__link {{homeActive}}" {{homeAria}}>Home</a>
+                    </li>
+                    <li class="main-nav__item">
+                        <a href="/crawl" class="main-nav__link {{crawlActive}}" {{crawlAria}}>Crawl</a>
+                    </li>
+                    <li class="main-nav__item">
+                        <a href="/reports/" class="main-nav__link {{reportsActive}}" {{reportsAria}}>Reports</a>
+                    </li>
+                    <li class="main-nav__item">
+                        <a href="/dashboard" class="main-nav__link {{dashboardActive}}" {{dashboardAria}}>Dashboard</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="site-header__utilities">
+            <!-- Future: Login/Sign Up buttons, user menu -->
+        </div>
+    </div>
+</header>

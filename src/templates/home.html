@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CATS - Crawl and Test System for Accessibility</title>
+    <link rel="stylesheet" href="/styles/design-system.css">
+</head>
+<body class="page-container">
+    <!-- Skip Links -->
+    <div class="skip-links">
+        <a href="#main-content" class="skip-links__link">Skip to main content</a>
+    </div>
+
+    {{>include:nav-main}}
+
+    <!-- Main Content Area -->
+    <main id="main-content">
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero__container">
+                <h1 class="hero__title">Automated Accessibility Testing Made Simple</h1>
+                <p class="hero__subtitle">Crawl, Test, and Ensure WCAG Compliance</p>
+                <p class="hero__description">
+                    CATS (Crawl and Test System) is a modern accessibility testing platform that helps developers,
+                    QA teams, and accessibility professionals ensure their websites meet WCAG standards through
+                    automated scanning and beautiful, actionable reports.
+                </p>
+                <div class="hero__cta">
+                    <a href="/crawl" class="btn-hero btn-hero--primary">Start Testing Now</a>
+                    <a href="/dashboard" class="btn-hero btn-hero--secondary">View Dashboard</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features">
+            <div class="features__container">
+                <div class="features__header">
+                    <h2 class="features__title">Why Choose CATS?</h2>
+                    <p class="features__subtitle">Powerful features to ensure your website is accessible to everyone</p>
+                </div>
+
+                <div class="features__grid">
+                    <article class="feature-card">
+                        <div class="feature-card__icon" aria-hidden="true">🔍</div>
+                        <h3 class="feature-card__title">Smart Crawling</h3>
+                        <p class="feature-card__description">
+                            Automatically discovers and scans pages using sitemaps or link discovery.
+                            Configurable depth and page limits give you control over scan scope.
+                        </p>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-card__icon" aria-hidden="true">⚡</div>
+                        <h3 class="feature-card__title">High Performance</h3>
+                        <p class="feature-card__description">
+                            Browser pooling and intelligent concurrency allow you to scan hundreds of pages
+                            quickly. Optimized for both local development and cloud deployments.
+                        </p>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-card__icon" aria-hidden="true">📊</div>
+                        <h3 class="feature-card__title">Beautiful Reports</h3>
+                        <p class="feature-card__description">
+                            Interactive HTML reports with detailed violation breakdowns, WCAG references,
+                            and actionable guidance to fix issues quickly.
+                        </p>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-card__icon" aria-hidden="true">✅</div>
+                        <h3 class="feature-card__title">WCAG Compliance</h3>
+                        <p class="feature-card__description">
+                            Comprehensive testing against WCAG 2.0, 2.1, and 2.2 standards.
+                            Support for Level A, AA, and AAA compliance requirements.
+                        </p>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-card__icon" aria-hidden="true">🔄</div>
+                        <h3 class="feature-card__title">Real-time Monitoring</h3>
+                        <p class="feature-card__description">
+                            Track crawl progress in real-time with live job status updates.
+                            Queue management ensures efficient resource utilization.
+                        </p>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-card__icon" aria-hidden="true">☁️</div>
+                        <h3 class="feature-card__title">Cloud Ready</h3>
+                        <p class="feature-card__description">
+                            Deploy to Google Cloud Run for production-grade scalability.
+                            Supports cloud storage integration for enterprise deployments.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="how-it-works">
+            <div class="how-it-works__container">
+                <h2 class="how-it-works__title">How It Works</h2>
+
+                <div class="steps">
+                    <article class="step">
+                        <div class="step__number" aria-hidden="true">1</div>
+                        <div class="step__content">
+                            <h3 class="step__title">Configure Your Scan</h3>
+                            <p class="step__description">
+                                Enter your website URL and choose your WCAG version and compliance level.
+                                Set crawl depth, page limits, and concurrency based on your needs.
+                            </p>
+                        </div>
+                    </article>
+
+                    <article class="step">
+                        <div class="step__number" aria-hidden="true">2</div>
+                        <div class="step__content">
+                            <h3 class="step__title">Automated Scanning</h3>
+                            <p class="step__description">
+                                CATS crawls your site, discovering pages through sitemaps or following links.
+                                Each page is tested using axe-core for comprehensive accessibility analysis.
+                            </p>
+                        </div>
+                    </article>
+
+                    <article class="step">
+                        <div class="step__number" aria-hidden="true">3</div>
+                        <div class="step__content">
+                            <h3 class="step__title">Review Results</h3>
+                            <p class="step__description">
+                                Access detailed reports showing violations, warnings, and passes.
+                                Each issue includes specific WCAG references and remediation guidance.
+                            </p>
+                        </div>
+                    </article>
+
+                    <article class="step">
+                        <div class="step__number" aria-hidden="true">4</div>
+                        <div class="step__content">
+                            <h3 class="step__title">Fix and Re-test</h3>
+                            <p class="step__description">
+                                Use the actionable insights to fix accessibility issues.
+                                Run new scans to verify fixes and track improvement over time.
+                            </p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action Section -->
+        <section class="cta-section">
+            <div class="cta-section__container">
+                <h2 class="cta-section__title">Ready to Improve Your Website's Accessibility?</h2>
+                <p class="cta-section__description">
+                    Start scanning your website today and ensure it's accessible to everyone.
+                </p>
+                <div class="hero__cta">
+                    <a href="/crawl" class="btn-hero btn-hero--primary">Start Your First Scan</a>
+                    <a href="/reports/" class="btn-hero btn-hero--secondary">View Sample Reports</a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Site Footer -->
+    <footer class="site-footer">
+        <div class="site-footer__links">
+            <a href="https://github.com/iamjolly/crawl-and-test" class="site-footer__link" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="/reports/" class="site-footer__link">Reports</a>
+            <a href="/dashboard" class="site-footer__link">Dashboard</a>
+        </div>
+        <p class="site-footer__copyright">
+            &copy; 2024 CATS - Crawl and Test System. Made with ❤️ for web accessibility.
+        </p>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CATS Accessibility Testing</title>
+    <link rel="stylesheet" href="/styles/design-system.css">
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-card__value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card__label {
+            font-size: 1rem;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-card__change {
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .stat-card__change.positive {
+            color: #28a745;
+        }
+
+        .stat-card__change.negative {
+            color: #dc3545;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .action-button {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #2d3748;
+            transition: all 0.3s ease;
+        }
+
+        .action-button:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .action-button__icon {
+            font-size: 2rem;
+        }
+
+        .action-button__content {
+            flex: 1;
+        }
+
+        .action-button__title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .action-button__description {
+            font-size: 0.875rem;
+            color: #718096;
+        }
+
+        .recent-activity {
+            margin-top: 2rem;
+        }
+
+        .activity-list {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .activity-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-item__content {
+            flex: 1;
+        }
+
+        .activity-item__title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-item__meta {
+            font-size: 0.875rem;
+            color: #718096;
+        }
+
+        .activity-item__badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .activity-item__badge.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .activity-item__badge.running {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .activity-item__badge.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body class="page-container">
+    <!-- Skip Links -->
+    <div class="skip-links">
+        <a href="#main-content" class="skip-links__link">Skip to main content</a>
+    </div>
+
+    {{>include:nav-main}}
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="page-main">
+        <div class="page-main__container">
+
+            <!-- Page Header -->
+            <header class="content-section__header">
+                <h1 class="content-section__title">Dashboard Overview</h1>
+                <p class="content-section__description">Monitor your accessibility testing activity and results</p>
+            </header>
+
+            <!-- Statistics Grid -->
+            <section aria-labelledby="stats-title">
+                <h2 id="stats-title" class="sr-only">System Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card__value" id="total-reports">--</div>
+                        <div class="stat-card__label">Total Reports</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card__value" id="active-jobs">--</div>
+                        <div class="stat-card__label">Active Jobs</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card__value" id="domains-tested">--</div>
+                        <div class="stat-card__label">Domains Tested</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card__value" id="queue-status">--</div>
+                        <div class="stat-card__label">Queue Status</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section aria-labelledby="actions-title">
+                <h2 id="actions-title" class="content-section__title">Quick Actions</h2>
+                <div class="quick-actions">
+                    <a href="/crawl" class="action-button">
+                        <div class="action-button__icon" aria-hidden="true">🚀</div>
+                        <div class="action-button__content">
+                            <div class="action-button__title">Start New Crawl</div>
+                            <div class="action-button__description">Launch accessibility scan</div>
+                        </div>
+                    </a>
+
+                    <a href="/reports/" class="action-button">
+                        <div class="action-button__icon" aria-hidden="true">📊</div>
+                        <div class="action-button__content">
+                            <div class="action-button__title">View Reports</div>
+                            <div class="action-button__description">Browse all reports</div>
+                        </div>
+                    </a>
+
+                    <a href="/api/reports" class="action-button">
+                        <div class="action-button__icon" aria-hidden="true">📥</div>
+                        <div class="action-button__content">
+                            <div class="action-button__title">Export Data</div>
+                            <div class="action-button__description">Download JSON reports</div>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Recent Activity -->
+            <section class="recent-activity" aria-labelledby="activity-title">
+                <h2 id="activity-title" class="content-section__title">Recent Activity</h2>
+                <div class="card">
+                    <div class="card-body">
+                        <div id="activity-list" class="activity-list" role="region" aria-live="polite">
+                            <p class="no-reports">Loading recent activity...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script src="/scripts/dashboard.js"></script>
+</body>
+</html>

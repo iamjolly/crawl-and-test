@@ -1,10 +1,12 @@
 # Google Cloud Run Deployment Guide
 
-This guide walks you through deploying CATS (Crawl and Test System) to Google Cloud Run for production use or proof-of-concept demonstrations.
+This guide walks you through deploying CATS (Crawl and Test System) to Google
+Cloud Run for production use or proof-of-concept demonstrations.
 
 ## ☁️ Architecture Overview
 
 **CATS on Cloud Run provides:**
+
 - Containerized accessibility crawler with web dashboard
 - Auto-scaling from 0 to 5 instances based on demand
 - Google Cloud Storage for report persistence
@@ -12,6 +14,7 @@ This guide walks you through deploying CATS (Crawl and Test System) to Google Cl
 - Cost-effective pay-per-use pricing
 
 **Cost Estimates:**
+
 - **POC (1,500 pages/week)**: $5-9/month
 - **Production (100,000 pages/week)**: $60-85/month
 
@@ -74,6 +77,7 @@ Visit the URL to access your CATS dashboard!
 ### Environment Variables
 
 Key environment variables set automatically:
+
 - `CATS_USE_CLOUD_STORAGE=true` - Enables cloud storage
 - `CATS_SERVER_HOST=0.0.0.0` - Allows Cloud Run traffic
 - `CATS_STORAGE_BUCKET=cats-reports-$PROJECT_ID` - Your bucket name
@@ -118,6 +122,7 @@ gcloud logs read --service=cats-accessibility-crawler
 ### Scale Configuration
 
 **Optimized settings for government site accessibility testing:**
+
 - **Memory**: 8GB (increased for browser stability)
 - **CPU**: 4 vCPU (improved parallel processing)
 - **Timeout**: 60 minutes (for large crawls)
@@ -126,6 +131,7 @@ gcloud logs read --service=cats-accessibility-crawler
 - **Min Instances**: 1 (eliminates cold starts)
 
 **Performance Optimizations:**
+
 - 🚀 Page timeout: 90 seconds (3x longer for slow sites)
 - 🔄 Retry logic: 3 attempts with exponential backoff
 - ⚡ Wait strategy: `domcontentloaded` (faster loading)
@@ -153,11 +159,13 @@ gcloud run services update cats-accessibility-crawler \
 ## 💰 Cost Optimization
 
 ### For POC/Testing
+
 - Current settings are optimal for small-scale testing
 - Scales to zero when not in use
 - ~$5-9/month for 1,500 pages/week
 
 ### For Production
+
 - Consider increasing `--max-instances` for high traffic
 - Monitor CPU/Memory usage and adjust accordingly
 - Use Cloud CDN for global report access
@@ -166,8 +174,8 @@ gcloud run services update cats-accessibility-crawler \
 
 ### Public vs Authenticated Access
 
-**Current**: Public access (no authentication required)
-**Recommended for Production**: Add authentication
+**Current**: Public access (no authentication required) **Recommended for
+Production**: Add authentication
 
 ```bash
 # Remove public access
@@ -198,16 +206,16 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - id: 'auth'
-      uses: 'google-github-actions/auth@v1'
-      with:
-        credentials_json: '${{ secrets.GCP_SA_KEY }}'
-    - name: 'Set up Cloud SDK'
-      uses: 'google-github-actions/setup-gcloud@v1'
-    - name: 'Deploy'
-      run: |
-        gcloud builds submit --config cloudbuild.yaml
+      - uses: actions/checkout@v4
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+      - name: 'Deploy'
+        run: |
+          gcloud builds submit --config cloudbuild.yaml
 ```
 
 ## 🆘 Troubleshooting
@@ -215,6 +223,7 @@ jobs:
 ### Domain Validation Issues
 
 **Error**: "Domain does not exist or is not accessible"
+
 ```bash
 # Check if domain resolves
 nslookup example.com
@@ -230,6 +239,7 @@ curl -I https://example.com
 ```
 
 **Error**: Job shows as "ERROR" instead of completing
+
 - This is expected behavior for invalid domains (prevents false reports)
 - Check logs for specific DNS/network error details
 - Ensure domain is publicly accessible
@@ -237,12 +247,14 @@ curl -I https://example.com
 ### Common Issues
 
 **Build Timeout**
+
 ```bash
 # Increase timeout in cloudbuild.yaml
 timeout: '2400s'  # 40 minutes
 ```
 
 **Out of Memory**
+
 ```bash
 # Increase memory allocation
 gcloud run services update cats-accessibility-crawler \
@@ -250,6 +262,7 @@ gcloud run services update cats-accessibility-crawler \
 ```
 
 **Playwright Browser Issues**
+
 - Browsers are installed in Dockerfile
 - Check logs for browser launch errors
 - Consider using `--no-sandbox` flags if needed

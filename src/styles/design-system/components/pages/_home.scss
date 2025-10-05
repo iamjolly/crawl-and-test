@@ -1,0 +1,374 @@
+// ==========================================================================
+// Home Page Styles
+// ==========================================================================
+//
+// Styles specific to the public-facing home/landing page
+// All colors meet WCAG AA contrast requirements
+//
+
+@use '../../tokens/colors' as colors;
+@use '../../tokens/spacing' as spacing;
+@use '../../tokens/typography' as typography;
+
+// ==========================================================================
+// Hero Section
+// ==========================================================================
+
+.hero {
+  background: linear-gradient(135deg, var(--color-blue-700) 0%, var(--color-blue-900) 100%);
+  color: var(--color-white);
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.hero__container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.hero__title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+  color: var(--color-white);
+}
+
+.hero__subtitle {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  opacity: 0.95;
+}
+
+.hero__description {
+  font-size: 1.125rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+.hero__cta {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+// ==========================================================================
+// Hero Buttons (WCAG AA compliant)
+// ==========================================================================
+
+.btn-hero {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.btn-hero--primary {
+  background: var(--color-white);
+  color: var(--color-blue-800); // Darker blue for 4.5:1 contrast on white
+  border: 2px solid var(--color-white);
+
+  /* Ensure visited links styled as primary hero buttons remain dark blue
+     even if a global reset sets visited links to inherit (which can cause
+     white-on-white when inside an inverse container like .hero). We add a
+     more specific selector for anchor elements to win the cascade without
+     using !important. */
+  &:visited {
+    color: var(--color-blue-800);
+  }
+  &:hover {
+    background: var(--color-gray-50);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  &:focus {
+    outline: 3px solid var(--color-yellow-400);
+    outline-offset: 2px;
+  }
+}
+
+/* More specific anchor selector to override global a:visited rules that may
+   otherwise inherit white from a parent (e.g. .hero). This targets anchors
+   that also have the primary hero class and ensures accessibility contrast. */
+a.btn-hero--primary:visited {
+  color: var(--color-blue-800);
+}
+
+.btn-hero--secondary {
+  background: transparent;
+  color: var(--color-white);
+  border: 2px solid var(--color-white);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    color: var(--color-white);
+  }
+
+  &:focus {
+    outline: 3px solid var(--color-yellow-400);
+    outline-offset: 2px;
+  }
+}
+
+a.btn-hero--secondary:hover {
+  color: var(--color-white);
+}
+
+/* Ensure visited secondary hero buttons remain white inside inverse containers
+   (mirrors the approach used for primary hero buttons). This wins the cascade
+   over the generic .btn:visited{color:inherit} reset without using !important. */
+a.btn-hero--secondary:visited {
+  color: var(--color-white);
+}
+
+/* Stronger selector to win cascade in case generic .btn rules or resets
+   appear later in the compiled CSS. Targets anchors inside the hero. */
+.hero a.btn-hero--secondary:hover {
+  color: var(--color-white);
+}
+
+// ==========================================================================
+// Features Section
+// ==========================================================================
+
+.features {
+  padding: 4rem 2rem;
+  background: var(--color-gray-50);
+}
+
+.features__container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.features__header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.features__title {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--color-gray-900);
+}
+
+.features__subtitle {
+  font-size: 1.25rem;
+  color: var(--color-gray-700); // Darker for 4.5:1 contrast on gray-50
+}
+
+.features__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+// ==========================================================================
+// Feature Cards
+// ==========================================================================
+
+.feature-card {
+  background: var(--color-white);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  &:focus-within {
+    outline: 3px solid var(--color-blue-500);
+    outline-offset: 2px;
+  }
+}
+
+.feature-card__icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.feature-card__title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--color-gray-900);
+}
+
+.feature-card__description {
+  color: var(--color-gray-700);
+  line-height: 1.6;
+}
+
+// ==========================================================================
+// How It Works Section
+// ==========================================================================
+
+.how-it-works {
+  padding: 4rem 2rem;
+  background: var(--color-white);
+}
+
+.how-it-works__container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.how-it-works__title {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 3rem;
+  color: var(--color-gray-900);
+}
+
+.steps {
+  display: grid;
+  gap: 2rem;
+}
+
+.step {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.step__number {
+  background: linear-gradient(135deg, var(--color-blue-700) 0%, var(--color-blue-900) 100%);
+  color: var(--color-white);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.step__content {
+  flex: 1;
+}
+
+.step__title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--color-gray-900);
+}
+
+.step__description {
+  color: var(--color-gray-700);
+  line-height: 1.6;
+}
+
+// ==========================================================================
+// CTA Section
+// ==========================================================================
+
+.cta-section {
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, var(--color-blue-700) 0%, var(--color-blue-900) 100%);
+  color: var(--color-white);
+  text-align: center;
+}
+
+.cta-section__container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.cta-section__title {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--color-white);
+}
+
+.cta-section__description {
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+  opacity: 0.95;
+}
+
+// ==========================================================================
+// Footer
+// ==========================================================================
+
+.site-footer {
+  background: var(--color-gray-900);
+  color: var(--color-white);
+  padding: 2rem;
+  text-align: center;
+}
+
+.site-footer__links {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.site-footer__link {
+  color: var(--color-white);
+  text-decoration: none;
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+
+  &:hover {
+    opacity: 1;
+    text-decoration: underline;
+  }
+
+  &:focus {
+    outline: 3px solid var(--color-yellow-400);
+    outline-offset: 2px;
+  }
+}
+
+.site-footer__copyright {
+  opacity: 0.8;
+  font-size: 0.9rem;
+}
+
+// ==========================================================================
+// Responsive Adjustments
+// ==========================================================================
+
+@media (max-width: 768px) {
+  .hero__title {
+    font-size: 2rem;
+  }
+
+  .hero__subtitle {
+    font-size: 1.25rem;
+  }
+
+  .features__title,
+  .how-it-works__title,
+  .cta-section__title {
+    font-size: 2rem;
+  }
+
+  .step {
+    flex-direction: column;
+  }
+
+  .step__number {
+    width: 50px;
+    height: 50px;
+    font-size: 1.25rem;
+  }
+}

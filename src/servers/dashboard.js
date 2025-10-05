@@ -191,13 +191,39 @@ function loadTemplate(templateName) {
   }
 }
 
-function renderTemplate(templateContent, data) {
+function renderTemplate(templateContent, data = {}) {
   let rendered = templateContent;
+
+  // First, process template includes ({{>include:template-name}})
+  const includePattern = /\{\{>include:([^}]+)\}\}/g;
+  let match;
+  while ((match = includePattern.exec(rendered)) !== null) {
+    const includeName = match[1];
+    const includeContent = loadTemplate(includeName);
+    rendered = rendered.replace(match[0], includeContent);
+  }
+
+  // Then, replace all placeholders with data
   for (const [key, value] of Object.entries(data)) {
     const placeholder = new RegExp(`{{${key}}}`, 'g');
     rendered = rendered.replace(placeholder, value || '');
   }
+
   return rendered;
+}
+
+// Generate navigation context for active states
+function getNavContext(currentPage) {
+  const pages = ['home', 'crawl', 'reports', 'dashboard'];
+  const context = {};
+
+  pages.forEach(page => {
+    const isActive = page === currentPage;
+    context[`${page}Active`] = isActive ? 'main-nav__link--active' : '';
+    context[`${page}Aria`] = isActive ? 'aria-current="page"' : '';
+  });
+
+  return context;
 }
 
 // Middleware
@@ -259,6 +285,38 @@ app.use('/reports', async (req, res, next) => {
     next(); // Let other routes handle it
   }
 });
+
+// ==============================================================================
+// ROUTES - Must come BEFORE static middleware to take precedence
+// ==============================================================================
+
+// Home page (public landing page)
+app.get('/', (req, res) => {
+  const template = loadTemplate('home');
+  const navContext = getNavContext('home');
+  const rendered = renderTemplate(template, navContext);
+  res.send(rendered);
+});
+
+// Crawl page (dedicated crawl interface)
+app.get('/crawl', (req, res) => {
+  const template = loadTemplate('crawl');
+  const navContext = getNavContext('crawl');
+  const rendered = renderTemplate(template, navContext);
+  res.send(rendered);
+});
+
+// Dashboard overview page
+app.get('/dashboard', (req, res) => {
+  const template = loadTemplate('dashboard-overview');
+  const navContext = getNavContext('dashboard');
+  const rendered = renderTemplate(template, navContext);
+  res.send(rendered);
+});
+
+// ==============================================================================
+// STATIC FILE MIDDLEWARE - Must come AFTER specific routes
+// ==============================================================================
 
 app.use('/styles', express.static(config.PUBLIC_STYLES_DIR));
 app.use('/scripts', express.static(config.PUBLIC_SCRIPTS_DIR));
@@ -413,17 +471,18 @@ async function generateDomainReportsListHTML(domain) {
 }
 
 // Generate reports index HTML using template
-async function generateReportsIndexHTML() {
+async function generateReportsIndexHTML(navContext = {}) {
   const template = loadTemplate('reports-index');
   const reportsList = await generateReportsListHTML();
 
   return renderTemplate(template, {
+    ...navContext,
     reportsList,
   });
 }
 
 // Generate HTML for domain-specific reports page using template
-async function generateDomainReportsHTML(domain) {
+async function generateDomainReportsHTML(domain, navContext = {}) {
   try {
     let reportCount = 0;
 
@@ -442,6 +501,7 @@ async function generateDomainReportsHTML(domain) {
     const reportsList = await generateDomainReportsListHTML(domain);
 
     return renderTemplate(template, {
+      ...navContext,
       domain,
       reportCount,
       reportsList,
@@ -450,23 +510,18 @@ async function generateDomainReportsHTML(domain) {
     console.error(`❌ Failed to generate domain reports HTML for ${domain}:`, error.message);
     const template = loadTemplate('error-404');
     return renderTemplate(template, {
+      ...navContext,
       errorTitle: 'Error Loading Reports',
       errorMessage: `Failed to load reports for domain: ${domain}`,
     });
   }
 }
 
-// Routes
-app.get('/', (req, res) => {
-  // Serve the dashboard index.html (regenerated on server startup)
-  const indexPath = path.join(config.PUBLIC_DIR, 'index.html');
-  res.sendFile(indexPath);
-});
-
 // Reports index page
 app.get('/reports/', async (req, res) => {
   try {
-    const html = await generateReportsIndexHTML();
+    const navContext = getNavContext('reports');
+    const html = await generateReportsIndexHTML(navContext);
     res.send(html);
   } catch (error) {
     console.error('❌ Failed to generate reports index:', error.message);
@@ -491,15 +546,18 @@ app.get('/browse/:domain', async (req, res) => {
     }
 
     if (!hasReports) {
+      const navContext = getNavContext('reports');
       const template = loadTemplate('error-404');
       const errorHTML = renderTemplate(template, {
+        ...navContext,
         errorTitle: 'Domain Not Found',
         errorMessage: `No reports found for domain: ${domain}`,
       });
       return res.status(404).send(errorHTML);
     }
 
-    const html = await generateDomainReportsHTML(domain);
+    const navContext = getNavContext('reports');
+    const html = await generateDomainReportsHTML(domain, navContext);
     res.send(html);
   } catch (error) {
     console.error(`❌ Failed to load domain reports for ${domain}:`, error.message);
