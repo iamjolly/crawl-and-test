@@ -11,6 +11,13 @@ services:
       # Local development - use local storage
       - CATS_REPORTS_DIR=/app/public/reports
       - CATS_PUBLIC_DIR=/app/public
+      # Database configuration
+      - CATS_DB_HOST=postgres
+      - CATS_DB_PORT=5432
+      - CATS_DB_NAME=cats_dev
+      - CATS_DB_USER=cats_user
+      - CATS_DB_PASSWORD=cats_password
+      - CATS_DB_SSL=false
       # Google Cloud Storage (commented out for local dev)
       # - GOOGLE_CLOUD_PROJECT=your-project-id
       # - CATS_STORAGE_BUCKET=your-bucket-name
@@ -19,12 +26,31 @@ services:
       # Mount reports directory for local development
       - ./public/reports:/app/public/reports
       - ./public/scripts:/app/public/scripts
+    depends_on:
+      postgres:
+        condition: service_healthy
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:3000/']
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=cats_dev
+      - POSTGRES_USER=cats_user
+      - POSTGRES_PASSWORD=cats_password
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U cats_user -d cats_dev']
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # Optional: Add a Google Cloud Storage emulator for local testing
   gcs-emulator:
@@ -34,3 +60,6 @@ services:
     command: ['-scheme', 'http', '-host', '0.0.0.0', '-port', '4443']
     profiles:
       - gcs-testing
+
+volumes:
+  postgres-data:
