@@ -1,7 +1,7 @@
 # Development image: keep devDependencies so watcher and dev tooling are available
 FROM node:22-slim
 
-# Install system deps needed for Playwright
+# Install system deps needed for Playwright and PostgreSQL client
 RUN apt-get update && \
     apt-get install -y \
     wget \
@@ -22,6 +22,7 @@ RUN apt-get update && \
     xdg-utils \
     libxss1 \
     libgconf-2-4 \
+    postgresql-client \
     --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
@@ -33,6 +34,10 @@ RUN npm install && npm cache clean --force
 
 # Copy source
 COPY . .
+
+# Copy and set entrypoint script permissions
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Create output directories
 RUN mkdir -p public/reports public/styles public/scripts
@@ -55,8 +60,9 @@ RUN npx playwright install chromium
 ENV PORT=3333
 EXPOSE 3333
 
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=30s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:3333/ || exit 1
 
-# Start watcher and server in the container for one-command dev
+# Set entrypoint and default command
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD /bin/sh -c "npm run sass:watch:local & node src/servers/dashboard.js"

@@ -53,7 +53,12 @@
     "storage:integrity": "node src/utils/storage-cli.js integrity check",
     "compose:dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build",
     "compose:dev:down": "docker compose -f docker-compose.yml -f docker-compose.dev.yml down",
-    "dev:all": "npm-run-all --parallel sass:watch:local compose:dev"
+    "dev:all": "npm-run-all --parallel sass:watch:local compose:dev",
+    "db:migrate": "sequelize-cli db:migrate",
+    "db:migrate:undo": "sequelize-cli db:migrate:undo",
+    "db:seed": "sequelize-cli db:seed:all",
+    "db:seed:undo": "sequelize-cli db:seed:undo:all",
+    "db:reset": "sequelize-cli db:drop && sequelize-cli db:create && sequelize-cli db:migrate && sequelize-cli db:seed:all"
   },
   "keywords": [
     "accessibility",
@@ -70,16 +75,26 @@
   "dependencies": {
     "@google-cloud/storage": "^7.17.1",
     "axe-core": "^4.8.2",
+    "bcryptjs": "^2.4.3",
     "commander": "^14.0.1",
+    "connect-pg-simple": "^9.0.1",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "express-rate-limit": "^8.1.0",
+    "express-session": "^1.18.0",
     "express-validator": "^7.2.0",
     "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
     "p-limit": "^7.1.1",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0",
+    "pg": "^8.13.1",
+    "pg-hstore": "^2.3.4",
     "playwright": "^1.55.1",
     "robots-parser": "^3.0.1",
+    "sequelize": "^6.37.5",
     "uuid": "^13.0.0",
     "xml2js": "^0.6.2"
   },
@@ -100,6 +115,7 @@
     "postcss-cli": "^11.0.1",
     "prettier": "^3.3.3",
     "sass": "^1.93.2",
+    "sequelize-cli": "^6.6.2",
     "supertest": "^7.0.0"
   },
   "jest": {
