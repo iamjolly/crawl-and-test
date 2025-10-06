@@ -350,7 +350,7 @@ async function getReportDirectories() {
         domain,
         reportCount: reports.length,
         lastReport: reports.length > 0 ? reports.sort().pop() : null,
-        reportFiles: reports.sort(),
+        reportFiles: reports.sort().reverse(), // Newest first
       }));
     } else {
       // Fallback to local filesystem
@@ -370,7 +370,7 @@ async function getReportDirectories() {
             domain: dirent.name,
             reportCount: reports.length,
             lastReport: reports.length > 0 ? reports.sort().pop() : null,
-            reportFiles: reports.sort(),
+            reportFiles: reports.sort().reverse(), // Newest first
           };
         });
     }
@@ -439,12 +439,16 @@ async function generateDomainReportsListHTML(domain) {
       reports = files
         .map(filePath => path.basename(filePath))
         .filter(fileName => fileName.endsWith('.html'))
-        .sort();
+        .sort()
+        .reverse(); // Newest first
     } else {
       // Fallback to local filesystem
       const domainDir = path.join(config.REPORTS_DIR, domain);
       const files = fs.readdirSync(domainDir);
-      reports = files.filter(file => file.endsWith('.html'));
+      reports = files
+        .filter(file => file.endsWith('.html'))
+        .sort()
+        .reverse(); // Newest first
     }
 
     if (reports.length === 0) {
