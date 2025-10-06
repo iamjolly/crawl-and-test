@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - CATS</title>
+    <link rel="stylesheet" href="/styles/design-system.css">
+</head>
+<body class="page-container">
+    <!-- Skip Links -->
+    <div class="skip-links">
+        <a href="#main-content" class="skip-links__link">Skip to main content</a>
+    </div>
+
+    {{>include:nav-main}}
+
+    <!-- Main Content Area -->
+    <main id="main-content">
+        <section class="auth-section">
+            <div class="auth-container">
+                <div class="auth-card">
+                    <h1 class="auth-card__title">Create Your CATS Account</h1>
+                    <p class="auth-card__subtitle">Start testing your website's accessibility today</p>
+
+                    <form id="registerForm" class="auth-form" action="/api/auth/register" method="POST">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName" class="form-label">First Name</label>
+                                <input
+                                    type="text"
+                                    id="firstName"
+                                    name="firstName"
+                                    class="form-input"
+                                    required
+                                    autocomplete="given-name"
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="lastName" class="form-label">Last Name</label>
+                                <input
+                                    type="text"
+                                    id="lastName"
+                                    name="lastName"
+                                    class="form-input"
+                                    required
+                                    autocomplete="family-name"
+                                >
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                class="form-input"
+                                required
+                                autocomplete="email"
+                                aria-describedby="email-help"
+                            >
+                            <p id="email-help" class="form-help">We'll never share your email with anyone</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password" class="form-label">Password</label>
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                class="form-input"
+                                required
+                                autocomplete="new-password"
+                                minlength="8"
+                                aria-describedby="password-help"
+                            >
+                            <p id="password-help" class="form-help">Must be at least 8 characters long</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirmPassword" class="form-label">Confirm Password</label>
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                name="confirmPassword"
+                                class="form-input"
+                                required
+                                autocomplete="new-password"
+                                minlength="8"
+                            >
+                        </div>
+
+                        <div id="error-message" class="alert alert--error" role="alert" style="display: none;"></div>
+
+                        <button type="submit" class="btn-primary btn-primary--full">
+                            <span id="submit-text">Create Account</span>
+                            <span id="submit-loading" style="display: none;">Creating Account...</span>
+                        </button>
+                    </form>
+
+                    <div class="auth-footer">
+                        <p class="auth-footer__text">
+                            Already have an account? <a href="/login" class="auth-footer__link">Sign in</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Site Footer -->
+    <footer class="site-footer">
+        <div class="site-footer__links">
+            <a href="https://github.com/iamjolly/crawl-and-test" class="site-footer__link" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="/reports/" class="site-footer__link">Reports</a>
+            <a href="/dashboard" class="site-footer__link">Dashboard</a>
+        </div>
+        <p class="site-footer__copyright">
+            &copy; 2024 CATS - Crawl and Test System. Made with ❤️ for web accessibility.
+        </p>
+    </footer>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const submitText = document.getElementById('submit-text');
+            const submitLoading = document.getElementById('submit-loading');
+            const errorMessage = document.getElementById('error-message');
+
+            // Validate password match
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                errorMessage.textContent = 'Passwords do not match';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            // Disable submit button and show loading state
+            submitBtn.disabled = true;
+            submitText.style.display = 'none';
+            submitLoading.style.display = 'inline';
+            errorMessage.style.display = 'none';
+
+            try {
+                const formData = new FormData(e.target);
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: formData.get('email'),
+                        password: formData.get('password'),
+                        firstName: formData.get('firstName'),
+                        lastName: formData.get('lastName'),
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Registration failed');
+                }
+
+                // Redirect to dashboard on success
+                window.location.href = '/dashboard';
+
+            } catch (error) {
+                errorMessage.textContent = error.message;
+                errorMessage.style.display = 'block';
+                submitBtn.disabled = false;
+                submitText.style.display = 'inline';
+                submitLoading.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

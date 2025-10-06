@@ -267,6 +267,208 @@
   }
 }
 
+// ==========================================================================
+// User Menu (Authenticated Users)
+// ==========================================================================
+
+.user-menu {
+  position: relative;
+
+  &__trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: var(--color-border-hover);
+      background: var(--color-bg-subtle);
+    }
+
+    &:focus-visible {
+      outline: 3px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+
+    &[aria-expanded='true'] {
+      border-color: var(--color-primary);
+    }
+  }
+
+  &__name {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--color-text);
+  }
+
+  &__icon {
+    color: var(--color-text-muted);
+    transition: transform 0.2s ease;
+
+    .user-menu__trigger[aria-expanded='true'] & {
+      transform: rotate(180deg);
+    }
+  }
+
+  &__dropdown {
+    position: absolute;
+    top: calc(100% + var(--space-2));
+    right: 0;
+    min-width: 240px;
+    background: var(--color-background-primary, #ffffff);
+    border: 2px solid #d1d5db;
+    border-radius: var(--radius-md);
+    box-shadow: var(--elevation-lg);
+    padding: var(--space-2);
+    z-index: 50;
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  &__header {
+    padding: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  &__user-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+
+    strong {
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+      color: var(--color-text);
+    }
+  }
+
+  &__email {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  &__list {
+    list-style: none;
+    padding: var(--space-2) 0;
+    margin: 0;
+
+    li {
+      margin: 0;
+    }
+  }
+
+  &__link {
+    display: block;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: var(--color-bg-subtle);
+      color: var(--color-primary);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: -2px;
+    }
+  }
+
+  &__footer {
+    padding: var(--space-2) 0 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  &__logout {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: #dc2626;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: -2px;
+    }
+  }
+}
+
+// ==========================================================================
+// Auth Actions (Guest Users)
+// ==========================================================================
+
+.auth-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+
+  &__link {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--color-text);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: var(--color-primary);
+      background: var(--color-bg-subtle);
+    }
+
+    &:focus-visible {
+      outline: 3px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+  }
+
+  &__button {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: white;
+    background: var(--color-primary);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: white;
+      background: var(--color-primary-hover);
+      box-shadow: var(--elevation-sm);
+    }
+
+    &:visited {
+      color: white;
+    }
+
+    &:focus-visible {
+      outline: 3px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+  }
+}
+
 // Print styles
 @media print {
   .site-header {

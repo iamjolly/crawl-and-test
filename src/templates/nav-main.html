@@ -31,7 +31,133 @@
         </nav>
 
         <div class="site-header__utilities">
-            <!-- Future: Login/Sign Up buttons, user menu -->
+            {{#if user}}
+            <!-- Authenticated User Menu -->
+            <div class="user-menu">
+                <button class="user-menu__trigger" aria-expanded="false" aria-haspopup="true" id="user-menu-button">
+                    <span class="user-menu__name">{{user.firstName}}</span>
+                    <svg class="user-menu__icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div class="user-menu__dropdown" id="user-menu-dropdown" hidden>
+                    <div class="user-menu__header">
+                        <div class="user-menu__user-info">
+                            <strong>{{user.firstName}} {{user.lastName}}</strong>
+                            <span class="user-menu__email">{{user.email}}</span>
+                        </div>
+                    </div>
+                    <ul class="user-menu__list">
+                        <li><a href="/dashboard" class="user-menu__link">Dashboard</a></li>
+                        <li><a href="/crawl" class="user-menu__link">Start Crawl</a></li>
+                        <li><a href="/reports/" class="user-menu__link">View Reports</a></li>
+                    </ul>
+                    <div class="user-menu__footer">
+                        <button class="user-menu__logout" id="logout-button">Sign Out</button>
+                    </div>
+                </div>
+            </div>
+            {{else}}
+            <!-- Guest User Actions -->
+            <div class="auth-actions">
+                <a href="/login" class="auth-actions__link">Sign In</a>
+                <a href="/register" class="auth-actions__button">Get Started</a>
+            </div>
+            {{/if}}
         </div>
     </div>
 </header>
+
+<script>
+// User menu dropdown functionality
+(function() {
+    const menuButton = document.getElementById('user-menu-button');
+    const menuDropdown = document.getElementById('user-menu-dropdown');
+    const logoutButton = document.getElementById('logout-button');
+    const userMenu = document.querySelector('.user-menu');
+
+    function closeMenu() {
+        if (menuButton && menuDropdown) {
+            menuButton.setAttribute('aria-expanded', 'false');
+            menuDropdown.hidden = true;
+        }
+    }
+
+    function openMenu() {
+        if (menuButton && menuDropdown) {
+            menuButton.setAttribute('aria-expanded', 'true');
+            menuDropdown.hidden = false;
+        }
+    }
+
+    if (menuButton && menuDropdown) {
+        // Toggle menu on button click
+        menuButton.addEventListener('click', function(event) {
+            event.stopPropagation();
+            const isExpanded = menuButton.getAttribute('aria-expanded') === 'true';
+            if (isExpanded) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.user-menu')) {
+                closeMenu();
+            }
+        });
+
+        // Close menu when tabbing out of the last focusable element
+        menuDropdown.addEventListener('keydown', function(event) {
+            if (event.key === 'Tab') {
+                const focusableElements = menuDropdown.querySelectorAll('a, button');
+                const lastElement = focusableElements[focusableElements.length - 1];
+
+                // If tabbing forward from the last element, close menu
+                if (!event.shiftKey && document.activeElement === lastElement) {
+                    closeMenu();
+                }
+            }
+
+            // Close on Escape key
+            if (event.key === 'Escape') {
+                closeMenu();
+                menuButton.focus();
+            }
+        });
+
+        // Close when tabbing backward from the first element to the button
+        menuButton.addEventListener('keydown', function(event) {
+            if (event.key === 'Tab' && event.shiftKey) {
+                const isExpanded = menuButton.getAttribute('aria-expanded') === 'true';
+                if (isExpanded) {
+                    closeMenu();
+                }
+            }
+        });
+    }
+
+    // Logout functionality
+    if (logoutButton) {
+        logoutButton.addEventListener('click', async function() {
+            try {
+                const response = await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (response.ok) {
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                // eslint-disable-next-line no-console
+                console.error('Logout failed:', error);
+            }
+        });
+    }
+})();
+</script>
