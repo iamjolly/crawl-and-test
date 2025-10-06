@@ -346,12 +346,15 @@ async function getReportDirectories() {
         }
       });
 
-      return Array.from(domainMap.entries()).map(([domain, reports]) => ({
-        domain,
-        reportCount: reports.length,
-        lastReport: reports.length > 0 ? reports.sort().pop() : null,
-        reportFiles: reports.sort().reverse(), // Newest first
-      }));
+      return Array.from(domainMap.entries()).map(([domain, reports]) => {
+        const sortedReports = reports.sort().reverse(); // Newest first
+        return {
+          domain,
+          reportCount: reports.length,
+          lastReport: sortedReports.length > 0 ? sortedReports[0] : null,
+          reportFiles: sortedReports,
+        };
+      });
     } else {
       // Fallback to local filesystem
       const reportsDir = config.REPORTS_DIR;
@@ -366,11 +369,12 @@ async function getReportDirectories() {
           const dirPath = path.join(reportsDir, dirent.name);
           const files = fs.readdirSync(dirPath);
           const reports = files.filter(file => file.endsWith('.html'));
+          const sortedReports = reports.sort().reverse(); // Newest first
           return {
             domain: dirent.name,
             reportCount: reports.length,
-            lastReport: reports.length > 0 ? reports.sort().pop() : null,
-            reportFiles: reports.sort().reverse(), // Newest first
+            lastReport: sortedReports.length > 0 ? sortedReports[0] : null,
+            reportFiles: sortedReports,
           };
         });
     }
