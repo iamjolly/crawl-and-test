@@ -73,7 +73,7 @@
   "author": "A11y Is, LLC - iamjolly - a11y.is",
   "license": "MIT",
   "dependencies": {
-    "@google-cloud/storage": "^7.17.1",
+    "@google-cloud/storage": "^7.17.2",
     "axe-core": "^4.8.2",
     "bcryptjs": "^3.0.2",
     "commander": "^14.0.1",
