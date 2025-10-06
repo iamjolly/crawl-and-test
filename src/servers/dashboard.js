@@ -10,6 +10,7 @@ const { generateIndexHTML } = require('../generators/index');
 const { parseTimestampFromFilename } = require('../scripts/utils');
 const browserPool = require('../utils/browserPool');
 const storage = require('../utils/storage');
+const { requireAuth } = require('../middleware/auth');
 
 // Initialize Passport configuration
 require('../config/passport');
@@ -208,17 +209,40 @@ function renderTemplate(templateContent, data = {}) {
     rendered = rendered.replace(match[0], includeContent);
   }
 
-  // Then, replace all placeholders with data
-  for (const [key, value] of Object.entries(data)) {
-    const placeholder = new RegExp(`{{${key}}}`, 'g');
-    rendered = rendered.replace(placeholder, value || '');
+  // Process conditional blocks ({{#if variable}}...{{else}}...{{/if}})
+  const conditionalPattern =
+    /\{\{#if ([^}]+)\}\}([\s\S]*?)(?:\{\{else\}\}([\s\S]*?))?\{\{\/if\}\}/g;
+  rendered = rendered.replace(
+    conditionalPattern,
+    (match, condition, truthyBlock, falsyBlock = '') => {
+      const value = data[condition.trim()];
+      return value ? truthyBlock : falsyBlock;
+    }
+  );
+
+  // Then, replace all placeholders with data, including nested objects
+  function replacePlaceholders(str, obj, prefix = '') {
+    for (const [key, value] of Object.entries(obj)) {
+      const fullKey = prefix ? `${prefix}.${key}` : key;
+
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        // Recursively handle nested objects
+        str = replacePlaceholders(str, value, fullKey);
+      } else {
+        const placeholder = new RegExp(`\\{\\{${fullKey}\\}\\}`, 'g');
+        str = str.replace(placeholder, value ?? '');
+      }
+    }
+    return str;
   }
+
+  rendered = replacePlaceholders(rendered, data);
 
   return rendered;
 }
 
 // Generate navigation context for active states
-function getNavContext(currentPage) {
+function getNavContext(currentPage, user = null) {
   const pages = ['home', 'crawl', 'reports', 'dashboard'];
   const context = {};
 
@@ -227,6 +251,17 @@ function getNavContext(currentPage) {
     context[`${page}Active`] = isActive ? 'main-nav__link--active' : '';
     context[`${page}Aria`] = isActive ? 'aria-current="page"' : '';
   });
+
+  // Add user context if authenticated
+  if (user) {
+    context.user = {
+      id: user.id,
+      email: user.email,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      role: user.role,
+    };
+  }
 
   return context;
 }
@@ -340,23 +375,47 @@ app.use('/api/auth', authRoutes);
 // Home page (public landing page)
 app.get('/', (req, res) => {
   const template = loadTemplate('home');
-  const navContext = getNavContext('home');
+  const navContext = getNavContext('home', req.user);
+  const rendered = renderTemplate(template, navContext);
+  res.send(rendered);
+});
+
+// Login page
+app.get('/login', (req, res) => {
+  // Redirect if already logged in
+  if (req.isAuthenticated()) {
+    return res.redirect('/dashboard');
+  }
+  const template = loadTemplate('login');
+  const navContext = getNavContext(null, req.user);
+  const rendered = renderTemplate(template, navContext);
+  res.send(rendered);
+});
+
+// Register page
+app.get('/register', (req, res) => {
+  // Redirect if already logged in
+  if (req.isAuthenticated()) {
+    return res.redirect('/dashboard');
+  }
+  const template = loadTemplate('register');
+  const navContext = getNavContext(null, req.user);
   const rendered = renderTemplate(template, navContext);
   res.send(rendered);
 });
 
 // Crawl page (dedicated crawl interface)
-app.get('/crawl', (req, res) => {
+app.get('/crawl', requireAuth, (req, res) => {
   const template = loadTemplate('crawl');
-  const navContext = getNavContext('crawl');
+  const navContext = getNavContext('crawl', req.user);
   const rendered = renderTemplate(template, navContext);
   res.send(rendered);
 });
 
 // Dashboard overview page
-app.get('/dashboard', (req, res) => {
+app.get('/dashboard', requireAuth, (req, res) => {
   const template = loadTemplate('dashboard-overview');
-  const navContext = getNavContext('dashboard');
+  const navContext = getNavContext('dashboard', req.user);
   const rendered = renderTemplate(template, navContext);
   res.send(rendered);
 });
@@ -573,9 +632,9 @@ async function generateDomainReportsHTML(domain, navContext = {}) {
 }
 
 // Reports index page
-app.get('/reports/', async (req, res) => {
+app.get('/reports/', requireAuth, async (req, res) => {
   try {
-    const navContext = getNavContext('reports');
+    const navContext = getNavContext('reports', req.user);
     const html = await generateReportsIndexHTML(navContext);
     res.send(html);
   } catch (error) {
@@ -621,7 +680,7 @@ app.get('/browse/:domain', async (req, res) => {
 });
 
 // API endpoint to get active jobs
-app.get('/api/jobs', (req, res) => {
+app.get('/api/jobs', requireAuth, (req, res) => {
   const activeJobsList = Array.from(activeJobs.entries()).map(([jobId, job]) => ({
     jobId,
     ...job,
@@ -655,7 +714,7 @@ app.get('/api/jobs', (req, res) => {
 });
 
 // API endpoint to get current reports
-app.get('/api/reports', async (req, res) => {
+app.get('/api/reports', requireAuth, async (req, res) => {
   try {
     const reportDirs = await getReportDirectories();
     res.json(reportDirs);
@@ -666,7 +725,7 @@ app.get('/api/reports', async (req, res) => {
 });
 
 // Start a new crawl
-app.post('/crawl', (req, res) => {
+app.post('/crawl', requireAuth, (req, res) => {
   const {
     url,
     wcagVersion = '2.1',
@@ -720,7 +779,7 @@ app.post('/crawl', (req, res) => {
 });
 
 // Cancel a job
-app.delete('/api/jobs/:jobId', (req, res) => {
+app.delete('/api/jobs/:jobId', requireAuth, (req, res) => {
   const { jobId } = req.params;
 
   // Check if job exists in active jobs
