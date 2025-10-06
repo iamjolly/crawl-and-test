@@ -87,6 +87,7 @@ Install dependencies and start the app locally:
 ```bash
 npm install
 npm run install-browsers
+npm run sass:build  # ⚠️ REQUIRED: Compile SCSS to CSS on first setup
 npm run dev
 ```
 
