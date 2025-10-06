@@ -3,11 +3,16 @@ const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const { spawn } = require('child_process');
+const session = require('express-session');
+const passport = require('passport');
 const config = require('../core/config');
 const { generateIndexHTML } = require('../generators/index');
 const { parseTimestampFromFilename } = require('../scripts/utils');
 const browserPool = require('../utils/browserPool');
 const storage = require('../utils/storage');
+
+// Initialize Passport configuration
+require('../config/passport');
 
 const app = express();
 
@@ -230,6 +235,44 @@ function getNavContext(currentPage) {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Session configuration
+const sessionConfig = {
+  secret: process.env.CATS_SESSION_SECRET || 'your-session-secret-change-in-production',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+    httpOnly: true,
+    maxAge: parseInt(process.env.CATS_SESSION_MAX_AGE || '604800000', 10), // 7 days default
+  },
+};
+
+// Use PostgreSQL session store if database is configured
+if (process.env.CATS_DB_HOST) {
+  const pgSession = require('connect-pg-simple')(session);
+  const { Pool } = require('pg');
+
+  const pool = new Pool({
+    host: process.env.CATS_DB_HOST,
+    port: parseInt(process.env.CATS_DB_PORT || '5432', 10),
+    database: process.env.CATS_DB_NAME,
+    user: process.env.CATS_DB_USER,
+    password: process.env.CATS_DB_PASSWORD,
+    ssl: process.env.CATS_DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  });
+
+  sessionConfig.store = new pgSession({
+    pool,
+    tableName: 'session',
+  });
+}
+
+app.use(session(sessionConfig));
+
+// Initialize Passport and session
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Custom reports middleware - serves from cloud storage or local filesystem
 app.use('/reports', async (req, res, next) => {
   if (req.method !== 'GET') {
@@ -289,6 +332,10 @@ app.use('/reports', async (req, res, next) => {
 // ==============================================================================
 // ROUTES - Must come BEFORE static middleware to take precedence
 // ==============================================================================
+
+// Authentication routes
+const authRoutes = require('../routes/auth');
+app.use('/api/auth', authRoutes);
 
 // Home page (public landing page)
 app.get('/', (req, res) => {
