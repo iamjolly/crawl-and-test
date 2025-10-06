@@ -46,6 +46,7 @@ git clone https://github.com/iamjolly/crawl-and-test.git
 cd crawl-and-test
 npm install
 npm run install-browsers
+npm run sass:build         # compile SCSS to CSS (required for first setup)
 npm run dev                # starts watcher + server (port 3000)
 
 # One-step dev (watch on host + dev container)
@@ -318,14 +319,15 @@ We welcome contributions! Please see our
 1. **Fork** the repository
 2. **Clone** your fork:
    `git clone https://github.com/YOUR_USERNAME/crawl-and-test.git`
-3. **Install dependencies**: `npm install`
-4. **Create a feature branch**: `git checkout -b feature/your-feature-name`
-5. **Make your changes**
-6. **Run tests**: `npm test`
-7. **Run linting**: `npm run lint:fix`
-8. **Commit using conventional commits**:
+3. **Install dependencies**: `npm install && npm run install-browsers`
+4. **Build CSS**: `npm run sass:build` (compiles SCSS to CSS)
+5. **Create a feature branch**: `git checkout -b feature/your-feature-name`
+6. **Make your changes**
+7. **Run tests**: `npm test`
+8. **Run linting**: `npm run lint:fix`
+9. **Commit using conventional commits**:
    `git commit -m "feat: add new feature"`
-9. **Push and create a PR**
+10. **Push and create a PR**
 
 ### Code Quality
 
