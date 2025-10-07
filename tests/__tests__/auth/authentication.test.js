@@ -15,7 +15,12 @@ describe('Authentication', () => {
     process.env.CATS_JWT_SECRET = 'test-secret-key-for-testing-only';
     process.env.CATS_SESSION_SECRET = 'test-session-secret-for-testing';
 
-    // Sync database
+    // Drop all tables first to avoid "relation already exists" errors
+    await sequelize.query('DROP TABLE IF EXISTS "crawl_jobs" CASCADE;');
+    await sequelize.query('DROP TABLE IF EXISTS "sessions" CASCADE;');
+    await sequelize.query('DROP TABLE IF EXISTS "users" CASCADE;');
+
+    // Sync database - create fresh tables
     await sequelize.sync({ force: true });
   });
 
