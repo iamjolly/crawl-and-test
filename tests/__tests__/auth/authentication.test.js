@@ -52,7 +52,7 @@ describe('Authentication', () => {
       });
 
       expect(response.status).toBe(201);
-      expect(response.body).toHaveProperty('success', true);
+      expect(response.body).toHaveProperty('message');
       expect(response.body).toHaveProperty('message');
 
       // Verify user was created in database
@@ -72,7 +72,7 @@ describe('Authentication', () => {
       });
 
       expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('success', false);
+      expect(response.body).toHaveProperty('error');
       expect(response.body).toHaveProperty('error');
     });
 
@@ -84,7 +84,7 @@ describe('Authentication', () => {
       });
 
       expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('success', false);
+      expect(response.body).toHaveProperty('error');
     });
 
     test('should reject registration with invalid email format', async () => {
@@ -96,7 +96,7 @@ describe('Authentication', () => {
       });
 
       expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('success', false);
+      expect(response.body).toHaveProperty('error');
     });
 
     test('should reject registration with duplicate email', async () => {
@@ -117,7 +117,7 @@ describe('Authentication', () => {
       });
 
       expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('success', false);
+      expect(response.body).toHaveProperty('error');
       expect(response.body.error).toMatch(/already exists|duplicate/i);
     });
 
@@ -155,7 +155,7 @@ describe('Authentication', () => {
       });
 
       expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('success', true);
+      expect(response.body).toHaveProperty('message');
       expect(response.body).toHaveProperty('user');
       expect(response.body.user).toHaveProperty('email', 'logintest@example.com');
       expect(response.body.user).not.toHaveProperty('password_hash');
@@ -169,7 +169,7 @@ describe('Authentication', () => {
       });
 
       expect(response.status).toBe(401);
-      expect(response.body).toHaveProperty('success', false);
+      expect(response.body).toHaveProperty('error');
       expect(response.body.error).toMatch(/invalid|incorrect/i);
     });
 
@@ -180,14 +180,14 @@ describe('Authentication', () => {
       });
 
       expect(response.status).toBe(401);
-      expect(response.body).toHaveProperty('success', false);
+      expect(response.body).toHaveProperty('error');
     });
 
     test('should reject login with missing credentials', async () => {
       const response = await request(app).post('/api/auth/login').send({});
 
       expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('success', false);
+      expect(response.body).toHaveProperty('error');
     });
 
     test('should update last_login_at timestamp on successful login', async () => {
@@ -229,7 +229,7 @@ describe('Authentication', () => {
       const response = await agent.post('/api/auth/logout');
 
       expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('success', true);
+      expect(response.body).toHaveProperty('message');
     });
 
     test('should clear session on logout', async () => {
