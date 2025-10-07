@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 const { spawn } = require('child_process');
 const session = require('express-session');
 const passport = require('passport');
@@ -876,7 +876,7 @@ app.post('/crawl', requireAuth, async (req, res) => {
     // Extract domain from URL
     const domain = new URL(url).hostname;
 
-    const jobId = uuidv4();
+    const jobId = randomUUID();
     const createdTime = new Date().toISOString();
     const status = canStartNewJob() ? JOB_STATUS.RUNNING : JOB_STATUS.QUEUED;
 
