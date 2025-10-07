@@ -125,6 +125,7 @@ class CATSConfig {
    * Log current configuration (useful for debugging)
    */
   logConfig() {
+    /* eslint-disable no-console */
     console.log('🔧 CATS Configuration:');
     console.log(`   ROOT_DIR: ${this.ROOT_DIR}`);
     console.log(`   REPORTS_DIR: ${this.REPORTS_DIR}`);
@@ -145,6 +146,7 @@ class CATSConfig {
       `   BROWSER: Strategy=${this.WAIT_STRATEGY}, Pool=${this.BROWSER_POOL_SIZE}, Images=${!this.DISABLE_IMAGES}`
     );
     console.log(`   ENVIRONMENT: ${this.IS_CLOUD_RUN ? 'Cloud Run' : 'Local'}`);
+    /* eslint-enable no-console */
   }
 
   /**
