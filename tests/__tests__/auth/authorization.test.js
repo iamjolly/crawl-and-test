@@ -102,6 +102,9 @@ describe('Authorization', () => {
   });
 
   afterAll(async () => {
+    if (app && app.locals && app.locals.sessionPool) {
+      await app.locals.sessionPool.end();
+    }
     await sequelize.close();
   });
 

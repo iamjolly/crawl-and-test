@@ -331,10 +331,15 @@ if (process.env.CATS_DB_HOST) {
     ssl: process.env.CATS_DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
   });
 
-  sessionConfig.store = new pgSession({
+  const store = new pgSession({
     pool,
     tableName: 'session',
   });
+  sessionConfig.store = store;
+
+  // Store reference for cleanup in tests
+  app.locals.sessionStore = store;
+  app.locals.sessionPool = pool;
 }
 
 app.use(session(sessionConfig));
