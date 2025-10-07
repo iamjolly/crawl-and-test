@@ -21,7 +21,8 @@ describe('Authentication', () => {
 
   beforeEach(async () => {
     // Clean up database before each test
-    await User.destroy({ where: {}, truncate: true });
+    // Use CASCADE to handle foreign key constraints
+    await sequelize.query('TRUNCATE TABLE "users" CASCADE;');
 
     // Create a fresh app instance for each test
     // Note: We need to require the app after setting env vars

@@ -28,8 +28,8 @@ describe('Authorization', () => {
 
   beforeEach(async () => {
     // Clean up database
-    await CrawlJob.destroy({ where: {}, truncate: true, cascade: true });
-    await User.destroy({ where: {}, truncate: true });
+    // Use CASCADE to handle foreign key constraints (crawl_jobs references users)
+    await sequelize.query('TRUNCATE TABLE "crawl_jobs", "users" CASCADE;');
 
     // Create fresh app instance
     delete require.cache[require.resolve('../../../src/servers/dashboard.js')];
