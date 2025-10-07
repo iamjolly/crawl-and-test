@@ -8,6 +8,7 @@ const { sequelize, User } = require('../../../src/models');
 
 describe('Authentication', () => {
   let app;
+  const pools = []; // Track all connection pools created during tests
 
   beforeAll(async () => {
     // Set auth enabled for tests
@@ -47,13 +48,21 @@ describe('Authentication', () => {
     delete require.cache[require.resolve('../../../src/servers/dashboard.js')];
     app = require('../../../src/servers/dashboard.js');
 
+    // Track the session pool for cleanup
+    if (app && app.locals && app.locals.sessionPool) {
+      pools.push(app.locals.sessionPool);
+    }
+
     // Ensure database is ready
     await sequelize.authenticate();
   });
 
   afterAll(async () => {
-    if (app && app.locals && app.locals.sessionPool) {
-      await app.locals.sessionPool.end();
+    // Close all connection pools created during tests
+    for (const pool of pools) {
+      if (pool && !pool.ended) {
+        await pool.end();
+      }
     }
     await sequelize.close();
   });

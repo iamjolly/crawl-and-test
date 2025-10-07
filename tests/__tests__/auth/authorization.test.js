@@ -15,6 +15,7 @@ describe('Authorization', () => {
   let agent1;
   let agent2;
   let agentAdmin;
+  const pools = []; // Track all connection pools created during tests
 
   beforeAll(async () => {
     // Set auth enabled for tests
@@ -53,8 +54,36 @@ describe('Authorization', () => {
     delete require.cache[require.resolve('../../../src/servers/dashboard.js')];
     app = require('../../../src/servers/dashboard.js');
 
+    // Track the session pool for cleanup
+    if (app && app.locals && app.locals.sessionPool) {
+      pools.push(app.locals.sessionPool);
+    }
+
     // Ensure database is ready
     await sequelize.authenticate();
+
+    // Create mock report files for testing
+    const fs = require('fs');
+    const path = require('path');
+    const reportsDir = process.env.CATS_REPORTS_DIR;
+    const exampleDir = path.join(reportsDir, 'example.com');
+    const testDir = path.join(reportsDir, 'test.com');
+
+    // Clean and recreate report directories
+    if (fs.existsSync(exampleDir)) fs.rmSync(exampleDir, { recursive: true });
+    if (fs.existsSync(testDir)) fs.rmSync(testDir, { recursive: true });
+    fs.mkdirSync(exampleDir, { recursive: true });
+    fs.mkdirSync(testDir, { recursive: true });
+
+    // Create mock report files
+    fs.writeFileSync(
+      path.join(exampleDir, 'report-2024-01-01-120000.html'),
+      '<html><body>Mock Report</body></html>'
+    );
+    fs.writeFileSync(
+      path.join(testDir, 'report-2024-01-01-120000.html'),
+      '<html><body>Mock Report</body></html>'
+    );
 
     // Create test users
     testUser1 = await User.create({
@@ -102,8 +131,11 @@ describe('Authorization', () => {
   });
 
   afterAll(async () => {
-    if (app && app.locals && app.locals.sessionPool) {
-      await app.locals.sessionPool.end();
+    // Close all connection pools created during tests
+    for (const pool of pools) {
+      if (pool && !pool.ended) {
+        await pool.end();
+      }
     }
     await sequelize.close();
   });
