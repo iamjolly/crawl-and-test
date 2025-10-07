@@ -40,6 +40,9 @@ describe('Authorization', () => {
     delete require.cache[require.resolve('../../../src/servers/dashboard.js')];
     app = require('../../../src/servers/dashboard.js');
 
+    // Ensure database is ready
+    await sequelize.authenticate();
+
     // Create test users
     testUser1 = await User.create({
       email: 'user1@example.com',

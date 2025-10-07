@@ -33,6 +33,9 @@ describe('Authentication', () => {
     // Note: We need to require the app after setting env vars
     delete require.cache[require.resolve('../../../src/servers/dashboard.js')];
     app = require('../../../src/servers/dashboard.js');
+
+    // Ensure database is ready
+    await sequelize.authenticate();
   });
 
   afterAll(async () => {
