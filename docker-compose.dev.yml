@@ -10,6 +10,8 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3333
+      # Authentication
+      - CATS_AUTH_ENABLED=true
       # Database configuration
       - CATS_DB_HOST=postgres
       - CATS_DB_PORT=5432
