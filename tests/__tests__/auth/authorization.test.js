@@ -24,11 +24,24 @@ describe('Authorization', () => {
 
     // Drop all tables first to avoid "relation already exists" errors
     await sequelize.query('DROP TABLE IF EXISTS "crawl_jobs" CASCADE;');
-    await sequelize.query('DROP TABLE IF EXISTS "sessions" CASCADE;');
+    await sequelize.query('DROP TABLE IF EXISTS "session" CASCADE;');
     await sequelize.query('DROP TABLE IF EXISTS "users" CASCADE;');
 
     // Sync database - create fresh tables
     await sequelize.sync({ force: true });
+
+    // Create session table for connect-pg-simple
+    await sequelize.query(`
+      CREATE TABLE IF NOT EXISTS "session" (
+        "sid" varchar NOT NULL COLLATE "default",
+        "sess" json NOT NULL,
+        "expire" timestamp(6) NOT NULL,
+        PRIMARY KEY ("sid")
+      ) WITH (OIDS=FALSE);
+    `);
+    await sequelize.query(
+      'CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "session" ("expire");'
+    );
   });
 
   beforeEach(async () => {

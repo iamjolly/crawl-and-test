@@ -6,7 +6,7 @@
 // Set test environment variables
 process.env.NODE_ENV = 'test';
 process.env.CATS_SERVER_PORT = '3001';
-process.env.CATS_REPORTS_DIR = './tests/fixtures/reports';
+process.env.CATS_REPORTS_DIR = require('path').join(__dirname, 'fixtures', 'reports');
 
 // Database configuration for tests
 // Use environment variables if provided (CI), otherwise use defaults (local)
