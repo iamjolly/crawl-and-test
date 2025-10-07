@@ -14,6 +14,21 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: cats_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
     strategy:
       matrix:
         node-version: [22.x, 24.x]
@@ -39,6 +54,14 @@ jobs:
 
       - name: Run tests
         run: npm test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/cats_test
+          CATS_DB_HOST: localhost
+          CATS_DB_PORT: 5432
+          CATS_DB_NAME: cats_test
+          CATS_DB_USER: postgres
+          CATS_DB_PASSWORD: postgres
+          NODE_ENV: test
 
       - name: Run security audit
         run: npm audit --audit-level moderate

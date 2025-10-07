@@ -8,6 +8,17 @@ process.env.NODE_ENV = 'test';
 process.env.CATS_SERVER_PORT = '3001';
 process.env.CATS_REPORTS_DIR = './tests/fixtures/reports';
 
+// Database configuration for tests
+// Use environment variables if provided (CI), otherwise use defaults (local)
+process.env.CATS_DB_HOST = process.env.CATS_DB_HOST || 'localhost';
+process.env.CATS_DB_PORT = process.env.CATS_DB_PORT || '5432';
+process.env.CATS_DB_NAME = process.env.CATS_DB_NAME || 'cats_test';
+process.env.CATS_DB_USER = process.env.CATS_DB_USER || 'postgres';
+process.env.CATS_DB_PASSWORD = process.env.CATS_DB_PASSWORD || 'postgres';
+process.env.DATABASE_URL =
+  process.env.DATABASE_URL ||
+  `postgresql://${process.env.CATS_DB_USER}:${process.env.CATS_DB_PASSWORD}@${process.env.CATS_DB_HOST}:${process.env.CATS_DB_PORT}/${process.env.CATS_DB_NAME}`;
+
 // Global test timeout (30 seconds for accessibility scans)
 jest.setTimeout(30000);
 

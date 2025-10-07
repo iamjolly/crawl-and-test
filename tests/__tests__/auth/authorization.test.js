@@ -5,7 +5,7 @@
 
 const request = require('supertest');
 const { sequelize, User, CrawlJob } = require('../../../src/models');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 
 describe('Authorization', () => {
   let app;
@@ -137,7 +137,7 @@ describe('Authorization', () => {
     beforeEach(async () => {
       // Create jobs for each user
       user1Job = await CrawlJob.create({
-        id: uuidv4(),
+        id: randomUUID(),
         user_id: testUser1.id,
         domain: 'example.com',
         status: 'completed',
@@ -145,7 +145,7 @@ describe('Authorization', () => {
       });
 
       user2Job = await CrawlJob.create({
-        id: uuidv4(),
+        id: randomUUID(),
         user_id: testUser2.id,
         domain: 'test.com',
         status: 'completed',
@@ -202,7 +202,7 @@ describe('Authorization', () => {
     beforeEach(async () => {
       // Create running jobs
       user1Job = await CrawlJob.create({
-        id: uuidv4(),
+        id: randomUUID(),
         user_id: testUser1.id,
         domain: 'example.com',
         status: 'running',
@@ -210,7 +210,7 @@ describe('Authorization', () => {
       });
 
       user2Job = await CrawlJob.create({
-        id: uuidv4(),
+        id: randomUUID(),
         user_id: testUser2.id,
         domain: 'test.com',
         status: 'running',
@@ -263,7 +263,7 @@ describe('Authorization', () => {
     beforeEach(async () => {
       // Create various jobs for user1
       await CrawlJob.create({
-        id: uuidv4(),
+        id: randomUUID(),
         user_id: testUser1.id,
         domain: 'example1.com',
         status: 'completed',
@@ -271,7 +271,7 @@ describe('Authorization', () => {
       });
 
       await CrawlJob.create({
-        id: uuidv4(),
+        id: randomUUID(),
         user_id: testUser1.id,
         domain: 'example2.com',
         status: 'running',
@@ -279,7 +279,7 @@ describe('Authorization', () => {
       });
 
       await CrawlJob.create({
-        id: uuidv4(),
+        id: randomUUID(),
         user_id: testUser1.id,
         domain: 'example3.com',
         status: 'error',
@@ -288,7 +288,7 @@ describe('Authorization', () => {
 
       // Create jobs for user2
       await CrawlJob.create({
-        id: uuidv4(),
+        id: randomUUID(),
         user_id: testUser2.id,
         domain: 'test1.com',
         status: 'completed',
@@ -325,7 +325,7 @@ describe('Authorization', () => {
 
     test('should check job modification permissions correctly', async () => {
       const job = await CrawlJob.create({
-        id: uuidv4(),
+        id: randomUUID(),
         user_id: testUser1.id,
         domain: 'example.com',
         status: 'running',
