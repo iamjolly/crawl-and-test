@@ -1009,49 +1009,54 @@ app.delete('/api/jobs/:jobId', requireAuth, async (req, res) => {
   }
 });
 
-// Start the server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`🚀 CATS Dashboard running at http://localhost:${PORT}`);
-  console.log(`📊 View your dashboard: http://localhost:${PORT}`);
-  console.log(`📁 Reports directory: ${config.REPORTS_DIR}`);
-  console.log(`⚡ Job Management:`);
-  console.log(`   • Max concurrent jobs: ${config.MAX_CONCURRENT_JOBS}`);
-  console.log(`   • Default crawler concurrency: ${config.DEFAULT_CRAWLER_CONCURRENCY} browsers`);
-  console.log(`   • Job timeout: ${Math.floor(config.MAX_JOB_RUNTIME_MS / 60000)} minutes`);
-  console.log('');
-  console.log('🚀 Performance Configuration:');
-  console.log(`   • Environment: ${config.IS_CLOUD_RUN ? '☁️  Cloud Run' : '💻 Local'}`);
-  console.log(`   • Page timeout: ${config.PAGE_NAVIGATION_TIMEOUT / 1000}s`);
-  console.log(`   • Wait strategy: ${config.WAIT_STRATEGY}`);
-  console.log(`   • Max retries: ${config.MAX_RETRIES}`);
-  console.log(`   • Browser pool: ${config.BROWSER_POOL_SIZE} instances`);
-  console.log(`   • Images disabled: ${config.DISABLE_IMAGES ? '✅' : '❌'}`);
-  console.log(`   • CSS disabled: ${config.DISABLE_CSS ? '✅' : '❌'}`);
-  console.log(`   • Cleanup delay: ${Math.floor(config.JOB_CLEANUP_DELAY_MS / 60000)} minutes`);
+// Start the server (only if not in test environment)
+if (process.env.NODE_ENV !== 'test') {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`🚀 CATS Dashboard running at http://localhost:${PORT}`);
+    console.log(`📊 View your dashboard: http://localhost:${PORT}`);
+    console.log(`📁 Reports directory: ${config.REPORTS_DIR}`);
+    console.log(`⚡ Job Management:`);
+    console.log(`   • Max concurrent jobs: ${config.MAX_CONCURRENT_JOBS}`);
+    console.log(`   • Default crawler concurrency: ${config.DEFAULT_CRAWLER_CONCURRENCY} browsers`);
+    console.log(`   • Job timeout: ${Math.floor(config.MAX_JOB_RUNTIME_MS / 60000)} minutes`);
+    console.log('');
+    console.log('🚀 Performance Configuration:');
+    console.log(`   • Environment: ${config.IS_CLOUD_RUN ? '☁️  Cloud Run' : '💻 Local'}`);
+    console.log(`   • Page timeout: ${config.PAGE_NAVIGATION_TIMEOUT / 1000}s`);
+    console.log(`   • Wait strategy: ${config.WAIT_STRATEGY}`);
+    console.log(`   • Max retries: ${config.MAX_RETRIES}`);
+    console.log(`   • Browser pool: ${config.BROWSER_POOL_SIZE} instances`);
+    console.log(`   • Images disabled: ${config.DISABLE_IMAGES ? '✅' : '❌'}`);
+    console.log(`   • CSS disabled: ${config.DISABLE_CSS ? '✅' : '❌'}`);
+    console.log(`   • Cleanup delay: ${Math.floor(config.JOB_CLEANUP_DELAY_MS / 60000)} minutes`);
 
-  // Regenerate index.html asynchronously after server starts
-  // eslint-disable-next-line no-undef
-  setImmediate(async () => {
-    console.log('🔄 Regenerating dashboard index.html...');
-    try {
-      await generateIndexHTML();
-      console.log('✅ Dashboard index.html regenerated');
-    } catch (error) {
-      console.error('❌ Failed to regenerate index.html:', error.message);
-    }
+    // Regenerate index.html asynchronously after server starts
+    // eslint-disable-next-line no-undef
+    setImmediate(async () => {
+      console.log('🔄 Regenerating dashboard index.html...');
+      try {
+        await generateIndexHTML();
+        console.log('✅ Dashboard index.html regenerated');
+      } catch (error) {
+        console.error('❌ Failed to regenerate index.html:', error.message);
+      }
+    });
   });
-});
 
-// Graceful shutdown handling
-process.on('SIGTERM', async () => {
-  console.log('🛑 SIGTERM received, shutting down gracefully...');
-  await browserPool.cleanup();
-  process.exit(0);
-});
+  // Graceful shutdown handling
+  process.on('SIGTERM', async () => {
+    console.log('🛑 SIGTERM received, shutting down gracefully...');
+    await browserPool.cleanup();
+    process.exit(0);
+  });
 
-process.on('SIGINT', async () => {
-  console.log('🛑 SIGINT received, shutting down gracefully...');
-  await browserPool.cleanup();
-  process.exit(0);
-});
+  process.on('SIGINT', async () => {
+    console.log('🛑 SIGINT received, shutting down gracefully...');
+    await browserPool.cleanup();
+    process.exit(0);
+  });
+}
+
+// Export app for testing
+module.exports = app;
