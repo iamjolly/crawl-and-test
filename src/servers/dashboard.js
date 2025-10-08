@@ -244,16 +244,30 @@ function renderTemplate(templateContent, data = {}) {
     rendered = rendered.replace(match[0], includeContent);
   }
 
+  // Helper function to get nested property value
+  function getNestedValue(obj, path) {
+    return path.split('.').reduce((current, key) => current?.[key], obj);
+  }
+
   // Process conditional blocks ({{#if variable}}...{{else}}...{{/if}})
-  const conditionalPattern =
-    /\{\{#if ([^}]+)\}\}([\s\S]*?)(?:\{\{else\}\}([\s\S]*?))?\{\{\/if\}\}/g;
-  rendered = rendered.replace(
-    conditionalPattern,
-    (match, condition, truthyBlock, falsyBlock = '') => {
-      const value = data[condition.trim()];
-      return value ? truthyBlock : falsyBlock;
+  // Find innermost conditionals first (those without nested {{#if}})
+  function processConditionals(str) {
+    const pattern =
+      /\{\{#if\s+([^}]+)\}\}((?:(?!\{\{#if)[\s\S])*?)(?:\{\{else\}\}((?:(?!\{\{#if)[\s\S])*?))?\{\{\/if\}\}/;
+    let maxIterations = 20;
+
+    while (pattern.test(str) && maxIterations > 0) {
+      str = str.replace(pattern, (match, condition, truthyBlock, falsyBlock = '') => {
+        const value = getNestedValue(data, condition.trim());
+        return value ? truthyBlock : falsyBlock;
+      });
+      maxIterations--;
     }
-  );
+
+    return str;
+  }
+
+  rendered = processConditionals(rendered);
 
   // Then, replace all placeholders with data, including nested objects
   function replacePlaceholders(str, obj, prefix = '') {
