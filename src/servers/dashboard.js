@@ -10,7 +10,7 @@ const { generateIndexHTML } = require('../generators/index');
 const { parseTimestampFromFilename } = require('../scripts/utils');
 const browserPool = require('../utils/browserPool');
 const storage = require('../utils/storage');
-const { requireAuth } = require('../middleware/auth');
+const { requireAuth, requireAdmin } = require('../middleware/auth');
 const { CrawlJob } = require('../models');
 
 // Initialize Passport configuration
@@ -278,7 +278,7 @@ function renderTemplate(templateContent, data = {}) {
 
 // Generate navigation context for active states
 function getNavContext(currentPage, user = null) {
-  const pages = ['home', 'crawl', 'reports', 'dashboard'];
+  const pages = ['home', 'crawl', 'reports', 'dashboard', 'admin-users'];
   const context = {};
 
   pages.forEach(page => {
@@ -295,6 +295,7 @@ function getNavContext(currentPage, user = null) {
       firstName: user.first_name,
       lastName: user.last_name,
       role: user.role,
+      isAdmin: user.role === 'admin',
     };
   }
 
@@ -460,6 +461,14 @@ app.get('/crawl', requireAuth, (req, res) => {
 app.get('/dashboard', requireAuth, (req, res) => {
   const template = loadTemplate('dashboard-overview');
   const navContext = getNavContext('dashboard', req.user);
+  const rendered = renderTemplate(template, navContext);
+  res.send(rendered);
+});
+
+// Admin users management page
+app.get('/admin/users', requireAuth, requireAdmin, (req, res) => {
+  const template = loadTemplate('admin-users');
+  const navContext = getNavContext('admin-users', req.user);
   const rendered = renderTemplate(template, navContext);
   res.send(rendered);
 });

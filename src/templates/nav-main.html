@@ -26,6 +26,11 @@
                     <li class="main-nav__item">
                         <a href="/dashboard" class="main-nav__link {{dashboardActive}}" {{dashboardAria}}>Dashboard</a>
                     </li>
+                    {{#if user.isAdmin}}
+                    <li class="main-nav__item">
+                        <a href="/admin/users" class="main-nav__link {{adminUsersActive}}" {{adminUsersAria}}>Admin</a>
+                    </li>
+                    {{/if}}
                 </ul>
             </div>
         </nav>
@@ -51,6 +56,9 @@
                         <li><a href="/dashboard" class="user-menu__link">Dashboard</a></li>
                         <li><a href="/crawl" class="user-menu__link">Start Crawl</a></li>
                         <li><a href="/reports/" class="user-menu__link">View Reports</a></li>
+                        {{#if user.isAdmin}}
+                        <li><a href="/admin/users" class="user-menu__link">User Management</a></li>
+                        {{/if}}
                     </ul>
                     <div class="user-menu__footer">
                         <button class="user-menu__logout" id="logout-button">Sign Out</button>
