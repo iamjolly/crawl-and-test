@@ -412,6 +412,10 @@ app.use('/reports', async (req, res, next) => {
 const authRoutes = require('../routes/auth');
 app.use('/api/auth', authRoutes);
 
+// Admin routes
+const adminRoutes = require('../routes/admin');
+app.use('/api/admin', adminRoutes);
+
 // Home page (public landing page)
 app.get('/', (req, res) => {
   const template = loadTemplate('home');
