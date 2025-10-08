@@ -50,7 +50,7 @@ function _loadJS() {
   return combinedJS;
 }
 
-// Template rendering with include support
+// Template rendering with include support and basic Handlebars conditionals
 function renderTemplate(templateContent, data = {}) {
   let rendered = templateContent;
 
@@ -62,6 +62,13 @@ function renderTemplate(templateContent, data = {}) {
     const includeContent = loadTemplate(includeName);
     rendered = rendered.replace(match[0], includeContent);
   }
+
+  // Process {{#if variable}} blocks - show else block if variable is falsy
+  const ifPattern = /\{\{#if ([^}]+)\}\}([\s\S]*?)(?:\{\{else\}\}([\s\S]*?))?\{\{\/if\}\}/g;
+  rendered = rendered.replace(ifPattern, (_match, variable, trueBlock, falseBlock) => {
+    const value = data[variable.trim()];
+    return value ? trueBlock : falseBlock || '';
+  });
 
   // Then, replace all placeholders with data
   for (const [key, value] of Object.entries(data)) {

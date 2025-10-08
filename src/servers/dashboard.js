@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 const { spawn } = require('child_process');
 const session = require('express-session');
 const passport = require('passport');
@@ -11,6 +11,7 @@ const { parseTimestampFromFilename } = require('../scripts/utils');
 const browserPool = require('../utils/browserPool');
 const storage = require('../utils/storage');
 const { requireAuth } = require('../middleware/auth');
+const { CrawlJob } = require('../models');
 
 // Initialize Passport configuration
 require('../config/passport');
@@ -96,7 +97,7 @@ function cleanupCompletedJobs() {
 setInterval(cleanupCompletedJobs, 30000);
 
 // Start a job process
-function startJobProcess(jobId, _jobData) {
+async function startJobProcess(jobId, _jobData) {
   const job = activeJobs.get(jobId);
   if (!job) {
     console.error(`❌ Job ${jobId} not found in activeJobs`);
@@ -106,6 +107,16 @@ function startJobProcess(jobId, _jobData) {
   // Update job status to running
   job.status = JOB_STATUS.RUNNING;
   job.startTime = new Date().toISOString();
+
+  // Persist to database
+  try {
+    const dbJob = await CrawlJob.findByPk(jobId);
+    if (dbJob) {
+      await dbJob.markStarted();
+    }
+  } catch (error) {
+    console.error(`❌ Failed to update job ${jobId} in database:`, error.message);
+  }
 
   // Start crawl process
   const domain = new URL(job.url).hostname;
@@ -154,6 +165,20 @@ function startJobProcess(jobId, _jobData) {
       currentJob.status = code === 0 ? JOB_STATUS.COMPLETED : JOB_STATUS.ERROR;
       currentJob.endTime = new Date().toISOString();
 
+      // Persist to database
+      try {
+        const dbJob = await CrawlJob.findByPk(jobId);
+        if (dbJob) {
+          if (code === 0) {
+            await dbJob.markCompleted();
+          } else {
+            await dbJob.markError('Crawl process failed');
+          }
+        }
+      } catch (error) {
+        console.error(`❌ Failed to update job ${jobId} in database:`, error.message);
+      }
+
       // Regenerate index.html if crawl was successful
       if (code === 0) {
         try {
@@ -170,13 +195,23 @@ function startJobProcess(jobId, _jobData) {
     processJobQueue();
   });
 
-  crawlProcess.on('error', error => {
+  crawlProcess.on('error', async error => {
     console.error('Crawl process error:', error);
     const currentJob = activeJobs.get(jobId);
     if (currentJob) {
       currentJob.status = JOB_STATUS.ERROR;
       currentJob.error = error.message;
       currentJob.endTime = new Date().toISOString();
+
+      // Persist to database
+      try {
+        const dbJob = await CrawlJob.findByPk(jobId);
+        if (dbJob) {
+          await dbJob.markError(error.message);
+        }
+      } catch (dbError) {
+        console.error(`❌ Failed to update job ${jobId} in database:`, dbError.message);
+      }
     }
 
     // Process next job in queue
@@ -296,10 +331,15 @@ if (process.env.CATS_DB_HOST) {
     ssl: process.env.CATS_DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
   });
 
-  sessionConfig.store = new pgSession({
+  const store = new pgSession({
     pool,
     tableName: 'session',
   });
+  sessionConfig.store = store;
+
+  // Store reference for cleanup in tests
+  app.locals.sessionStore = store;
+  app.locals.sessionPool = pool;
 }
 
 app.use(session(sessionConfig));
@@ -491,8 +531,24 @@ async function getReportDirectories() {
 }
 
 // Generate reports list HTML for reports index page
-async function generateReportsListHTML() {
-  const reportDirs = await getReportDirectories();
+async function generateReportsListHTML(user = null) {
+  let reportDirs = await getReportDirectories();
+
+  // Filter reports by user ownership (if auth enabled)
+  const authEnabled = process.env.CATS_AUTH_ENABLED === 'true';
+  if (authEnabled && user && user.role !== 'admin') {
+    // Get domains from user's jobs
+    const userJobs = await CrawlJob.findAll({
+      where: { user_id: user.id },
+      attributes: ['domain'],
+      group: ['domain'],
+    });
+
+    const userDomains = new Set(userJobs.map(job => job.domain));
+
+    // Filter report directories to only show domains user has jobs for
+    reportDirs = reportDirs.filter(report => userDomains.has(report.domain));
+  }
 
   if (reportDirs.length === 0) {
     return '<p class="no-reports">No reports generated yet. Start a crawl to create your first report!</p>';
@@ -585,9 +641,9 @@ async function generateDomainReportsListHTML(domain) {
 }
 
 // Generate reports index HTML using template
-async function generateReportsIndexHTML(navContext = {}) {
+async function generateReportsIndexHTML(navContext = {}, user = null) {
   const template = loadTemplate('reports-index');
-  const reportsList = await generateReportsListHTML();
+  const reportsList = await generateReportsListHTML(user);
 
   return renderTemplate(template, {
     ...navContext,
@@ -635,7 +691,7 @@ async function generateDomainReportsHTML(domain, navContext = {}) {
 app.get('/reports/', requireAuth, async (req, res) => {
   try {
     const navContext = getNavContext('reports', req.user);
-    const html = await generateReportsIndexHTML(navContext);
+    const html = await generateReportsIndexHTML(navContext, req.user);
     res.send(html);
   } catch (error) {
     console.error('❌ Failed to generate reports index:', error.message);
@@ -680,44 +736,126 @@ app.get('/browse/:domain', async (req, res) => {
 });
 
 // API endpoint to get active jobs
-app.get('/api/jobs', requireAuth, (req, res) => {
-  const activeJobsList = Array.from(activeJobs.entries()).map(([jobId, job]) => ({
-    jobId,
-    ...job,
-  }));
+app.get('/api/jobs', requireAuth, async (req, res) => {
+  try {
+    // Build where clause based on user role (if auth enabled)
+    const authEnabled = process.env.CATS_AUTH_ENABLED === 'true';
+    const where =
+      authEnabled && req.user && req.user.role !== 'admin' ? { user_id: req.user.id } : {};
 
-  const queuedJobsList = Array.from(queuedJobs.entries()).map(([jobId, job]) => ({
-    jobId,
-    ...job,
-    status: JOB_STATUS.QUEUED,
-  }));
+    // Fetch jobs from database
+    const dbJobs = await CrawlJob.findAll({
+      where,
+      order: [['created_at', 'DESC']],
+      limit: 100, // Limit to last 100 jobs
+    });
 
-  res.json({
-    active: activeJobsList,
-    queued: queuedJobsList,
-    stats: {
-      running: getRunningJobsCount(),
-      maxConcurrent: config.MAX_CONCURRENT_JOBS,
-      canStartNew: canStartNewJob(),
-      totalActive: activeJobs.size,
-      totalQueued: queuedJobs.size,
-    },
-    browserPool: browserPool.getStatus(),
-    performance: {
-      environment: config.IS_CLOUD_RUN ? 'Cloud Run' : 'Local',
-      pageTimeout: config.PAGE_NAVIGATION_TIMEOUT,
-      maxRetries: config.MAX_RETRIES,
-      waitStrategy: config.WAIT_STRATEGY,
-      disableImages: config.DISABLE_IMAGES,
-    },
-  });
+    // Get in-memory jobs for real-time status (if different from DB)
+    const activeJobsList = Array.from(activeJobs.entries()).map(([jobId, job]) => ({
+      jobId,
+      ...job,
+    }));
+
+    const queuedJobsList = Array.from(queuedJobs.entries()).map(([jobId, job]) => ({
+      jobId,
+      ...job,
+      status: JOB_STATUS.QUEUED,
+    }));
+
+    // Filter in-memory jobs by user (unless admin or auth disabled)
+    const userActiveJobs =
+      !authEnabled || !req.user || req.user.role === 'admin'
+        ? activeJobsList
+        : activeJobsList.filter(job => {
+            const dbJob = dbJobs.find(dj => dj.id === job.jobId);
+            return dbJob && dbJob.user_id === req.user.id;
+          });
+
+    const userQueuedJobs =
+      !authEnabled || !req.user || req.user.role === 'admin'
+        ? queuedJobsList
+        : queuedJobsList.filter(job => {
+            const dbJob = dbJobs.find(dj => dj.id === job.jobId);
+            return dbJob && dbJob.user_id === req.user.id;
+          });
+
+    res.json({
+      active: userActiveJobs,
+      queued: userQueuedJobs,
+      allJobs: dbJobs.map(job => ({
+        jobId: job.id,
+        domain: job.domain,
+        status: job.status,
+        options: job.options,
+        created_at: job.created_at,
+        started_at: job.started_at,
+        completed_at: job.completed_at,
+        error: job.error,
+      })),
+      stats: {
+        running: getRunningJobsCount(),
+        maxConcurrent: config.MAX_CONCURRENT_JOBS,
+        canStartNew: canStartNewJob(),
+        totalActive: activeJobs.size,
+        totalQueued: queuedJobs.size,
+      },
+      browserPool: browserPool.getStatus(),
+      performance: {
+        environment: config.IS_CLOUD_RUN ? 'Cloud Run' : 'Local',
+        pageTimeout: config.PAGE_NAVIGATION_TIMEOUT,
+        maxRetries: config.MAX_RETRIES,
+        waitStrategy: config.WAIT_STRATEGY,
+        disableImages: config.DISABLE_IMAGES,
+      },
+    });
+  } catch (error) {
+    console.error('❌ Failed to fetch jobs:', error);
+    res.status(500).json({ error: 'Failed to fetch jobs' });
+  }
+});
+
+// API endpoint to get user-specific job statistics
+app.get('/api/stats', requireAuth, async (req, res) => {
+  try {
+    // Get stats based on user role (if auth enabled)
+    const authEnabled = process.env.CATS_AUTH_ENABLED === 'true';
+    const stats =
+      !authEnabled || !req.user || req.user.role === 'admin'
+        ? await CrawlJob.getAllStats()
+        : await CrawlJob.getStatsForUser(req.user.id);
+
+    res.json(stats);
+  } catch (error) {
+    console.error('❌ Failed to get stats:', error);
+    res.status(500).json({ error: 'Failed to load statistics' });
+  }
 });
 
 // API endpoint to get current reports
 app.get('/api/reports', requireAuth, async (req, res) => {
   try {
     const reportDirs = await getReportDirectories();
-    res.json(reportDirs);
+
+    // Filter reports by user ownership (if auth enabled)
+    const authEnabled = process.env.CATS_AUTH_ENABLED === 'true';
+    if (authEnabled && req.user && req.user.role !== 'admin') {
+      // Get domains from user's jobs
+      const userJobs = await CrawlJob.findAll({
+        where: { user_id: req.user.id },
+        attributes: ['domain'],
+        group: ['domain'],
+      });
+
+      const userDomains = new Set(userJobs.map(job => job.domain));
+
+      // Filter report directories to only show domains user has jobs for
+      const filteredReports = reportDirs.filter(report => userDomains.has(report.domain));
+
+      res.json(filteredReports);
+    } else {
+      // Admin or auth disabled - show all reports
+      res.json(reportDirs);
+    }
   } catch (error) {
     console.error('❌ Failed to get reports for API:', error.message);
     res.status(500).json({ error: 'Failed to load reports' });
@@ -725,7 +863,7 @@ app.get('/api/reports', requireAuth, async (req, res) => {
 });
 
 // Start a new crawl
-app.post('/crawl', requireAuth, (req, res) => {
+app.post('/crawl', requireAuth, async (req, res) => {
   const {
     url,
     wcagVersion = '2.1',
@@ -739,135 +877,191 @@ app.post('/crawl', requireAuth, (req, res) => {
     return res.status(400).json({ success: false, error: 'URL is required' });
   }
 
-  const jobId = uuidv4();
-  const createdTime = new Date().toISOString();
+  try {
+    // Extract domain from URL
+    const domain = new URL(url).hostname;
 
-  // Create job data
-  const jobData = {
-    url,
-    wcagVersion,
-    wcagLevel,
-    maxDepth: parseInt(maxDepth),
-    maxPages: parseInt(maxPages),
-    crawlerConcurrency: crawlerConcurrency
-      ? parseInt(crawlerConcurrency)
-      : config.DEFAULT_CRAWLER_CONCURRENCY,
-    createdTime,
-    status: canStartNewJob() ? JOB_STATUS.RUNNING : JOB_STATUS.QUEUED,
-  };
+    const jobId = randomUUID();
+    const createdTime = new Date().toISOString();
+    const status = canStartNewJob() ? JOB_STATUS.RUNNING : JOB_STATUS.QUEUED;
 
-  if (canStartNewJob()) {
-    // Start immediately - only add to activeJobs
-    activeJobs.set(jobId, jobData);
-    startJobProcess(jobId, jobData);
-    console.log(`🚀 Job ${jobId} started immediately`);
-  } else {
-    // Add to queue only - will be moved to activeJobs when ready
-    jobData.status = JOB_STATUS.QUEUED;
-    queuedJobs.set(jobId, jobData);
-    console.log(
-      `📋 Job ${jobId} queued (${getRunningJobsCount()}/${config.MAX_CONCURRENT_JOBS} slots used)`
-    );
+    // Create job data for in-memory tracking
+    const jobData = {
+      url,
+      wcagVersion,
+      wcagLevel,
+      maxDepth: parseInt(maxDepth),
+      maxPages: parseInt(maxPages),
+      crawlerConcurrency: crawlerConcurrency
+        ? parseInt(crawlerConcurrency)
+        : config.DEFAULT_CRAWLER_CONCURRENCY,
+      createdTime,
+      status,
+    };
+
+    // Persist job to database
+    const authEnabled = process.env.CATS_AUTH_ENABLED === 'true';
+    await CrawlJob.create({
+      id: jobId,
+      user_id: authEnabled && req.user ? req.user.id : null,
+      domain,
+      status,
+      options: {
+        url,
+        wcagVersion,
+        wcagLevel,
+        maxDepth: parseInt(maxDepth),
+        maxPages: parseInt(maxPages),
+        crawlerConcurrency: jobData.crawlerConcurrency,
+      },
+      created_at: new Date(),
+    });
+
+    if (canStartNewJob()) {
+      // Start immediately - only add to activeJobs
+      activeJobs.set(jobId, jobData);
+      startJobProcess(jobId, jobData);
+      console.log(`🚀 Job ${jobId} started immediately for user ${req.user.id}`);
+    } else {
+      // Add to queue only - will be moved to activeJobs when ready
+      jobData.status = JOB_STATUS.QUEUED;
+      queuedJobs.set(jobId, jobData);
+      console.log(
+        `📋 Job ${jobId} queued for user ${req.user.id} (${getRunningJobsCount()}/${config.MAX_CONCURRENT_JOBS} slots used)`
+      );
+    }
+
+    res.json({
+      success: true,
+      jobId,
+      status: jobData.status,
+      queuePosition: jobData.status === JOB_STATUS.QUEUED ? queuedJobs.size : 0,
+    });
+  } catch (error) {
+    console.error('❌ Failed to create crawl job:', error);
+    return res.status(500).json({ success: false, error: 'Failed to create job' });
   }
-
-  res.json({
-    success: true,
-    jobId,
-    status: jobData.status,
-    queuePosition: jobData.status === JOB_STATUS.QUEUED ? queuedJobs.size : 0,
-  });
 });
 
 // Cancel a job
-app.delete('/api/jobs/:jobId', requireAuth, (req, res) => {
+app.delete('/api/jobs/:jobId', requireAuth, async (req, res) => {
   const { jobId } = req.params;
 
-  // Check if job exists in active jobs
-  const job = activeJobs.get(jobId);
-  if (!job) {
-    return res.status(404).json({ success: false, error: 'Job not found' });
-  }
+  try {
+    // Check if job exists in database
+    const dbJob = await CrawlJob.findByPk(jobId);
+    if (!dbJob) {
+      return res.status(404).json({ success: false, error: 'Job not found' });
+    }
 
-  // Check if job is in queue
-  if (queuedJobs.has(jobId)) {
-    // Remove from queue
-    queuedJobs.delete(jobId);
-    job.status = JOB_STATUS.CANCELLED;
-    job.endTime = new Date().toISOString();
-    console.log(`🚫 Cancelled queued job ${jobId}`);
+    // Check authorization - user must own the job or be an admin (if auth enabled)
+    const authEnabled = process.env.CATS_AUTH_ENABLED === 'true';
+    if (authEnabled && req.user && !dbJob.canUserModify(req.user.id, req.user.role)) {
+      return res.status(403).json({ success: false, error: 'Not authorized to cancel this job' });
+    }
 
-    return res.json({ success: true, message: 'Queued job cancelled' });
-  }
+    // Check if job exists in active jobs
+    const job = activeJobs.get(jobId);
+    if (!job) {
+      return res.status(404).json({ success: false, error: 'Job not found in active jobs' });
+    }
 
-  // Check if job is running
-  if (job.status === JOB_STATUS.RUNNING && job.process) {
-    // Kill the process
-    try {
-      job.process.kill('SIGTERM');
+    // Check if job is in queue
+    if (queuedJobs.has(jobId)) {
+      // Remove from queue
+      queuedJobs.delete(jobId);
       job.status = JOB_STATUS.CANCELLED;
       job.endTime = new Date().toISOString();
-      console.log(`🚫 Cancelled running job ${jobId}`);
 
-      // Process next job in queue
-      processJobQueue();
+      // Persist to database
+      await dbJob.markCancelled();
 
-      return res.json({ success: true, message: 'Running job cancelled' });
-    } catch (error) {
-      console.error(`❌ Failed to cancel job ${jobId}:`, error);
-      return res.status(500).json({ success: false, error: 'Failed to cancel job' });
+      console.log(`🚫 Cancelled queued job ${jobId}`);
+      return res.json({ success: true, message: 'Queued job cancelled' });
     }
+
+    // Check if job is running
+    if (job.status === JOB_STATUS.RUNNING && job.process) {
+      // Kill the process
+      try {
+        job.process.kill('SIGTERM');
+        job.status = JOB_STATUS.CANCELLED;
+        job.endTime = new Date().toISOString();
+
+        // Persist to database
+        await dbJob.markCancelled();
+
+        console.log(`🚫 Cancelled running job ${jobId}`);
+
+        // Process next job in queue
+        processJobQueue();
+
+        return res.json({ success: true, message: 'Running job cancelled' });
+      } catch (error) {
+        console.error(`❌ Failed to cancel job ${jobId}:`, error);
+        return res.status(500).json({ success: false, error: 'Failed to cancel job' });
+      }
+    }
+
+    // Job is already completed or in error state
+    return res.status(400).json({
+      success: false,
+      error: 'Job cannot be cancelled (already completed or in error state)',
+    });
+  } catch (error) {
+    console.error(`❌ Failed to cancel job ${jobId}:`, error);
+    return res.status(500).json({ success: false, error: 'Failed to cancel job' });
   }
+});
 
-  // Job is already completed or in error state
-  return res.status(400).json({
-    success: false,
-    error: 'Job cannot be cancelled (already completed or in error state)',
+// Start the server (only if not in test environment)
+if (process.env.NODE_ENV !== 'test') {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`🚀 CATS Dashboard running at http://localhost:${PORT}`);
+    console.log(`📊 View your dashboard: http://localhost:${PORT}`);
+    console.log(`📁 Reports directory: ${config.REPORTS_DIR}`);
+    console.log(`⚡ Job Management:`);
+    console.log(`   • Max concurrent jobs: ${config.MAX_CONCURRENT_JOBS}`);
+    console.log(`   • Default crawler concurrency: ${config.DEFAULT_CRAWLER_CONCURRENCY} browsers`);
+    console.log(`   • Job timeout: ${Math.floor(config.MAX_JOB_RUNTIME_MS / 60000)} minutes`);
+    console.log('');
+    console.log('🚀 Performance Configuration:');
+    console.log(`   • Environment: ${config.IS_CLOUD_RUN ? '☁️  Cloud Run' : '💻 Local'}`);
+    console.log(`   • Page timeout: ${config.PAGE_NAVIGATION_TIMEOUT / 1000}s`);
+    console.log(`   • Wait strategy: ${config.WAIT_STRATEGY}`);
+    console.log(`   • Max retries: ${config.MAX_RETRIES}`);
+    console.log(`   • Browser pool: ${config.BROWSER_POOL_SIZE} instances`);
+    console.log(`   • Images disabled: ${config.DISABLE_IMAGES ? '✅' : '❌'}`);
+    console.log(`   • CSS disabled: ${config.DISABLE_CSS ? '✅' : '❌'}`);
+    console.log(`   • Cleanup delay: ${Math.floor(config.JOB_CLEANUP_DELAY_MS / 60000)} minutes`);
+
+    // Regenerate index.html asynchronously after server starts
+    // eslint-disable-next-line no-undef
+    setImmediate(async () => {
+      console.log('🔄 Regenerating dashboard index.html...');
+      try {
+        await generateIndexHTML();
+        console.log('✅ Dashboard index.html regenerated');
+      } catch (error) {
+        console.error('❌ Failed to regenerate index.html:', error.message);
+      }
+    });
   });
-});
 
-// Start the server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`🚀 CATS Dashboard running at http://localhost:${PORT}`);
-  console.log(`📊 View your dashboard: http://localhost:${PORT}`);
-  console.log(`📁 Reports directory: ${config.REPORTS_DIR}`);
-  console.log(`⚡ Job Management:`);
-  console.log(`   • Max concurrent jobs: ${config.MAX_CONCURRENT_JOBS}`);
-  console.log(`   • Default crawler concurrency: ${config.DEFAULT_CRAWLER_CONCURRENCY} browsers`);
-  console.log(`   • Job timeout: ${Math.floor(config.MAX_JOB_RUNTIME_MS / 60000)} minutes`);
-  console.log('');
-  console.log('🚀 Performance Configuration:');
-  console.log(`   • Environment: ${config.IS_CLOUD_RUN ? '☁️  Cloud Run' : '💻 Local'}`);
-  console.log(`   • Page timeout: ${config.PAGE_NAVIGATION_TIMEOUT / 1000}s`);
-  console.log(`   • Wait strategy: ${config.WAIT_STRATEGY}`);
-  console.log(`   • Max retries: ${config.MAX_RETRIES}`);
-  console.log(`   • Browser pool: ${config.BROWSER_POOL_SIZE} instances`);
-  console.log(`   • Images disabled: ${config.DISABLE_IMAGES ? '✅' : '❌'}`);
-  console.log(`   • CSS disabled: ${config.DISABLE_CSS ? '✅' : '❌'}`);
-  console.log(`   • Cleanup delay: ${Math.floor(config.JOB_CLEANUP_DELAY_MS / 60000)} minutes`);
-
-  // Regenerate index.html asynchronously after server starts
-  // eslint-disable-next-line no-undef
-  setImmediate(async () => {
-    console.log('🔄 Regenerating dashboard index.html...');
-    try {
-      await generateIndexHTML();
-      console.log('✅ Dashboard index.html regenerated');
-    } catch (error) {
-      console.error('❌ Failed to regenerate index.html:', error.message);
-    }
+  // Graceful shutdown handling
+  process.on('SIGTERM', async () => {
+    console.log('🛑 SIGTERM received, shutting down gracefully...');
+    await browserPool.cleanup();
+    process.exit(0);
   });
-});
 
-// Graceful shutdown handling
-process.on('SIGTERM', async () => {
-  console.log('🛑 SIGTERM received, shutting down gracefully...');
-  await browserPool.cleanup();
-  process.exit(0);
-});
+  process.on('SIGINT', async () => {
+    console.log('🛑 SIGINT received, shutting down gracefully...');
+    await browserPool.cleanup();
+    process.exit(0);
+  });
+}
 
-process.on('SIGINT', async () => {
-  console.log('🛑 SIGINT received, shutting down gracefully...');
-  await browserPool.cleanup();
-  process.exit(0);
-});
+// Export app for testing
+module.exports = app;
