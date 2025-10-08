@@ -86,7 +86,7 @@ describe('Authentication', () => {
       expect(user.first_name).toBe('Test');
       expect(user.last_name).toBe('User');
       expect(user.role).toBe('user');
-      expect(user.is_active).toBe(true);
+      expect(user.is_active).toBe(false); // New users require admin approval
     });
 
     test('should reject registration with missing email', async () => {
