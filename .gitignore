@@ -62,7 +62,9 @@ test-*.js
 debug-*.js
 *-test.*
 *-debug.*
-.planning
+
+# Session planning and review files
+.planning/
 
 # =============================================================================
 # System & Editor Files
