@@ -92,6 +92,8 @@ describe('Authorization', () => {
       first_name: 'User',
       last_name: 'One',
       role: 'user',
+      is_active: true,
+      email_verified: true,
     });
 
     testUser2 = await User.create({
@@ -100,6 +102,8 @@ describe('Authorization', () => {
       first_name: 'User',
       last_name: 'Two',
       role: 'user',
+      is_active: true,
+      email_verified: true,
     });
 
     adminUser = await User.create({
@@ -108,6 +112,8 @@ describe('Authorization', () => {
       first_name: 'Admin',
       last_name: 'User',
       role: 'admin',
+      is_active: true,
+      email_verified: true,
     });
 
     // Create authenticated agents
