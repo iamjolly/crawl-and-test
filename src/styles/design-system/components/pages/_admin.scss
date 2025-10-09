@@ -152,25 +152,26 @@
 // ==========================================================================
 
 // Status and role badges use .badge class in HTML
+// Colors use design system tokens with WCAG AA contrast (4.5:1 minimum)
 .admin-status-badge {
   text-transform: capitalize;
 
   &.admin-status-badge--active {
-    background-color: rgba(var(--color-success-rgb), 0.15);
-    color: var(--color-success);
-    border-color: var(--color-success);
+    background-color: var(--color-green-100);
+    color: var(--color-green-800);
+    border-color: var(--color-green-800);
   }
 
   &.admin-status-badge--inactive {
-    background-color: rgba(var(--color-danger-rgb), 0.15);
-    color: var(--color-danger);
-    border-color: var(--color-danger);
+    background-color: var(--color-red-100);
+    color: var(--color-red-800);
+    border-color: var(--color-red-800);
   }
 
   &.admin-status-badge--pending {
-    background-color: rgba(var(--color-warning-rgb), 0.15);
-    color: var(--color-warning);
-    border-color: var(--color-warning);
+    background-color: var(--color-yellow-100);
+    color: var(--color-yellow-800);
+    border-color: var(--color-yellow-800);
   }
 }
 
@@ -178,15 +179,15 @@
   text-transform: capitalize;
 
   &.admin-role-badge--user {
-    background-color: rgba(var(--color-info-rgb), 0.15);
-    color: var(--color-info);
-    border-color: var(--color-info);
+    background-color: var(--color-blue-100);
+    color: var(--color-blue-800);
+    border-color: var(--color-blue-800);
   }
 
   &.admin-role-badge--admin {
-    background-color: rgba(var(--color-primary-rgb), 0.15);
-    color: var(--color-primary);
-    border-color: var(--color-primary);
+    background-color: var(--color-purple-100);
+    color: var(--color-purple-700);
+    border-color: var(--color-purple-700);
   }
 }
 
