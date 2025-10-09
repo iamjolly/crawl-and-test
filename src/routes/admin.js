@@ -4,7 +4,7 @@
  */
 
 const express = require('express');
-const { User } = require('../models');
+const { User, AuditLog } = require('../models');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
 
 const router = express.Router();
@@ -152,6 +152,17 @@ router.patch('/users/:id/approve', async (req, res) => {
     user.is_active = true;
     await user.save();
 
+    // Log the approval action
+    await AuditLog.log({
+      actorId: req.user.id,
+      action: 'user.approve',
+      resourceType: 'user',
+      resourceId: user.id,
+      details: { email: user.email },
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     res.json({
       message: 'User approved successfully',
       user: {
@@ -185,6 +196,18 @@ router.patch('/users/:id/reject', async (req, res) => {
       return res.status(400).json({ error: 'Cannot reject an active user. Deactivate first.' });
     }
 
+    // Log before destroying
+    const userEmail = user.email;
+    await AuditLog.log({
+      actorId: req.user.id,
+      action: 'user.reject',
+      resourceType: 'user',
+      resourceId: user.id,
+      details: { email: userEmail },
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     await user.destroy();
 
     res.json({
@@ -216,8 +239,24 @@ router.patch('/users/:id/toggle-active', async (req, res) => {
       return res.status(400).json({ error: 'Cannot deactivate your own account' });
     }
 
+    const previousState = user.is_active;
     user.is_active = !user.is_active;
     await user.save();
+
+    // Log the toggle action
+    await AuditLog.log({
+      actorId: req.user.id,
+      action: user.is_active ? 'user.activate' : 'user.deactivate',
+      resourceType: 'user',
+      resourceId: user.id,
+      details: {
+        email: user.email,
+        previousState,
+        newState: user.is_active,
+      },
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
 
     res.json({
       message: `User ${user.is_active ? 'activated' : 'deactivated'} successfully`,
@@ -271,6 +310,20 @@ router.put('/users/:id', async (req, res) => {
 
     await user.save();
 
+    // Log the update action
+    await AuditLog.log({
+      actorId: req.user.id,
+      action: 'user.update',
+      resourceType: 'user',
+      resourceId: user.id,
+      details: {
+        email: user.email,
+        updates: { email, firstName, lastName, role },
+      },
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     res.json({
       message: 'User updated successfully',
       user: {
@@ -306,6 +359,18 @@ router.delete('/users/:id', async (req, res) => {
     if (user.id === req.user.id) {
       return res.status(400).json({ error: 'Cannot delete your own account' });
     }
+
+    // Log before destroying
+    const userEmail = user.email;
+    await AuditLog.log({
+      actorId: req.user.id,
+      action: 'user.delete',
+      resourceType: 'user',
+      resourceId: user.id,
+      details: { email: userEmail },
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
 
     await user.destroy();
 
