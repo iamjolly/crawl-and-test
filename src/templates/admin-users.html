@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - CATS Admin</title>
+    <link rel="stylesheet" href="/styles/design-system.css">
+    <style>
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .admin-header h1 {
+            font-size: 2rem;
+            color: #2d3748;
+        }
+
+        .pending-badge {
+            background: #f59e0b;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .filter-bar {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar input,
+        .filter-bar select {
+            padding: 0.5rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        .filter-bar input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .users-table {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .users-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .users-table th {
+            background: #f7fafc;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #4a5568;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .users-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .users-table tr:hover {
+            background: #f7fafc;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-badge.active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-badge.inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .role-badge.admin {
+            background: #fce7f3;
+            color: #9f1239;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-approve {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #059669;
+        }
+
+        .btn-reject {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-reject:hover {
+            background: #dc2626;
+        }
+
+        .btn-deactivate {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-deactivate:hover {
+            background: #d97706;
+        }
+
+        .btn-activate {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-activate:hover {
+            background: #059669;
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+    </style>
+</head>
+<body>
+    {{>include:nav-main}}
+
+    <div class="admin-container">
+        <div class="admin-header">
+            <div>
+                <h1>User Management<span id="pending-count-badge" class="pending-badge" style="display: none;">0 Pending</span></h1>
+                <p style="color: #718096;">Manage user accounts and approval requests</p>
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <input type="text" id="search-input" placeholder="Search by name or email...">
+            <select id="status-filter">
+                <option value="">All Status</option>
+                <option value="pending">Pending Approval</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+            <select id="role-filter">
+                <option value="">All Roles</option>
+                <option value="admin">Admin</option>
+                <option value="user">User</option>
+            </select>
+            <button class="btn-sm btn-approve" onclick="loadUsers()">Apply Filters</button>
+        </div>
+
+        <div class="users-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="users-tbody">
+                    <tr>
+                        <td colspan="6" class="loading">Loading users...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let currentUsers = [];
+
+        async function loadUsers() {
+            const search = document.getElementById('search-input').value;
+            const status = document.getElementById('status-filter').value;
+            const role = document.getElementById('role-filter').value;
+
+            const params = new URLSearchParams();
+            if (search) params.append('search', search);
+            if (status) params.append('status', status);
+            if (role) params.append('role', role);
+
+            try {
+                const response = await fetch(`/api/admin/users?${params.toString()}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to load users');
+                }
+
+                currentUsers = data.users;
+                renderUsers(data.users);
+                updatePendingCount();
+            } catch (error) {
+                console.error('Error loading users:', error);
+                document.getElementById('users-tbody').innerHTML = `
+                    <tr><td colspan="6" class="empty-state">Error loading users: ${error.message}</td></tr>
+                `;
+            }
+        }
+
+        async function updatePendingCount() {
+            try {
+                const response = await fetch('/api/admin/users/pending');
+                const data = await response.json();
+                const badge = document.getElementById('pending-count-badge');
+                if (data.count > 0) {
+                    badge.textContent = `${data.count} Pending`;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error loading pending count:', error);
+            }
+        }
+
+        function renderUsers(users) {
+            const tbody = document.getElementById('users-tbody');
+
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No users found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = users.map(user => {
+                const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ') || '—';
+                const statusClass = user.is_active ? 'active' : 'inactive';
+                const statusText = user.is_active ? 'Active' : 'Inactive';
+                const roleClass = user.role === 'admin' ? 'admin' : '';
+                const createdDate = new Date(user.created_at).toLocaleDateString();
+
+                let actions = '';
+                if (!user.is_active) {
+                    actions += `<button class="btn-sm btn-approve" onclick="approveUser('${user.id}')">Approve</button>`;
+                    actions += `<button class="btn-sm btn-reject" onclick="rejectUser('${user.id}')">Reject</button>`;
+                } else {
+                    actions += `<button class="btn-sm btn-deactivate" onclick="toggleActive('${user.id}')">Deactivate</button>`;
+                }
+                actions += `<button class="btn-sm btn-delete" onclick="deleteUser('${user.id}', '${user.email}')">Delete</button>`;
+
+                return `
+                    <tr>
+                        <td><strong>${fullName}</strong></td>
+                        <td>${user.email}</td>
+                        <td><span class="role-badge ${roleClass}">${user.role}</span></td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>${createdDate}</td>
+                        <td><div class="action-buttons">${actions}</div></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function approveUser(userId) {
+            if (!confirm('Approve this user?')) return;
+
+            try {
+                const response = await fetch(`/api/admin/users/${userId}/approve`, {
+                    method: 'PATCH',
+                });
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to approve user');
+                }
+
+                alert('User approved successfully');
+                loadUsers();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function rejectUser(userId) {
+            if (!confirm('Reject and delete this user? This cannot be undone.')) return;
+
+            try {
+                const response = await fetch(`/api/admin/users/${userId}/reject`, {
+                    method: 'PATCH',
+                });
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to reject user');
+                }
+
+                alert('User rejected successfully');
+                loadUsers();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function toggleActive(userId) {
+            try {
+                const response = await fetch(`/api/admin/users/${userId}/toggle-active`, {
+                    method: 'PATCH',
+                });
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to toggle user status');
+                }
+
+                alert(data.message);
+                loadUsers();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function deleteUser(userId, email) {
+            if (!confirm(`Delete user ${email}? This cannot be undone.`)) return;
+
+            try {
+                const response = await fetch(`/api/admin/users/${userId}`, {
+                    method: 'DELETE',
+                });
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to delete user');
+                }
+
+                alert('User deleted successfully');
+                loadUsers();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Load users on page load
+        loadUsers();
+    </script>
+</body>
+</html>
