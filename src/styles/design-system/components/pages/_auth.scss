@@ -161,13 +161,12 @@
 
   &__link {
     color: var(--color-primary);
-    text-decoration: none;
+    text-decoration: underline;
     font-weight: var(--font-medium);
     transition: color 0.2s ease;
 
     &:hover {
       color: var(--color-primary-hover);
-      text-decoration: underline;
     }
 
     &:focus {

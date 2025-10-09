@@ -1,0 +1,203 @@
+// ==========================================================================
+// Admin Pages Component
+// ==========================================================================
+//
+// Styles for admin pages (user management, settings, etc.)
+// Uses design system tokens and components for consistency
+//
+
+@use '../../tokens' as tokens;
+
+// ==========================================================================
+// Admin Container
+// ==========================================================================
+
+.admin-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--space-6);
+}
+
+// ==========================================================================
+// Admin Header
+// ==========================================================================
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-6);
+
+  h1 {
+    font-size: var(--text-heading-1);
+    font-weight: var(--font-weight-heading);
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+
+  .admin-header__subtitle {
+    color: var(--color-text-secondary);
+    font-size: var(--text-body-medium);
+    margin-top: var(--space-1);
+  }
+}
+
+// Pending badge for admin header
+.admin-pending-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  margin-left: var(--space-2);
+  background-color: var(--color-warning);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-full);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-semibold);
+}
+
+// ==========================================================================
+// Filter Bar
+// ==========================================================================
+
+// Filter bar uses .card class directly in HTML, styles here extend it
+.admin-filter-bar {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  align-items: flex-end;
+
+  .form-group {
+    flex: 1;
+    min-width: 200px;
+    margin-bottom: 0;
+  }
+
+  .form-label {
+    font-size: var(--text-body-small);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-1);
+  }
+
+  .btn {
+    align-self: flex-end;
+  }
+}
+
+// ==========================================================================
+// Users Table
+// ==========================================================================
+
+// Table container uses .card class directly in HTML
+.admin-table-container {
+  overflow: hidden;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead {
+    background-color: var(--color-background-secondary);
+    border-bottom: 2px solid var(--color-border-primary);
+
+    th {
+      padding: var(--space-4);
+      text-align: left;
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-secondary);
+      font-size: var(--text-body-small);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid var(--color-border-primary);
+      transition: background-color 0.2s ease-in-out;
+
+      &:hover {
+        background-color: var(--color-background-secondary);
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    td {
+      padding: var(--space-4);
+      color: var(--color-text-primary);
+      font-size: var(--text-body-medium);
+
+      strong {
+        font-weight: var(--font-weight-semibold);
+      }
+    }
+  }
+
+  // Empty state and loading state
+  .admin-table__empty,
+  .admin-table__loading {
+    text-align: center;
+    padding: var(--space-8);
+    color: var(--color-text-secondary);
+    font-size: var(--text-body-medium);
+  }
+}
+
+// ==========================================================================
+// Status and Role Badges
+// ==========================================================================
+
+// Status and role badges use .badge class in HTML
+// Colors use design system tokens with WCAG AA contrast (4.5:1 minimum)
+.admin-status-badge {
+  text-transform: capitalize;
+
+  &.admin-status-badge--active {
+    background-color: var(--color-green-100);
+    color: var(--color-green-800);
+    border-color: var(--color-green-800);
+  }
+
+  &.admin-status-badge--inactive {
+    background-color: var(--color-red-100);
+    color: var(--color-red-800);
+    border-color: var(--color-red-800);
+  }
+
+  &.admin-status-badge--pending {
+    background-color: var(--color-yellow-100);
+    color: var(--color-yellow-800);
+    border-color: var(--color-yellow-800);
+  }
+}
+
+.admin-role-badge {
+  text-transform: capitalize;
+
+  &.admin-role-badge--user {
+    background-color: var(--color-blue-100);
+    color: var(--color-blue-800);
+    border-color: var(--color-blue-800);
+  }
+
+  &.admin-role-badge--admin {
+    background-color: var(--color-purple-100);
+    color: var(--color-purple-700);
+    border-color: var(--color-purple-700);
+  }
+}
+
+// ==========================================================================
+// Action Buttons
+// ==========================================================================
+
+.admin-action-buttons {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
