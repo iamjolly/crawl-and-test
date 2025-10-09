@@ -107,10 +107,19 @@
                     }),
                 });
 
-                const data = await response.json();
+                // Check if response is JSON
+                const contentType = response.headers.get('content-type');
+                let data;
+
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    // Got HTML or other non-JSON response
+                    throw new Error('Unable to connect to server. Please try again.');
+                }
 
                 if (!response.ok) {
-                    throw new Error(data.error || 'Login failed');
+                    throw new Error(data.error || data.message || 'Login failed');
                 }
 
                 // Get return URL from query params or default to dashboard
@@ -121,7 +130,9 @@
                 window.location.href = returnUrl;
 
             } catch (error) {
-                errorMessage.textContent = error.message;
+                // Show user-friendly error message
+                const errorText = error.message || 'Login failed. Please try again.';
+                errorMessage.textContent = errorText;
                 errorMessage.style.display = 'block';
                 submitBtn.disabled = false;
                 submitText.style.display = 'inline';

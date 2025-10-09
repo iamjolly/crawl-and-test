@@ -86,7 +86,7 @@ describe('Authentication', () => {
       expect(user.first_name).toBe('Test');
       expect(user.last_name).toBe('User');
       expect(user.role).toBe('user');
-      expect(user.is_active).toBe(true);
+      expect(user.is_active).toBe(false); // New users require admin approval
     });
 
     test('should reject registration with missing email', async () => {
@@ -164,12 +164,15 @@ describe('Authentication', () => {
 
   describe('User Login', () => {
     beforeEach(async () => {
-      // Create a test user for login tests
-      await request(app).post('/api/auth/register').send({
+      // Create an active test user for login tests
+      await User.create({
         email: 'logintest@example.com',
-        password: 'TestPassword123!',
-        firstName: 'Login',
-        lastName: 'Test',
+        password_hash: 'TestPassword123!',
+        first_name: 'Login',
+        last_name: 'Test',
+        role: 'user',
+        is_active: true, // Must be active to log in
+        email_verified: false,
       });
     });
 
@@ -260,12 +263,15 @@ describe('Authentication', () => {
     test('should clear session on logout', async () => {
       const agent = request.agent(app);
 
-      // Register and login
-      await agent.post('/api/auth/register').send({
+      // Create active user and login
+      await User.create({
         email: 'sessiontest@example.com',
-        password: 'TestPassword123!',
-        firstName: 'Session',
-        lastName: 'Test',
+        password_hash: 'TestPassword123!',
+        first_name: 'Session',
+        last_name: 'Test',
+        role: 'user',
+        is_active: true,
+        email_verified: false,
       });
 
       await agent.post('/api/auth/login').send({
@@ -290,12 +296,15 @@ describe('Authentication', () => {
     test('should maintain session across requests', async () => {
       const agent = request.agent(app);
 
-      // Register
-      await agent.post('/api/auth/register').send({
+      // Create active user
+      await User.create({
         email: 'sessionpersist@example.com',
-        password: 'TestPassword123!',
-        firstName: 'Session',
-        lastName: 'Persist',
+        password_hash: 'TestPassword123!',
+        first_name: 'Session',
+        last_name: 'Persist',
+        role: 'user',
+        is_active: true,
+        email_verified: false,
       });
 
       // Login

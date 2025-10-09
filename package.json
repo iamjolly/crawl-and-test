@@ -74,7 +74,6 @@
   "license": "MIT",
   "dependencies": {
     "@google-cloud/storage": "^7.17.2",
-    "axe-core": "^4.8.2",
     "bcryptjs": "^3.0.2",
     "commander": "^14.0.1",
     "connect-pg-simple": "^10.0.0",
@@ -102,8 +101,11 @@
     "node": ">=22.0.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
     "@fullhuman/postcss-purgecss": "^7.0.2",
     "autoprefixer": "^10.4.21",
+    "axe-core": "^4.11.0",
+    "axe-playwright": "^2.2.2",
     "cssnano": "^7.1.1",
     "eslint": "^9.37.0",
     "eslint-config-prettier": "^10.1.8",

@@ -10,7 +10,7 @@ const { generateIndexHTML } = require('../generators/index');
 const { parseTimestampFromFilename } = require('../scripts/utils');
 const browserPool = require('../utils/browserPool');
 const storage = require('../utils/storage');
-const { requireAuth } = require('../middleware/auth');
+const { requireAuth, requireAdmin } = require('../middleware/auth');
 const { CrawlJob } = require('../models');
 
 // Initialize Passport configuration
@@ -244,16 +244,30 @@ function renderTemplate(templateContent, data = {}) {
     rendered = rendered.replace(match[0], includeContent);
   }
 
+  // Helper function to get nested property value
+  function getNestedValue(obj, path) {
+    return path.split('.').reduce((current, key) => current?.[key], obj);
+  }
+
   // Process conditional blocks ({{#if variable}}...{{else}}...{{/if}})
-  const conditionalPattern =
-    /\{\{#if ([^}]+)\}\}([\s\S]*?)(?:\{\{else\}\}([\s\S]*?))?\{\{\/if\}\}/g;
-  rendered = rendered.replace(
-    conditionalPattern,
-    (match, condition, truthyBlock, falsyBlock = '') => {
-      const value = data[condition.trim()];
-      return value ? truthyBlock : falsyBlock;
+  // Find innermost conditionals first (those without nested {{#if}})
+  function processConditionals(str) {
+    const pattern =
+      /\{\{#if\s+([^}]+)\}\}((?:(?!\{\{#if)[\s\S])*?)(?:\{\{else\}\}((?:(?!\{\{#if)[\s\S])*?))?\{\{\/if\}\}/;
+    let maxIterations = 20;
+
+    while (pattern.test(str) && maxIterations > 0) {
+      str = str.replace(pattern, (match, condition, truthyBlock, falsyBlock = '') => {
+        const value = getNestedValue(data, condition.trim());
+        return value ? truthyBlock : falsyBlock;
+      });
+      maxIterations--;
     }
-  );
+
+    return str;
+  }
+
+  rendered = processConditionals(rendered);
 
   // Then, replace all placeholders with data, including nested objects
   function replacePlaceholders(str, obj, prefix = '') {
@@ -278,7 +292,7 @@ function renderTemplate(templateContent, data = {}) {
 
 // Generate navigation context for active states
 function getNavContext(currentPage, user = null) {
-  const pages = ['home', 'crawl', 'reports', 'dashboard'];
+  const pages = ['home', 'crawl', 'reports', 'dashboard', 'admin-users'];
   const context = {};
 
   pages.forEach(page => {
@@ -295,6 +309,7 @@ function getNavContext(currentPage, user = null) {
       firstName: user.first_name,
       lastName: user.last_name,
       role: user.role,
+      isAdmin: user.role === 'admin',
     };
   }
 
@@ -412,6 +427,10 @@ app.use('/reports', async (req, res, next) => {
 const authRoutes = require('../routes/auth');
 app.use('/api/auth', authRoutes);
 
+// Admin routes
+const adminRoutes = require('../routes/admin');
+app.use('/api/admin', adminRoutes);
+
 // Home page (public landing page)
 app.get('/', (req, res) => {
   const template = loadTemplate('home');
@@ -456,6 +475,14 @@ app.get('/crawl', requireAuth, (req, res) => {
 app.get('/dashboard', requireAuth, (req, res) => {
   const template = loadTemplate('dashboard-overview');
   const navContext = getNavContext('dashboard', req.user);
+  const rendered = renderTemplate(template, navContext);
+  res.send(rendered);
+});
+
+// Admin users management page
+app.get('/admin/users', requireAuth, requireAdmin, (req, res) => {
+  const template = loadTemplate('admin-users');
+  const navContext = getNavContext('admin-users', req.user);
   const rendered = renderTemplate(template, navContext);
   res.send(rendered);
 });

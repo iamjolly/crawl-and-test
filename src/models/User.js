@@ -100,7 +100,7 @@ module.exports = (sequelize, DataTypes) => {
       is_active: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: true,
+        defaultValue: false, // New users require admin approval
       },
       email_verified: {
         type: DataTypes.BOOLEAN,

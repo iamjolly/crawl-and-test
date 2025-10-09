@@ -3,6 +3,7 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 const { requireAuth } = require('../middleware/auth');
+const { validatePassword } = require('../utils/password-validator');
 
 const router = express.Router();
 
@@ -29,6 +30,15 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Invalid email format' });
     }
 
+    // Validate password strength
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.valid) {
+      return res.status(400).json({
+        error: 'Password does not meet requirements',
+        details: passwordValidation.errors,
+      });
+    }
+
     // Check if user already exists
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
@@ -36,40 +46,26 @@ router.post('/register', async (req, res) => {
     }
 
     // Create user (password will be hashed automatically by User model hooks)
+    // is_active defaults to false (requires admin approval)
     const user = await User.create({
       email,
       password_hash: password, // Will be hashed by beforeCreate hook
       first_name: firstName,
       last_name: lastName,
       role: 'user',
-      is_active: true,
       email_verified: false,
     });
 
-    // Generate JWT token
-    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, {
-      expiresIn: JWT_EXPIRES_IN,
-    });
-
-    // Log user in via session
-    req.login(user, err => {
-      if (err) {
-        // eslint-disable-next-line no-console
-        console.error('Session login error:', err);
-        // Still return success even if session fails
-      }
-    });
-
+    // Don't auto-login since user needs approval
     res.status(201).json({
-      message: 'User registered successfully',
+      message: 'Registration successful',
+      info: 'Your account is pending approval. An administrator will review your request shortly.',
       user: {
         id: user.id,
         email: user.email,
         firstName: user.first_name,
         lastName: user.last_name,
-        role: user.role,
       },
-      token,
     });
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -90,6 +86,14 @@ router.post('/login', (req, res, next) => {
 
     if (!user) {
       return res.status(401).json({ error: info?.message || 'Invalid credentials' });
+    }
+
+    // Check if user account is active
+    if (!user.is_active) {
+      return res.status(403).json({
+        error: 'Account pending approval',
+        message: 'Your account is awaiting admin approval. Please contact an administrator.',
+      });
     }
 
     // Log user in via session
