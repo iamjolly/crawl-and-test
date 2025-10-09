@@ -91,6 +91,7 @@
                             >
                         </div>
 
+                        <div id="success-message" class="alert alert--success" role="alert" style="display: none;"></div>
                         <div id="error-message" class="alert alert--error" role="alert" style="display: none;"></div>
 
                         <button type="submit" class="btn-primary btn-primary--full">
@@ -161,17 +162,41 @@
                     }),
                 });
 
-                const data = await response.json();
+                // Check if response is JSON
+                const contentType = response.headers.get('content-type');
+                let data;
 
-                if (!response.ok) {
-                    throw new Error(data.error || 'Registration failed');
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    // Got HTML or other non-JSON response
+                    throw new Error('Unable to connect to server. Please try again.');
                 }
 
-                // Redirect to dashboard on success
-                window.location.href = '/dashboard';
+                if (!response.ok) {
+                    // Handle validation errors with details
+                    if (data.details && Array.isArray(data.details)) {
+                        throw new Error(data.details.join(', '));
+                    }
+                    throw new Error(data.error || data.message || 'Registration failed');
+                }
+
+                // Show success message and redirect to login
+                const successMessage = document.getElementById('success-message');
+                if (successMessage) {
+                    successMessage.textContent = data.info || 'Registration successful! Please wait for admin approval.';
+                    successMessage.style.display = 'block';
+                }
+
+                // Redirect to login page after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 2000);
 
             } catch (error) {
-                errorMessage.textContent = error.message;
+                // Show user-friendly error message
+                const errorText = error.message || 'Registration failed. Please try again.';
+                errorMessage.textContent = errorText;
                 errorMessage.style.display = 'block';
                 submitBtn.disabled = false;
                 submitText.style.display = 'inline';
