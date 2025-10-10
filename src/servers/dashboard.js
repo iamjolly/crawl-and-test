@@ -138,6 +138,8 @@ async function startJobProcess(jobId, _jobData) {
     job.wcagLevel,
     '--output',
     outputFilename,
+    '--timestamp',
+    timestamp, // Pass timestamp so HTML and JSON use the same filename
     '--html', // Generate HTML report
   ];
 
@@ -1061,38 +1063,10 @@ app.get('/api/reports/by-job/:jobId', requireAuth, async (req, res) => {
       });
     }
 
-    // The HTML report filename may differ from the JSON filename
-    // JSON: domain_wcag2.1_AA_2025-10-10T22-06-23-158Z (with milliseconds)
-    // HTML: domain_wcag2.1_AA_2025-10-10T22-06-31 (without milliseconds, different timestamp)
-    // We need to find the matching HTML file by searching the directory
-    const config = require('../core/config');
-    const domainDir = config.getDomainReportsDir(domain);
-    const reportFiles = await fs.promises.readdir(domainDir);
-
-    // Extract the base pattern (domain_wcagVERSION_LEVEL_DATE) from report_id
-    // Example: focofondo.com_wcag2.1_AA_2025-10-10T22-06-23-158Z -> focofondo.com_wcag2.1_AA_2025-10-10
-    const dateMatch = completedJob.report_id.match(/^(.+_\d{4}-\d{2}-\d{2})/);
-    if (!dateMatch) {
-      return res.status(404).json({
-        success: false,
-        error: 'Invalid report ID format',
-      });
-    }
-    const basePattern = dateMatch[1];
-
-    // Find HTML file that starts with the same base pattern and ends with .html
-    const htmlFile = reportFiles.find(
-      file => file.startsWith(basePattern) && file.endsWith('.html')
-    );
-
-    if (!htmlFile) {
-      return res.status(404).json({
-        success: false,
-        error: 'HTML report file not found',
-      });
-    }
-
-    const reportUrl = `/reports/${domain}/${htmlFile}`;
+    // Since we pass the same timestamp to both JSON and HTML generation,
+    // the HTML filename is simply the report_id without extension + .html
+    const htmlReportFilename = completedJob.report_id + '.html';
+    const reportUrl = `/reports/${domain}/${htmlReportFilename}`;
 
     // Redirect to the HTML report
     res.redirect(reportUrl);

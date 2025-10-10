@@ -53,6 +53,10 @@ program
   )
   .option('--wcag-level <level>', 'WCAG compliance level (A, AA, AAA)', config.DEFAULT_WCAG_LEVEL)
   .option('--custom-tags <tags>', 'Custom axe tags (comma-separated, overrides WCAG options)')
+  .option(
+    '--timestamp <timestamp>',
+    'Use specific timestamp for report filenames (for consistency)'
+  )
   .option('--html', 'Generate HTML report in addition to JSON')
   .parse(process.argv);
 
@@ -67,6 +71,7 @@ const {
   wcagVersion,
   wcagLevel,
   customTags,
+  timestamp: providedTimestamp,
   html: generateHtml,
 } = program.opts();
 
@@ -180,18 +185,20 @@ function buildAxeTags(wcagVersion, wcagLevel, customTags) {
 // ------------------------------------------------------------------
 // Report Directory Management
 // ------------------------------------------------------------------
-function generateReportFilename(domain, wcagVersion, wcagLevel) {
-  const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-');
+function generateReportFilename(domain, wcagVersion, wcagLevel, timestamp) {
+  // Use provided timestamp or generate new one
+  const ts = timestamp || new Date().toISOString().replace(/[:.]/g, '-');
   // Remove 'wcag' prefix if it exists to avoid duplication
   const cleanVersion = wcagVersion.startsWith('wcag') ? wcagVersion.substring(4) : wcagVersion;
-  return `${domain}_wcag${cleanVersion}_${wcagLevel}_${timestamp}.json`;
+  return `${domain}_wcag${cleanVersion}_${wcagLevel}_${ts}.json`;
 }
 
-function generateHtmlFilename(domain, wcagVersion, wcagLevel) {
-  const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-');
+function generateHtmlFilename(domain, wcagVersion, wcagLevel, timestamp) {
+  // Use provided timestamp or generate new one
+  const ts = timestamp || new Date().toISOString().replace(/[:.]/g, '-');
   // Remove 'wcag' prefix if it exists to avoid duplication
   const cleanVersion = wcagVersion.startsWith('wcag') ? wcagVersion.substring(4) : wcagVersion;
-  return `${domain}_wcag${cleanVersion}_${wcagLevel}_${timestamp}.html`;
+  return `${domain}_wcag${cleanVersion}_${wcagLevel}_${ts}.html`;
 }
 
 async function ensureReportsDirectory(domain) {
@@ -705,7 +712,10 @@ async function main() {
   let jsonOutput;
   if (output === 'report.json') {
     // Use default naming if user didn't specify custom output
-    jsonOutput = path.join(reportsDir, generateReportFilename(domain, wcagVersion, wcagLevel));
+    jsonOutput = path.join(
+      reportsDir,
+      generateReportFilename(domain, wcagVersion, wcagLevel, providedTimestamp)
+    );
   } else {
     // Use user-specified output in reports directory
     jsonOutput = path.join(reportsDir, output);
@@ -724,7 +734,7 @@ async function main() {
   // Generate HTML report if requested
   let htmlOutput = null;
   if (generateHtml) {
-    const htmlFilename = generateHtmlFilename(domain, wcagVersion, wcagLevel);
+    const htmlFilename = generateHtmlFilename(domain, wcagVersion, wcagLevel, providedTimestamp);
     htmlOutput = path.join(reportsDir, htmlFilename);
     // Use modern template system from src/generators/html.js
     const htmlContent = generateHTMLReport(results, htmlFilename);
