@@ -167,8 +167,9 @@ async function startJobProcess(jobId, _jobData) {
       currentJob.endTime = new Date().toISOString();
 
       // Persist to database
+      let dbJob = null;
       try {
-        const dbJob = await CrawlJob.findByPk(jobId);
+        dbJob = await CrawlJob.findByPk(jobId);
         if (dbJob) {
           if (code === 0) {
             await dbJob.markCompleted();
@@ -187,9 +188,12 @@ async function startJobProcess(jobId, _jobData) {
           ? currentJob.outputFilename.replace('.json', '')
           : null;
 
+        // Get user_id from database job record
+        const userId = dbJob ? dbJob.user_id : null;
+
         await CompletedJob.create({
           job_id: jobId,
-          user_id: currentJob.userId,
+          user_id: userId,
           url: currentJob.url,
           status: code === 0 ? 'completed' : 'failed',
           report_id: code === 0 ? reportId : null,
@@ -230,8 +234,9 @@ async function startJobProcess(jobId, _jobData) {
       currentJob.endTime = new Date().toISOString();
 
       // Persist to database
+      let dbJob = null;
       try {
-        const dbJob = await CrawlJob.findByPk(jobId);
+        dbJob = await CrawlJob.findByPk(jobId);
         if (dbJob) {
           await dbJob.markError(error.message);
         }
@@ -241,9 +246,12 @@ async function startJobProcess(jobId, _jobData) {
 
       // Store failed job in completed_jobs table
       try {
+        // Get user_id from database job record
+        const userId = dbJob ? dbJob.user_id : null;
+
         await CompletedJob.create({
           job_id: jobId,
-          user_id: currentJob.userId,
+          user_id: userId,
           url: currentJob.url,
           status: 'failed',
           report_id: null,
