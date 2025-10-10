@@ -1063,14 +1063,8 @@ app.get('/api/reports/by-job/:jobId', requireAuth, async (req, res) => {
 
     const reportUrl = `/reports/${domain}/${completedJob.report_id}`;
 
-    res.json({
-      success: true,
-      report: {
-        id: completedJob.report_id,
-        domain,
-        url: reportUrl,
-      },
-    });
+    // Redirect to the HTML report
+    res.redirect(reportUrl);
   } catch (error) {
     console.error('❌ Failed to fetch report by job ID:', error);
     res.status(500).json({
