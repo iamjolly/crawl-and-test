@@ -183,3 +183,63 @@
     grid-template-columns: 1fr;
   }
 }
+
+// ==========================================================================
+// Completed Jobs Section
+// ==========================================================================
+
+.completed-jobs-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.completed-job-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  background-color: var(--color-background-primary);
+  transition: background-color 0.2s ease-in-out;
+
+  &:hover {
+    background-color: var(--color-background-secondary);
+  }
+
+  &--failed {
+    border-color: var(--color-danger);
+    background-color: rgba(var(--color-danger-rgb), 0.05);
+
+    &:hover {
+      background-color: rgba(var(--color-danger-rgb), 0.1);
+    }
+  }
+}
+
+.completed-job-info {
+  flex: 1;
+
+  strong {
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  small {
+    color: var(--color-text-secondary);
+    font-size: var(--text-body-small);
+  }
+
+  .error-text {
+    color: var(--color-danger);
+    font-weight: var(--font-weight-medium);
+  }
+}
+
+.completed-job-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-shrink: 0;
+  margin-left: var(--space-3);
+}

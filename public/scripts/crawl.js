@@ -154,11 +154,13 @@ function updateJobs() {
                             if (typeof announceToScreenReader === 'function') {
                                 announceToScreenReader(`Crawl job for ${job.url} completed successfully. Report is ready to view.`);
                             }
-                            // Focus the completed job (will be in completed section later)
-                            const jobElement = document.getElementById(`job-${job.jobId}`);
-                            if (jobElement) {
-                                jobElement.focus();
-                            }
+                            // Reload completed jobs and focus the first report link
+                            loadCompletedJobs().then(() => {
+                                const firstReportLink = document.getElementById('first-completed-report-link');
+                                if (firstReportLink) {
+                                    firstReportLink.focus();
+                                }
+                            }).catch(err => console.error('Error reloading completed jobs:', err));
                         } else if (currentStatus === 'failed') {
                             // Announce failure
                             if (typeof announceToScreenReader === 'function') {
@@ -197,6 +199,91 @@ function updateJobs() {
             console.error('Error fetching jobs:', err);
             throw err; // Re-throw to allow caller to handle
         });
+}
+
+// Load completed jobs from API
+async function loadCompletedJobs() {
+    try {
+        const response = await fetch('/api/jobs/completed?limit=10');
+        const data = await response.json();
+
+        if (data.success && data.completedJobs && data.completedJobs.length > 0) {
+            renderCompletedJobs(data.completedJobs);
+        } else {
+            // Hide completed section if no jobs
+            const section = document.getElementById('completedJobsSection');
+            if (section) {
+                section.style.display = 'none';
+            }
+        }
+    } catch (error) {
+        console.error('Error loading completed jobs:', error);
+        // Hide section on error
+        const section = document.getElementById('completedJobsSection');
+        if (section) {
+            section.style.display = 'none';
+        }
+    }
+}
+
+// Calculate duration between two timestamps
+function calculateDuration(startTime, endTime) {
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+    const seconds = Math.floor((end - start) / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}m ${remainingSeconds}s`;
+}
+
+// Render completed jobs in the UI
+function renderCompletedJobs(completedJobs) {
+    const container = document.getElementById('completedJobsList');
+    const section = document.getElementById('completedJobsSection');
+
+    if (!container || !section) {
+        return;
+    }
+
+    const html = completedJobs
+        .map((job, index) => {
+            const endTime = new Date(job.end_time).toLocaleString();
+            const duration = calculateDuration(job.start_time, job.end_time);
+
+            if (job.status === 'completed' && job.report_id) {
+                return `
+                <div class="completed-job-item" id="completed-job-${job.job_id}">
+                    <div class="completed-job-info">
+                        <strong>${job.url}</strong><br>
+                        <small>Completed: ${endTime} • Duration: ${duration}</small>
+                    </div>
+                    <div class="completed-job-actions">
+                        <a href="/api/reports/by-job/${job.job_id}"
+                           class="btn btn-sm btn-primary"
+                           ${index === 0 ? 'id="first-completed-report-link"' : ''}
+                           aria-label="View report for ${job.url}">
+                            View Report
+                        </a>
+                    </div>
+                </div>
+            `;
+            } else if (job.status === 'failed') {
+                return `
+                <div class="completed-job-item completed-job-item--failed" id="completed-job-${job.job_id}">
+                    <div class="completed-job-info">
+                        <strong>${job.url}</strong><br>
+                        <small>Failed: ${endTime}</small>
+                        ${job.error_message ? `<br><small class="error-text">${job.error_message}</small>` : ''}
+                    </div>
+                </div>
+            `;
+            }
+            return '';
+        })
+        .join('');
+
+    container.innerHTML = html;
+    section.style.display = 'block';
 }
 
 // Enhanced URL validation and formatting
@@ -594,4 +681,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initial load
     updateJobs().catch(err => console.error('Error in initial job load:', err));
+    loadCompletedJobs().catch(err => console.error('Error in initial completed jobs load:', err));
 });
