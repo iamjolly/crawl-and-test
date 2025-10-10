@@ -7,8 +7,80 @@
 // - Crawl form layout
 // - Job status indicators
 // - Resource warnings
+// - Alert component
 //
 // ==========================================================================
+
+// Alert Component
+// ==========================================================================
+
+.alert {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-4);
+  border: 1px solid transparent;
+
+  &__content {
+    flex: 1;
+  }
+
+  &__title {
+    display: block;
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--space-1);
+  }
+
+  &__message {
+    margin: 0;
+    font-size: var(--text-body-small);
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    margin-left: var(--space-3);
+    color: inherit;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    &:focus {
+      outline: 2px solid currentColor;
+      outline-offset: 2px;
+    }
+  }
+
+  // Success variant
+  &--success {
+    background-color: rgba(var(--color-success-rgb), 0.1);
+    border-color: var(--color-success);
+    color: var(--color-success);
+  }
+
+  // Error variant
+  &--error {
+    background-color: rgba(var(--color-danger-rgb), 0.1);
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+  }
+
+  // Info variant
+  &--info {
+    background-color: rgba(var(--color-info-rgb), 0.1);
+    border-color: var(--color-info);
+    color: var(--color-info);
+  }
+}
 
 // Job Management Styles
 // ==========================================================================

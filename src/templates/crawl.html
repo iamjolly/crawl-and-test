@@ -25,6 +25,15 @@
                 <p class="content-section__description">Configure and launch an automated accessibility scan of your website</p>
             </header>
 
+            <!-- Alert Component (for success/error messages) -->
+            <div id="crawl-alert" class="alert" role="alert" aria-live="polite" style="display: none;">
+                <div class="alert__content">
+                    <strong id="alert-title" class="alert__title"></strong>
+                    <p id="alert-message" class="alert__message"></p>
+                </div>
+                <button id="alert-close" class="alert__close" type="button" aria-label="Close alert">&times;</button>
+            </div>
+
             <!-- Crawl Content -->
             <div class="crawl-layout">
 

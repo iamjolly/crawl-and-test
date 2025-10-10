@@ -62,12 +62,16 @@
 // Filter bar uses .card class directly in HTML, styles here extend it
 .admin-filter-bar {
   display: flex;
-  gap: var(--space-3);
+  flex-direction: row;
+  gap: var(--space-4);
   flex-wrap: wrap;
   align-items: flex-end;
+  padding: var(--space-4);
 
   .form-group {
-    flex: 1;
+    display: flex;
+    flex-direction: column;
+    flex: 0 1 auto;
     min-width: 200px;
     margin-bottom: 0;
   }
@@ -80,7 +84,7 @@
   }
 
   .btn {
-    align-self: flex-end;
+    margin-top: auto;
   }
 }
 
