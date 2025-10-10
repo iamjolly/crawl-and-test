@@ -942,5 +942,19 @@
             }, 1000);
         }
     </script>
+    <script type="module">
+        import { formatDateTime } from '/scripts/date-utils.js';
+
+        // Format all timestamps on the reports page
+        document.addEventListener('DOMContentLoaded', () => {
+            const timestampElements = document.querySelectorAll('.report-item__timestamp time');
+            timestampElements.forEach(timeEl => {
+                const isoTimestamp = timeEl.getAttribute('datetime');
+                if (isoTimestamp) {
+                    timeEl.textContent = 'Generated ' + formatDateTime(isoTimestamp);
+                }
+            });
+        });
+    </script>
 </body>
 </html>

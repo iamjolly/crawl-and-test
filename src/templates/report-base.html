@@ -43,7 +43,7 @@
           <div class="content-section__description report-header">
             <div class="report-meta">
               <p><strong>Domain:</strong> {{domain}}</p>
-              <p><strong>Generated:</strong> {{timestamp}}</p>
+              <p><strong>Generated:</strong> <time datetime="{{timestamp}}" id="report-timestamp">{{timestamp}}</time></p>
               <p><strong>Standards:</strong> {{wcagInfo}}</p>
             </div>
             <div class="download-section">
@@ -74,5 +74,17 @@
 
     <script src="/scripts/utils.js"></script>
     <script src="/scripts/accordion.js"></script>
+    <script type="module">
+      import { formatDateTime } from '/scripts/date-utils.js';
+
+      // Format the report timestamp on page load
+      const timestampEl = document.getElementById('report-timestamp');
+      if (timestampEl) {
+        const isoTimestamp = timestampEl.getAttribute('datetime');
+        if (isoTimestamp) {
+          timestampEl.textContent = formatDateTime(isoTimestamp);
+        }
+      }
+    </script>
   </body>
 </html>
