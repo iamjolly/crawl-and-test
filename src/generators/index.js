@@ -3,6 +3,42 @@ const path = require('path');
 const config = require('../core/config');
 const storage = require('../utils/storage');
 
+// Extract metadata from JSON report
+async function extractReportMetadata(domain, htmlFilename) {
+  try {
+    // Convert HTML filename to JSON filename
+    const jsonFilename = htmlFilename.replace('.html', '.json');
+    const jsonPath = path.join(config.REPORTS_DIR, domain, jsonFilename);
+
+    if (!fs.existsSync(jsonPath)) {
+      return null;
+    }
+
+    const jsonContent = fs.readFileSync(jsonPath, 'utf8');
+    const reportData = JSON.parse(jsonContent);
+
+    // Count pages and total violations
+    const pageCount = Array.isArray(reportData) ? reportData.length : 0;
+    let totalViolations = 0;
+
+    if (Array.isArray(reportData)) {
+      reportData.forEach(page => {
+        if (page.violations && Array.isArray(page.violations)) {
+          totalViolations += page.violations.length;
+        }
+      });
+    }
+
+    return {
+      pageCount,
+      totalViolations,
+    };
+  } catch (error) {
+    console.error(`Failed to extract metadata for ${domain}/${htmlFilename}:`, error.message);
+    return null;
+  }
+}
+
 // Utility function to get all report directories
 async function getReportDirectories() {
   try {
@@ -67,13 +103,15 @@ async function generateReportsListHTML() {
     return '<p class="no-reports">No reports generated yet. Start a crawl to create your first report!</p>';
   }
 
-  return reportDirs
-    .map(dir => {
+  const reportsHTML = await Promise.all(
+    reportDirs.map(async dir => {
       const lastReportUrl = dir.lastReport ? `/reports/${dir.domain}/${dir.lastReport}` : '#';
 
       // Extract metadata from filename (e.g., "domain_wcag2.1_AA_2025-10-10T22-06-31.html")
       let wcagInfo = '';
       let timestamp = '';
+      let metadata = null;
+
       if (dir.lastReport) {
         const wcagMatch = dir.lastReport.match(/wcag(\d\.\d)_([A-Z]{1,3})/);
         const timestampMatch = dir.lastReport.match(/(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2})/);
@@ -87,28 +125,39 @@ async function generateReportsListHTML() {
             .replace(/-/g, ':')
             .replace(/T(\d{2}):(\d{2}):(\d{2})/, 'T$1:$2:$3Z');
         }
+
+        // Extract page count and violations from JSON
+        metadata = await extractReportMetadata(dir.domain, dir.lastReport);
       }
 
       return `
-            <div class="report-item">
-                <h3 class="report-item__domain">${dir.domain}</h3>
-                ${wcagInfo ? `<p class="report-item__meta">${wcagInfo}</p>` : ''}
-                ${timestamp ? `<p class="report-item__timestamp" data-timestamp="${timestamp}"><time datetime="${timestamp}">${timestamp}</time></p>` : ''}
-                <p class="report-item__count">${dir.reportCount} report(s) available</p>
+            <div class="report-card">
+                <div class="report-card__header">
+                    <h3 class="report-card__domain">${dir.domain}</h3>
+                    ${wcagInfo ? `<p class="report-card__wcag">${wcagInfo}</p>` : ''}
+                </div>
+                ${timestamp ? `<p class="report-card__timestamp"><time datetime="${timestamp}">${timestamp}</time></p>` : ''}
+                ${
+                  metadata
+                    ? `<p class="report-card__stats">${metadata.pageCount} page${metadata.pageCount !== 1 ? 's' : ''} • ${metadata.totalViolations} violation${metadata.totalViolations !== 1 ? 's' : ''}</p>`
+                    : ''
+                }
+                <div class="report-card__actions">
                 ${
                   dir.lastReport
                     ? `
-                    <div class="report-item__actions">
-                        <a href="${lastReportUrl}" class="btn btn-primary">View Latest Report</a>
-                        <a href="/browse/${dir.domain}" class="btn btn-secondary">Browse All</a>
-                    </div>
+                        <a href="${lastReportUrl}" class="btn btn-primary btn-block">View Latest Report →</a>
+                        ${dir.reportCount > 1 ? `<a href="/browse/${dir.domain}" class="btn btn-secondary btn-block">Browse All (${dir.reportCount})</a>` : ''}
                 `
                     : '<p class="no-reports">No reports yet</p>'
                 }
+                </div>
             </div>
         `;
     })
-    .join('');
+  );
+
+  return reportsHTML.join('');
 }
 
 // Generate index.html from template
