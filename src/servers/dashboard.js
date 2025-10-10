@@ -146,8 +146,9 @@ async function startJobProcess(jobId, _jobData) {
     stdio: 'pipe',
   });
 
-  // Store process reference for potential cancellation
+  // Store process reference and output filename for potential cancellation and report tracking
   job.process = crawlProcess;
+  job.outputFilename = outputFilename;
 
   // Log process output for debugging
   crawlProcess.stdout.on('data', data => {
@@ -177,6 +178,31 @@ async function startJobProcess(jobId, _jobData) {
         }
       } catch (error) {
         console.error(`❌ Failed to update job ${jobId} in database:`, error.message);
+      }
+
+      // Store completed job in completed_jobs table
+      try {
+        // Extract report ID from output filename (remove .json extension)
+        const reportId = currentJob.outputFilename
+          ? currentJob.outputFilename.replace('.json', '')
+          : null;
+
+        await CompletedJob.create({
+          job_id: jobId,
+          user_id: currentJob.userId,
+          url: currentJob.url,
+          status: code === 0 ? 'completed' : 'failed',
+          report_id: code === 0 ? reportId : null,
+          start_time: currentJob.startTime,
+          end_time: currentJob.endTime,
+          error_message: code === 0 ? null : 'Crawl process failed',
+          wcag_version: currentJob.wcagVersion,
+          wcag_level: currentJob.wcagLevel,
+          max_pages: currentJob.maxPages,
+        });
+        console.log(`✅ Stored completed job ${jobId} in completed_jobs table`);
+      } catch (error) {
+        console.error(`❌ Failed to store completed job ${jobId}:`, error.message);
       }
 
       // Regenerate index.html if crawl was successful
@@ -211,6 +237,26 @@ async function startJobProcess(jobId, _jobData) {
         }
       } catch (dbError) {
         console.error(`❌ Failed to update job ${jobId} in database:`, dbError.message);
+      }
+
+      // Store failed job in completed_jobs table
+      try {
+        await CompletedJob.create({
+          job_id: jobId,
+          user_id: currentJob.userId,
+          url: currentJob.url,
+          status: 'failed',
+          report_id: null,
+          start_time: currentJob.startTime,
+          end_time: currentJob.endTime,
+          error_message: error.message,
+          wcag_version: currentJob.wcagVersion,
+          wcag_level: currentJob.wcagLevel,
+          max_pages: currentJob.maxPages,
+        });
+        console.log(`✅ Stored failed job ${jobId} in completed_jobs table`);
+      } catch (storeError) {
+        console.error(`❌ Failed to store completed job ${jobId}:`, storeError.message);
       }
     }
 
