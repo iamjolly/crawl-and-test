@@ -220,21 +220,47 @@
 
 .completed-job-info {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
 
-  strong {
-    color: var(--color-text-primary);
-    font-weight: var(--font-weight-semibold);
-  }
+.completed-job-domain {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-body-large);
+}
 
-  small {
-    color: var(--color-text-secondary);
-    font-size: var(--text-body-small);
-  }
+.completed-job-meta {
+  color: var(--color-text-secondary);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 
-  .error-text {
-    color: var(--color-danger);
-    font-weight: var(--font-weight-medium);
+.completed-job-timestamp {
+  color: var(--color-text-secondary);
+  font-size: var(--text-body-small);
+
+  time {
+    font-style: normal;
   }
+}
+
+.completed-job-duration {
+  color: var(--color-text-tertiary);
+  font-size: var(--text-body-small);
+}
+
+.completed-job-error {
+  color: var(--color-danger);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-body-small);
+  margin-top: var(--space-2);
+  padding: var(--space-2);
+  background-color: rgba(var(--color-danger-rgb), 0.1);
+  border-radius: var(--radius-sm);
 }
 
 .completed-job-actions {
@@ -242,4 +268,5 @@
   gap: var(--space-2);
   flex-shrink: 0;
   margin-left: var(--space-3);
+  align-items: center;
 }

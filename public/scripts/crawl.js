@@ -1,6 +1,9 @@
 // Crawl Page JavaScript - Job Management and Form Submission
 /* global confirm, alert, FormData, URLSearchParams */
 
+// Import date utilities for human-friendly formatting
+import { formatDateTime, calculateDuration as calcDuration, extractDomainFromReportId, extractWcagInfo } from './date-utils.js';
+
 // Track previous job statuses to detect state changes
 const previousJobStatuses = {};
 
@@ -226,16 +229,6 @@ async function loadCompletedJobs() {
     }
 }
 
-// Calculate duration between two timestamps
-function calculateDuration(startTime, endTime) {
-    const start = new Date(startTime);
-    const end = new Date(endTime);
-    const seconds = Math.floor((end - start) / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}m ${remainingSeconds}s`;
-}
-
 // Render completed jobs in the UI
 function renderCompletedJobs(completedJobs) {
     const container = document.getElementById('completedJobsList');
@@ -247,33 +240,46 @@ function renderCompletedJobs(completedJobs) {
 
     const html = completedJobs
         .map((job, index) => {
-            const endTime = new Date(job.end_time).toLocaleString();
-            const duration = calculateDuration(job.start_time, job.end_time);
+            // Extract clean domain name and WCAG info from report_id if available
+            const domain = job.report_id ? extractDomainFromReportId(job.report_id) : new URL(job.url).hostname;
+            const wcagInfo = job.report_id ? extractWcagInfo(job.report_id) : { version: job.wcag_version, level: job.wcag_level };
+
+            // Format timestamps in user's local timezone
+            const completedTime = formatDateTime(job.end_time);
+            const duration = calcDuration(job.start_time, job.end_time);
 
             if (job.status === 'completed' && job.report_id) {
                 return `
                 <div class="completed-job-item" id="completed-job-${job.job_id}">
                     <div class="completed-job-info">
-                        <strong>${job.url}</strong><br>
-                        <small>Completed: ${endTime} • Duration: ${duration}</small>
+                        <div class="completed-job-domain">${domain}</div>
+                        <div class="completed-job-meta">WCAG ${wcagInfo.version} Level ${wcagInfo.level}</div>
+                        <div class="completed-job-timestamp">
+                            <time datetime="${job.end_time}">Completed ${completedTime}</time>
+                        </div>
+                        <div class="completed-job-duration">Duration: ${duration}</div>
                     </div>
                     <div class="completed-job-actions">
                         <a href="/api/reports/by-job/${job.job_id}"
                            class="btn btn-sm btn-primary"
                            ${index === 0 ? 'id="first-completed-report-link"' : ''}
-                           aria-label="View report for ${job.url}">
-                            View Report
+                           aria-label="View accessibility report for ${domain}">
+                            View Report →
                         </a>
                     </div>
                 </div>
             `;
             } else if (job.status === 'failed') {
+                const failedTime = formatDateTime(job.end_time);
                 return `
                 <div class="completed-job-item completed-job-item--failed" id="completed-job-${job.job_id}">
                     <div class="completed-job-info">
-                        <strong>${job.url}</strong><br>
-                        <small>Failed: ${endTime}</small>
-                        ${job.error_message ? `<br><small class="error-text">${job.error_message}</small>` : ''}
+                        <div class="completed-job-domain">${domain}</div>
+                        <div class="completed-job-meta">WCAG ${wcagInfo.version} Level ${wcagInfo.level}</div>
+                        <div class="completed-job-timestamp">
+                            <time datetime="${job.end_time}">Failed ${failedTime}</time>
+                        </div>
+                        ${job.error_message ? `<div class="completed-job-error">${job.error_message}</div>` : ''}
                     </div>
                 </div>
             `;
