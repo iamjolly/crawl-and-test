@@ -2,7 +2,7 @@
 /* global confirm, alert, FormData, URLSearchParams */
 
 // Import date utilities for human-friendly formatting
-import { formatDateTime, calculateDuration as calcDuration, extractDomainFromReportId, extractWcagInfo } from './date-utils.js';
+import { formatDateTime, calculateDuration as calcDuration, extractDomainFromReportId, extractWcagInfo, formatRelativeTime } from './date-utils.js';
 
 // Track previous job statuses to detect state changes
 const previousJobStatuses = {};
@@ -128,7 +128,7 @@ function updateJobs() {
                                     ${job.status === 'queued' ? '<span class="queue-indicator">(queued)</span>' : ''}
                                     <br>
                                     <small>
-                                        ${job.status === 'queued' ? 'Created' : 'Started'}: ${new Date(startTime).toLocaleString()}
+                                        ${job.status === 'queued' ? 'Created' : 'Started'} <time datetime="${startTime}" class="job-start-time">${formatRelativeTime(startTime)}</time>
                                         ${job.crawlerConcurrency ? ` • Concurrency: ${job.crawlerConcurrency}` : ''}
                                         ${job.maxPages ? ` • Max Pages: ${job.maxPages}` : ''}
                                         ${runtimeInfo}
@@ -684,6 +684,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     startPolling();
+
+    // Update relative timestamps every minute
+    function updateRelativeTimestamps() {
+        const timeElements = document.querySelectorAll('.job-start-time');
+        timeElements.forEach(timeEl => {
+            const datetime = timeEl.getAttribute('datetime');
+            if (datetime) {
+                timeEl.textContent = formatRelativeTime(datetime);
+            }
+        });
+    }
+
+    // Update relative times every 60 seconds
+    setInterval(updateRelativeTimestamps, 60000);
 
     // Initial load
     updateJobs().catch(err => console.error('Error in initial job load:', err));
