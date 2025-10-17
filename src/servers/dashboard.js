@@ -5,6 +5,7 @@ const { randomUUID } = require('crypto');
 const { spawn } = require('child_process');
 const session = require('express-session');
 const passport = require('passport');
+const helmet = require('helmet');
 const config = require('../core/config');
 const { generateIndexHTML } = require('../generators/index');
 const { parseTimestampFromFilename } = require('../scripts/utils');
@@ -12,6 +13,7 @@ const browserPool = require('../utils/browserPool');
 const storage = require('../utils/storage');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
 const { CrawlJob, CompletedJob } = require('../models');
+const { apiLimiter, globalLimiter } = require('../middleware/rateLimiter');
 
 // Initialize Passport configuration
 require('../config/passport');
@@ -375,6 +377,48 @@ function getNavContext(currentPage, user = null) {
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// Security: Helmet.js - Add security headers
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'", // Required for inline event handlers (temporary)
+          // TODO: Move to nonce-based CSP after refactoring inline scripts
+        ],
+        styleSrc: ["'self'", "'unsafe-inline'"], // Required for inline styles
+        imgSrc: ["'self'", 'data:', 'https:'],
+        connectSrc: ["'self'"],
+        fontSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        mediaSrc: ["'self'"],
+        frameSrc: ["'none'"],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: 'same-site' },
+    dnsPrefetchControl: { allow: false },
+    frameguard: { action: 'deny' },
+    hidePoweredBy: true,
+    hsts: {
+      maxAge: 31536000, // 1 year
+      includeSubDomains: true,
+      preload: true,
+    },
+    ieNoOpen: true,
+    noSniff: true,
+    originAgentCluster: true,
+    permittedCrossDomainPolicies: { permittedPolicies: 'none' },
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    xssFilter: true,
+  })
+);
+
+// Security: Global rate limiting
+app.use(globalLimiter);
 
 // Session configuration
 const sessionConfig = {
@@ -819,7 +863,7 @@ app.get('/browse/:domain', async (req, res) => {
 });
 
 // API endpoint to get active jobs
-app.get('/api/jobs', requireAuth, async (req, res) => {
+app.get('/api/jobs', apiLimiter, requireAuth, async (req, res) => {
   try {
     // Build where clause based on user role (if auth enabled)
     const authEnabled = process.env.CATS_AUTH_ENABLED === 'true';
@@ -946,7 +990,7 @@ app.get('/api/reports', requireAuth, async (req, res) => {
 });
 
 // API endpoint to store a completed job
-app.post('/api/jobs/completed', requireAuth, async (req, res) => {
+app.post('/api/jobs/completed', apiLimiter, requireAuth, async (req, res) => {
   try {
     const {
       jobId,
@@ -1008,7 +1052,7 @@ app.post('/api/jobs/completed', requireAuth, async (req, res) => {
 });
 
 // API endpoint to get completed jobs for the current user
-app.get('/api/jobs/completed', requireAuth, async (req, res) => {
+app.get('/api/jobs/completed', apiLimiter, requireAuth, async (req, res) => {
   try {
     const userId = req.user.id;
     const limit = Math.min(parseInt(req.query.limit) || 10, 50);
@@ -1080,7 +1124,7 @@ app.get('/api/reports/by-job/:jobId', requireAuth, async (req, res) => {
 });
 
 // Start a new crawl
-app.post('/crawl', requireAuth, async (req, res) => {
+app.post('/crawl', apiLimiter, requireAuth, async (req, res) => {
   const {
     url,
     wcagVersion = '2.1',
@@ -1161,7 +1205,7 @@ app.post('/crawl', requireAuth, async (req, res) => {
 });
 
 // Cancel a job
-app.delete('/api/jobs/:jobId', requireAuth, async (req, res) => {
+app.delete('/api/jobs/:jobId', apiLimiter, requireAuth, async (req, res) => {
   const { jobId } = req.params;
 
   try {

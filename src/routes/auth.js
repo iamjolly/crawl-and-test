@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 const { requireAuth } = require('../middleware/auth');
 const { validatePassword } = require('../utils/password-validator');
+const { authLimiter } = require('../middleware/rateLimiter');
 
 const router = express.Router();
 
@@ -15,7 +16,7 @@ const JWT_EXPIRES_IN = process.env.CATS_JWT_EXPIRES_IN || '7d';
  * POST /api/auth/register
  * Register a new user
  */
-router.post('/register', async (req, res) => {
+router.post('/register', authLimiter, async (req, res) => {
   try {
     const { email, password, firstName, lastName } = req.body;
 
@@ -78,7 +79,7 @@ router.post('/register', async (req, res) => {
  * POST /api/auth/login
  * Login with email and password
  */
-router.post('/login', (req, res, next) => {
+router.post('/login', authLimiter, (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
     if (err) {
       return next(err);
