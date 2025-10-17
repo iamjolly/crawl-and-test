@@ -38,13 +38,15 @@
         <!-- Report Header -->
         <header class="content-section__header">
           <h1 class="content-section__title report-page__title">
-            CATS Accessibility Report for {{domain}}
+            Accessibility Report for {{domain}}
           </h1>
+          <p class="report-subtitle">{{wcagInfo}} Compliance Test</p>
           <div class="content-section__description report-header">
             <div class="report-meta">
-              <p><strong>Domain:</strong> {{domain}}</p>
-              <p><strong>Generated:</strong> {{timestamp}}</p>
-              <p><strong>Standards:</strong> {{wcagInfo}}</p>
+              <p class="report-timestamp">Generated on <time datetime="{{timestamp}}" id="report-timestamp">{{timestamp}}</time></p>
+              {{#if reportStats}}
+              <p class="report-stats">{{reportStats}}</p>
+              {{/if}}
             </div>
             <div class="download-section">
               <a
@@ -74,5 +76,134 @@
 
     <script src="/scripts/utils.js"></script>
     <script src="/scripts/accordion.js"></script>
+    <script type="module">
+      import { formatDateTime } from '/scripts/date-utils.js';
+
+      // Format the report timestamp on page load
+      const timestampEl = document.getElementById('report-timestamp');
+      if (timestampEl) {
+        const isoTimestamp = timestampEl.getAttribute('datetime');
+        if (isoTimestamp) {
+          timestampEl.textContent = formatDateTime(isoTimestamp);
+        }
+      }
+
+      // Check authentication status and update header dynamically
+      async function updateAuthUI() {
+        try {
+          const response = await fetch('/api/auth/me');
+          if (response.ok) {
+            const data = await response.json();
+            const user = data.user;
+
+            // Replace guest actions with user menu
+            const authActions = document.querySelector('.auth-actions');
+            if (authActions && user) {
+              const isAdmin = user.role === 'admin';
+              const userMenuHTML = `
+                <div class="user-menu">
+                  <button class="user-menu__trigger" aria-expanded="false" aria-haspopup="true" id="user-menu-button">
+                    <span class="user-menu__name">${user.firstName || 'User'}</span>
+                    <svg class="user-menu__icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                  <div class="user-menu__dropdown" id="user-menu-dropdown" hidden>
+                    <div class="user-menu__header">
+                      <div class="user-menu__user-info">
+                        <strong>${user.firstName || ''} ${user.lastName || ''}</strong>
+                        <span class="user-menu__email">${user.email || ''}</span>
+                      </div>
+                    </div>
+                    <ul class="user-menu__list">
+                      <li><a href="/dashboard" class="user-menu__link">Dashboard</a></li>
+                      <li><a href="/crawl" class="user-menu__link">Start Crawl</a></li>
+                      <li><a href="/reports/" class="user-menu__link">View Reports</a></li>
+                      ${isAdmin ? '<li><a href="/admin/users" class="user-menu__link">User Management</a></li>' : ''}
+                    </ul>
+                    <div class="user-menu__footer">
+                      <button class="user-menu__logout" id="logout-button">Sign Out</button>
+                    </div>
+                  </div>
+                </div>
+              `;
+
+              authActions.outerHTML = userMenuHTML;
+
+              // Re-initialize user menu functionality
+              initUserMenu();
+            }
+          }
+        } catch (error) {
+          // User not authenticated or error - keep guest UI
+          console.log('Not authenticated or error checking auth:', error);
+        }
+      }
+
+      // Initialize user menu dropdown functionality
+      function initUserMenu() {
+        const menuButton = document.getElementById('user-menu-button');
+        const menuDropdown = document.getElementById('user-menu-dropdown');
+        const logoutButton = document.getElementById('logout-button');
+
+        function closeMenu() {
+          if (menuButton && menuDropdown) {
+            menuButton.setAttribute('aria-expanded', 'false');
+            menuDropdown.hidden = true;
+          }
+        }
+
+        function openMenu() {
+          if (menuButton && menuDropdown) {
+            menuButton.setAttribute('aria-expanded', 'true');
+            menuDropdown.hidden = false;
+          }
+        }
+
+        if (menuButton && menuDropdown) {
+          menuButton.addEventListener('click', function(event) {
+            event.stopPropagation();
+            const isExpanded = menuButton.getAttribute('aria-expanded') === 'true';
+            if (isExpanded) {
+              closeMenu();
+            } else {
+              openMenu();
+            }
+          });
+
+          document.addEventListener('click', function(event) {
+            if (!event.target.closest('.user-menu')) {
+              closeMenu();
+            }
+          });
+
+          menuDropdown.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+              closeMenu();
+              menuButton.focus();
+            }
+          });
+        }
+
+        if (logoutButton) {
+          logoutButton.addEventListener('click', async function() {
+            try {
+              const response = await fetch('/api/auth/logout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+              });
+              if (response.ok) {
+                window.location.href = '/';
+              }
+            } catch (error) {
+              console.error('Logout failed:', error);
+            }
+          });
+        }
+      }
+
+      // Update auth UI on page load
+      updateAuthUI();
+    </script>
   </body>
 </html>

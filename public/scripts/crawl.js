@@ -1,6 +1,12 @@
 // Crawl Page JavaScript - Job Management and Form Submission
 /* global confirm, alert, FormData, URLSearchParams */
 
+// Import date utilities for human-friendly formatting
+import { formatDateTime, calculateDuration as calcDuration, extractDomainFromReportId, extractWcagInfo, formatRelativeTime } from './date-utils.js';
+
+// Track previous job statuses to detect state changes
+const previousJobStatuses = {};
+
 // Cancel a job (called from inline onclick handlers in HTML)
 // eslint-disable-next-line no-unused-vars
 function cancelJob(jobId) {
@@ -79,7 +85,10 @@ function updateJobs() {
                     const startTime = job.startTime || job.createdTime;
                     const canCancel = job.status === 'running' || job.status === 'queued';
                     const cancelButton = canCancel ?
-                        `<button class="btn-cancel" onclick="cancelJob('${job.jobId}')" title="Cancel job">✗</button>` : '';
+                        `<button class="btn-cancel" onclick="cancelJob('${job.jobId}')" aria-label="Cancel job for ${job.url}">
+                            <span aria-hidden="true">✗</span>
+                            <span class="sr-only">Cancel Job</span>
+                        </button>` : '';
 
                     // Calculate runtime and estimated completion
                     let runtimeInfo = '';
@@ -119,7 +128,7 @@ function updateJobs() {
                                     ${job.status === 'queued' ? '<span class="queue-indicator">(queued)</span>' : ''}
                                     <br>
                                     <small>
-                                        ${job.status === 'queued' ? 'Created' : 'Started'}: ${new Date(startTime).toLocaleString()}
+                                        ${job.status === 'queued' ? 'Created' : 'Started'} <time datetime="${startTime}" class="job-start-time">${formatRelativeTime(startTime)}</time>
                                         ${job.crawlerConcurrency ? ` • Concurrency: ${job.crawlerConcurrency}` : ''}
                                         ${job.maxPages ? ` • Max Pages: ${job.maxPages}` : ''}
                                         ${runtimeInfo}
@@ -136,8 +145,48 @@ function updateJobs() {
 
                 jobsList.innerHTML = statsHTML + jobsHTML;
 
+                // Detect status changes and announce/focus on completion or failure
+                allJobs.forEach(job => {
+                    const previousStatus = previousJobStatuses[job.jobId];
+                    const currentStatus = job.status;
+
+                    // If status changed from running/queued to completed or failed
+                    if (previousStatus && previousStatus !== currentStatus) {
+                        if (currentStatus === 'completed') {
+                            // Announce completion
+                            if (typeof announceToScreenReader === 'function') {
+                                announceToScreenReader(`Crawl job for ${job.url} completed successfully. Report is ready to view.`);
+                            }
+                            // Reload completed jobs and focus the first report link
+                            loadCompletedJobs().then(() => {
+                                const firstReportLink = document.getElementById('first-completed-report-link');
+                                if (firstReportLink) {
+                                    firstReportLink.focus();
+                                }
+                            }).catch(err => console.error('Error reloading completed jobs:', err));
+                        } else if (currentStatus === 'failed') {
+                            // Announce failure
+                            if (typeof announceToScreenReader === 'function') {
+                                announceToScreenReader(`Crawl job for ${job.url} failed. Please check the error details.`, 'assertive');
+                            }
+                            // Focus the failed job
+                            const jobElement = document.getElementById(`job-${job.jobId}`);
+                            if (jobElement) {
+                                jobElement.focus();
+                            }
+                        }
+                    }
+
+                    // Update status tracking
+                    previousJobStatuses[job.jobId] = currentStatus;
+                });
+
                 // Restore focus if a job was previously focused and still exists
-                if (focusedJobId) {
+                // Only if no state change occurred (to avoid overriding completion focus)
+                if (focusedJobId && !allJobs.some(job =>
+                    previousJobStatuses[job.jobId] !== job.status &&
+                    (job.status === 'completed' || job.status === 'failed')
+                )) {
                     const jobStillExists = allJobs.find(job => job.jobId === focusedJobId);
                     if (jobStillExists) {
                         const restoredElement = document.getElementById(`job-${focusedJobId}`);
@@ -155,21 +204,92 @@ function updateJobs() {
         });
 }
 
-// Reliable focus management for new jobs
-function focusNewJob(jobId, maxAttempts = 5) {
-    const attempt = (attemptsLeft) => {
-        const jobElement = document.getElementById(`job-${jobId}`);
-        if (jobElement) {
-            jobElement.focus();
-            return true;
-        } else if (attemptsLeft > 0) {
-            setTimeout(() => attempt(attemptsLeft - 1), 200);
+// Load completed jobs from API
+async function loadCompletedJobs() {
+    try {
+        const response = await fetch('/api/jobs/completed?limit=10');
+        const data = await response.json();
+
+        if (data.success && data.completedJobs && data.completedJobs.length > 0) {
+            renderCompletedJobs(data.completedJobs);
         } else {
-            console.warn(`Failed to focus job ${jobId} after ${maxAttempts} attempts`);
-            return false;
+            // Hide completed section if no jobs
+            const section = document.getElementById('completedJobsSection');
+            if (section) {
+                section.style.display = 'none';
+            }
         }
-    };
-    return attempt(maxAttempts);
+    } catch (error) {
+        console.error('Error loading completed jobs:', error);
+        // Hide section on error
+        const section = document.getElementById('completedJobsSection');
+        if (section) {
+            section.style.display = 'none';
+        }
+    }
+}
+
+// Render completed jobs in the UI
+function renderCompletedJobs(completedJobs) {
+    const container = document.getElementById('completedJobsList');
+    const section = document.getElementById('completedJobsSection');
+
+    if (!container || !section) {
+        return;
+    }
+
+    const html = completedJobs
+        .map((job, index) => {
+            // Extract clean domain name and WCAG info from report_id if available
+            const domain = job.report_id ? extractDomainFromReportId(job.report_id) : new URL(job.url).hostname;
+            const wcagInfo = job.report_id ? extractWcagInfo(job.report_id) : { version: job.wcag_version, level: job.wcag_level };
+
+            // Format timestamps in user's local timezone
+            const completedTime = formatDateTime(job.end_time);
+            const duration = calcDuration(job.start_time, job.end_time);
+
+            if (job.status === 'completed' && job.report_id) {
+                return `
+                <div class="completed-job-item" id="completed-job-${job.job_id}">
+                    <div class="completed-job-info">
+                        <div class="completed-job-domain">${domain}</div>
+                        <div class="completed-job-meta">WCAG ${wcagInfo.version} Level ${wcagInfo.level}</div>
+                        <div class="completed-job-timestamp">
+                            <time datetime="${job.end_time}">Completed ${completedTime}</time>
+                        </div>
+                        <div class="completed-job-duration">Duration: ${duration}</div>
+                    </div>
+                    <div class="completed-job-actions">
+                        <a href="/api/reports/by-job/${job.job_id}"
+                           class="btn btn-sm btn-primary"
+                           ${index === 0 ? 'id="first-completed-report-link"' : ''}
+                           aria-label="View accessibility report for ${domain}">
+                            View Report →
+                        </a>
+                    </div>
+                </div>
+            `;
+            } else if (job.status === 'failed') {
+                const failedTime = formatDateTime(job.end_time);
+                return `
+                <div class="completed-job-item completed-job-item--failed" id="completed-job-${job.job_id}">
+                    <div class="completed-job-info">
+                        <div class="completed-job-domain">${domain}</div>
+                        <div class="completed-job-meta">WCAG ${wcagInfo.version} Level ${wcagInfo.level}</div>
+                        <div class="completed-job-timestamp">
+                            <time datetime="${job.end_time}">Failed ${failedTime}</time>
+                        </div>
+                        ${job.error_message ? `<div class="completed-job-error">${job.error_message}</div>` : ''}
+                    </div>
+                </div>
+            `;
+            }
+            return '';
+        })
+        .join('');
+
+    container.innerHTML = html;
+    section.style.display = 'block';
 }
 
 // Enhanced URL validation and formatting
@@ -368,65 +488,47 @@ function validateUrlField() {
     }
 }
 
-// Utility function to show notifications
-function showNotification(message, type = 'info') {
-    // Remove any existing notification
-    const existingNotification = document.querySelector('.notification');
-    if (existingNotification) {
-        existingNotification.remove();
+// Utility function to show in-page alerts
+function showAlert(title, message, type = 'info') {
+    const alert = document.getElementById('crawl-alert');
+    const alertTitle = document.getElementById('alert-title');
+    const alertMessage = document.getElementById('alert-message');
+    const alertClose = document.getElementById('alert-close');
+
+    if (!alert || !alertTitle || !alertMessage || !alertClose) {
+        console.error('Alert component elements not found');
+        return;
     }
 
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `notification notification--${type}`;
-    notification.setAttribute('role', 'alert');
-    notification.setAttribute('aria-live', 'assertive');
-    notification.innerHTML = `
-        <span class="notification__message">${message}</span>
-        <button class="notification__close" type="button" aria-label="Close notification">&times;</button>
-    `;
+    // Remove any existing type classes
+    alert.classList.remove('alert--success', 'alert--error', 'alert--info');
 
-    // Add notification styles
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: ${type === 'error' ? '#dc3545' : '#28a745'};
-        color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        z-index: 1000;
-        max-width: 400px;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    `;
+    // Add the appropriate type class
+    alert.classList.add(`alert--${type}`);
 
-    // Style the close button
-    const closeBtn = notification.querySelector('.notification__close');
-    closeBtn.style.cssText = `
-        background: none;
-        border: none;
-        color: white;
-        font-size: 1.5em;
-        cursor: pointer;
-        padding: 0;
-        margin-left: auto;
-    `;
+    // Set the content
+    alertTitle.textContent = title;
+    alertMessage.textContent = message;
 
-    // Add close functionality
-    closeBtn.addEventListener('click', () => notification.remove());
+    // Show the alert
+    alert.style.display = 'flex';
 
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-        if (notification.parentElement) {
-            notification.remove();
-        }
-    }, 5000);
+    // Setup close button handler (remove any existing listeners first)
+    const newCloseBtn = alertClose.cloneNode(true);
+    alertClose.parentNode.replaceChild(newCloseBtn, alertClose);
+    newCloseBtn.addEventListener('click', () => {
+        alert.style.display = 'none';
+    });
 
-    // Add to page
-    document.body.appendChild(notification);
+    // Scroll to alert if it's not in view
+    alert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    // Announce to screen readers using global announcer
+    const fullMessage = `${title}: ${message}`;
+    const priority = type === 'error' ? 'assertive' : 'polite';
+    if (typeof announceToScreenReader === 'function') {
+        announceToScreenReader(fullMessage, priority);
+    }
 }
 
 // Utility function for screen reader announcements
@@ -524,33 +626,23 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                const successMessage = `Crawl started successfully! Job ID: ${data.jobId}`;
-                showNotification(successMessage, 'success');
+                showAlert('Crawl Started', `Crawl started successfully! Job ID: ${data.jobId}`, 'success');
 
                 // Reset form to clean state
                 this.reset();
                 validateUrlField();
 
-                // Update jobs list and focus on the specific new job
+                // Update jobs list (focus is no longer needed here - alert handles announcement)
                 updateJobs()
-                    .then(() => {
-                        if (data.jobId) {
-                            focusNewJob(data.jobId);
-                            announceToScreenReader(`New crawl job for ${normalizedUrl} has been started and is now active.`);
-                        }
-                    })
                     .catch(err => {
                         console.error('Error updating jobs after submission:', err);
-                        announceToScreenReader(`New crawl job for ${normalizedUrl} has been started.`);
                     });
             } else {
-                const errorMessage = `Error starting crawl: ${data.error || 'Unknown error'}`;
-                showNotification(errorMessage, 'error');
+                showAlert('Error', `Error starting crawl: ${data.error || 'Unknown error'}`, 'error');
             }
         })
         .catch(err => {
-            const errorMessage = `Failed to start crawl: ${err.message || 'Network error'}`;
-            showNotification(errorMessage, 'error');
+            showAlert('Error', `Failed to start crawl: ${err.message || 'Network error'}`, 'error');
             console.error('Crawl submission error:', err);
         })
         .finally(() => {
@@ -593,6 +685,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     startPolling();
 
+    // Update relative timestamps every minute
+    function updateRelativeTimestamps() {
+        const timeElements = document.querySelectorAll('.job-start-time');
+        timeElements.forEach(timeEl => {
+            const datetime = timeEl.getAttribute('datetime');
+            if (datetime) {
+                timeEl.textContent = formatRelativeTime(datetime);
+            }
+        });
+    }
+
+    // Update relative times every 60 seconds
+    setInterval(updateRelativeTimestamps, 60000);
+
     // Initial load
     updateJobs().catch(err => console.error('Error in initial job load:', err));
+    loadCompletedJobs().catch(err => console.error('Error in initial completed jobs load:', err));
 });

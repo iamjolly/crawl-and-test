@@ -149,5 +149,8 @@
     "*.{json,md,yml,yaml}": [
       "prettier --write"
     ]
+  },
+  "overrides": {
+    "validator": "13.15.15"
   }
 }

@@ -119,8 +119,13 @@
 
             if (users.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" class="admin-table__empty">No users found</td></tr>';
+                announceToScreenReader('No users found matching the current filters.');
                 return;
             }
+
+            // Announce filter results to screen readers
+            const message = users.length === 1 ? '1 user found.' : `${users.length} users found.`;
+            announceToScreenReader(message);
 
             tbody.innerHTML = users.map(user => {
                 const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ') || '—';

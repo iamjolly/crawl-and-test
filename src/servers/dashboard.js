@@ -11,7 +11,7 @@ const { parseTimestampFromFilename } = require('../scripts/utils');
 const browserPool = require('../utils/browserPool');
 const storage = require('../utils/storage');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
-const { CrawlJob } = require('../models');
+const { CrawlJob, CompletedJob } = require('../models');
 
 // Initialize Passport configuration
 require('../config/passport');
@@ -138,6 +138,8 @@ async function startJobProcess(jobId, _jobData) {
     job.wcagLevel,
     '--output',
     outputFilename,
+    '--timestamp',
+    timestamp, // Pass timestamp so HTML and JSON use the same filename
     '--html', // Generate HTML report
   ];
 
@@ -146,8 +148,9 @@ async function startJobProcess(jobId, _jobData) {
     stdio: 'pipe',
   });
 
-  // Store process reference for potential cancellation
+  // Store process reference and output filename for potential cancellation and report tracking
   job.process = crawlProcess;
+  job.outputFilename = outputFilename;
 
   // Log process output for debugging
   crawlProcess.stdout.on('data', data => {
@@ -166,8 +169,9 @@ async function startJobProcess(jobId, _jobData) {
       currentJob.endTime = new Date().toISOString();
 
       // Persist to database
+      let dbJob = null;
       try {
-        const dbJob = await CrawlJob.findByPk(jobId);
+        dbJob = await CrawlJob.findByPk(jobId);
         if (dbJob) {
           if (code === 0) {
             await dbJob.markCompleted();
@@ -177,6 +181,34 @@ async function startJobProcess(jobId, _jobData) {
         }
       } catch (error) {
         console.error(`❌ Failed to update job ${jobId} in database:`, error.message);
+      }
+
+      // Store completed job in completed_jobs table
+      try {
+        // Extract report ID from output filename (remove .json extension)
+        const reportId = currentJob.outputFilename
+          ? currentJob.outputFilename.replace('.json', '')
+          : null;
+
+        // Get user_id from database job record
+        const userId = dbJob ? dbJob.user_id : null;
+
+        await CompletedJob.create({
+          job_id: jobId,
+          user_id: userId,
+          url: currentJob.url,
+          status: code === 0 ? 'completed' : 'failed',
+          report_id: code === 0 ? reportId : null,
+          start_time: currentJob.startTime,
+          end_time: currentJob.endTime,
+          error_message: code === 0 ? null : 'Crawl process failed',
+          wcag_version: currentJob.wcagVersion,
+          wcag_level: currentJob.wcagLevel,
+          max_pages: currentJob.maxPages,
+        });
+        console.log(`✅ Stored completed job ${jobId} in completed_jobs table`);
+      } catch (error) {
+        console.error(`❌ Failed to store completed job ${jobId}:`, error.message);
       }
 
       // Regenerate index.html if crawl was successful
@@ -204,13 +236,37 @@ async function startJobProcess(jobId, _jobData) {
       currentJob.endTime = new Date().toISOString();
 
       // Persist to database
+      let dbJob = null;
       try {
-        const dbJob = await CrawlJob.findByPk(jobId);
+        dbJob = await CrawlJob.findByPk(jobId);
         if (dbJob) {
           await dbJob.markError(error.message);
         }
       } catch (dbError) {
         console.error(`❌ Failed to update job ${jobId} in database:`, dbError.message);
+      }
+
+      // Store failed job in completed_jobs table
+      try {
+        // Get user_id from database job record
+        const userId = dbJob ? dbJob.user_id : null;
+
+        await CompletedJob.create({
+          job_id: jobId,
+          user_id: userId,
+          url: currentJob.url,
+          status: 'failed',
+          report_id: null,
+          start_time: currentJob.startTime,
+          end_time: currentJob.endTime,
+          error_message: error.message,
+          wcag_version: currentJob.wcagVersion,
+          wcag_level: currentJob.wcagLevel,
+          max_pages: currentJob.maxPages,
+        });
+        console.log(`✅ Stored failed job ${jobId} in completed_jobs table`);
+      } catch (storeError) {
+        console.error(`❌ Failed to store completed job ${jobId}:`, storeError.message);
       }
     }
 
@@ -886,6 +942,140 @@ app.get('/api/reports', requireAuth, async (req, res) => {
   } catch (error) {
     console.error('❌ Failed to get reports for API:', error.message);
     res.status(500).json({ error: 'Failed to load reports' });
+  }
+});
+
+// API endpoint to store a completed job
+app.post('/api/jobs/completed', requireAuth, async (req, res) => {
+  try {
+    const {
+      jobId,
+      url,
+      status,
+      reportId,
+      startTime,
+      endTime,
+      errorMessage,
+      wcagVersion,
+      wcagLevel,
+      maxPages,
+    } = req.body;
+
+    // Validate required fields
+    if (!jobId || !url || !status || !startTime || !endTime) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: jobId, url, status, startTime, endTime',
+      });
+    }
+
+    // Validate status
+    if (!['completed', 'failed'].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Status must be "completed" or "failed"',
+      });
+    }
+
+    const userId = req.user.id;
+
+    // Create completed job record
+    const completedJob = await CompletedJob.create({
+      job_id: jobId,
+      user_id: userId,
+      url,
+      status,
+      report_id: reportId || null,
+      start_time: startTime,
+      end_time: endTime,
+      error_message: errorMessage || null,
+      wcag_version: wcagVersion || null,
+      wcag_level: wcagLevel || null,
+      max_pages: maxPages || null,
+    });
+
+    res.json({
+      success: true,
+      completedJob: completedJob.toJSON(),
+    });
+  } catch (error) {
+    console.error('❌ Failed to store completed job:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to store completed job',
+    });
+  }
+});
+
+// API endpoint to get completed jobs for the current user
+app.get('/api/jobs/completed', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const limit = Math.min(parseInt(req.query.limit) || 10, 50);
+
+    const completedJobs = await CompletedJob.getForUser(userId, limit);
+
+    res.json({
+      success: true,
+      completedJobs: completedJobs.map(job => job.toJSON()),
+    });
+  } catch (error) {
+    console.error('❌ Failed to fetch completed jobs:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch completed jobs',
+    });
+  }
+});
+
+// API endpoint to get report by job ID (for redirect)
+app.get('/api/reports/by-job/:jobId', requireAuth, async (req, res) => {
+  try {
+    const { jobId } = req.params;
+    const userId = req.user.id;
+
+    // Look up the completed job
+    const completedJob = await CompletedJob.getByJobId(jobId, userId);
+
+    if (!completedJob) {
+      return res.status(404).json({
+        success: false,
+        error: 'Job not found',
+      });
+    }
+
+    if (!completedJob.report_id) {
+      return res.status(404).json({
+        success: false,
+        error: 'No report available for this job',
+      });
+    }
+
+    // Extract domain from URL for report path
+    let domain;
+    try {
+      const urlObj = new URL(completedJob.url);
+      domain = urlObj.hostname.replace(/^www\./, '');
+    } catch {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid job URL',
+      });
+    }
+
+    // Since we pass the same timestamp to both JSON and HTML generation,
+    // the HTML filename is simply the report_id without extension + .html
+    const htmlReportFilename = completedJob.report_id + '.html';
+    const reportUrl = `/reports/${domain}/${htmlReportFilename}`;
+
+    // Redirect to the HTML report
+    res.redirect(reportUrl);
+  } catch (error) {
+    console.error('❌ Failed to fetch report by job ID:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch report',
+    });
   }
 });
 

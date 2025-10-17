@@ -63,18 +63,63 @@ function renderTemplate(templateContent, data = {}) {
     rendered = rendered.replace(match[0], includeContent);
   }
 
-  // Process {{#if variable}} blocks - show else block if variable is falsy
-  const ifPattern = /\{\{#if ([^}]+)\}\}([\s\S]*?)(?:\{\{else\}\}([\s\S]*?))?\{\{\/if\}\}/g;
-  rendered = rendered.replace(ifPattern, (_match, variable, trueBlock, falseBlock) => {
-    const value = data[variable.trim()];
-    return value ? trueBlock : falseBlock || '';
-  });
+  // Process {{#if variable}} blocks - recursively handle nested conditionals
+  // Support nested properties like user.isAdmin
+  function processConditionals(text) {
+    // Find the first {{#if that doesn't have a nested {{#if before its {{/if}}
+    let changed = true;
+    let result = text;
+
+    while (changed) {
+      const before = result;
+
+      // Match non-nested if blocks (innermost first)
+      const ifPattern =
+        /\{\{#if ([^}]+)\}\}((?:(?!\{\{#if)[\s\S])*?)(?:\{\{else\}\}((?:(?!\{\{#if)[\s\S])*?))?\{\{\/if\}\}/;
+      result = result.replace(ifPattern, (_match, variable, trueBlock, falseBlock) => {
+        const varName = variable.trim();
+        let value;
+
+        // Handle nested properties like user.isAdmin
+        if (varName.includes('.')) {
+          const parts = varName.split('.');
+          value = data;
+          for (const part of parts) {
+            value = value?.[part];
+          }
+        } else {
+          value = data[varName];
+        }
+
+        return value ? trueBlock : falseBlock || '';
+      });
+
+      changed = result !== before;
+    }
+
+    return result;
+  }
+
+  rendered = processConditionals(rendered);
 
   // Then, replace all placeholders with data
-  for (const [key, value] of Object.entries(data)) {
-    const placeholder = new RegExp(`{{${key}}}`, 'g');
-    rendered = rendered.replace(placeholder, value || '');
-  }
+  // Handle nested properties like {{user.firstName}}
+  const placeholderPattern = /\{\{([^}]+)\}\}/g;
+  rendered = rendered.replace(placeholderPattern, (_match, varName) => {
+    const trimmedVar = varName.trim();
+
+    // Handle nested properties
+    if (trimmedVar.includes('.')) {
+      const parts = trimmedVar.split('.');
+      let value = data;
+      for (const part of parts) {
+        value = value?.[part];
+      }
+      return value || '';
+    }
+
+    return data[trimmedVar] || '';
+  });
 
   return rendered;
 }
@@ -330,6 +375,35 @@ function generateHTMLReport(data, filename) {
     }
   }
 
+  // Calculate crawl duration from first to last page timestamp
+  let crawlDuration = '';
+  if (pages.length > 0 && pages[0].timestamp && pages[pages.length - 1].timestamp) {
+    const startTime = new Date(pages[0].timestamp);
+    const endTime = new Date(pages[pages.length - 1].timestamp);
+    const durationSeconds = Math.floor((endTime - startTime) / 1000);
+
+    const minutes = Math.floor(durationSeconds / 60);
+    const seconds = durationSeconds % 60;
+
+    if (minutes > 0) {
+      crawlDuration = `${minutes} minute${minutes !== 1 ? 's' : ''} ${seconds} second${seconds !== 1 ? 's' : ''}`;
+    } else {
+      crawlDuration = `${seconds} second${seconds !== 1 ? 's' : ''}`;
+    }
+  }
+
+  // Get page count
+  const pageCount = pages.length;
+
+  // Create report stats string
+  let reportStats = '';
+  if (pageCount > 0) {
+    reportStats = `${pageCount} page${pageCount !== 1 ? 's' : ''} analyzed`;
+    if (crawlDuration) {
+      reportStats += ` • ${crawlDuration}`;
+    }
+  }
+
   // Get WCAG info from first page toolOptions or filename
   let wcagInfo = 'WCAG 2.1 Level AA';
 
@@ -540,6 +614,20 @@ function generateHTMLReport(data, filename) {
     jsonFilename,
     summaryCards,
     content: pagesContent,
+    reportStats,
+    // Navigation active states (reports page is active)
+    homeActive: '',
+    homeAria: '',
+    crawlActive: '',
+    crawlAria: '',
+    reportsActive: 'main-nav__link--active',
+    reportsAria: 'aria-current="page"',
+    dashboardActive: '',
+    dashboardAria: '',
+    adminUsersActive: '',
+    adminUsersAria: '',
+    // User context - not authenticated in static reports
+    user: null,
   });
 
   return html;

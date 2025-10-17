@@ -25,6 +25,15 @@
                 <p class="content-section__description">Configure and launch an automated accessibility scan of your website</p>
             </header>
 
+            <!-- Alert Component (for success/error messages) -->
+            <div id="crawl-alert" class="alert" role="alert" aria-live="polite" style="display: none;">
+                <div class="alert__content">
+                    <strong id="alert-title" class="alert__title"></strong>
+                    <p id="alert-message" class="alert__message"></p>
+                </div>
+                <button id="alert-close" class="alert__close" type="button" aria-label="Close alert">&times;</button>
+            </div>
+
             <!-- Crawl Content -->
             <div class="crawl-layout">
 
@@ -122,10 +131,27 @@
                         </div>
                     </div>
                 </section>
+
+                <!-- Recently Completed Jobs Section -->
+                <section id="completedJobsSection"
+                         aria-labelledby="completed-jobs-title"
+                         style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 id="completed-jobs-title" class="card-title">Recently Completed</h2>
+                            <p class="card-subtitle">Last 10 completed crawl jobs</p>
+                        </div>
+                        <div class="card-body">
+                            <div id="completedJobsList" class="completed-jobs-list">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
         </div>
     </main>
 
-    <script src="/scripts/crawl.js"></script>
+    <script type="module" src="/scripts/crawl.js"></script>
 </body>
 </html>
