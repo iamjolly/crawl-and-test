@@ -12,7 +12,7 @@ process.env.CATS_REPORTS_DIR = require('path').join(__dirname, 'fixtures', 'repo
 // Use environment variables if provided (CI), otherwise use defaults (local)
 process.env.CATS_DB_HOST = process.env.CATS_DB_HOST || 'localhost';
 process.env.CATS_DB_PORT = process.env.CATS_DB_PORT || '5432';
-process.env.CATS_DB_NAME = process.env.CATS_DB_NAME || 'cats_dev';
+process.env.CATS_DB_NAME = process.env.CATS_DB_NAME || 'cats_test'; // Use test database
 process.env.CATS_DB_USER = process.env.CATS_DB_USER || 'cats_user';
 process.env.CATS_DB_PASSWORD = process.env.CATS_DB_PASSWORD || 'cats_password';
 process.env.DATABASE_URL =
