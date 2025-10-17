@@ -93,11 +93,13 @@
         try {
           const response = await fetch('/api/auth/me');
           if (response.ok) {
-            const user = await response.json();
+            const data = await response.json();
+            const user = data.user;
 
             // Replace guest actions with user menu
             const authActions = document.querySelector('.auth-actions');
             if (authActions && user) {
+              const isAdmin = user.role === 'admin';
               const userMenuHTML = `
                 <div class="user-menu">
                   <button class="user-menu__trigger" aria-expanded="false" aria-haspopup="true" id="user-menu-button">
@@ -117,7 +119,7 @@
                       <li><a href="/dashboard" class="user-menu__link">Dashboard</a></li>
                       <li><a href="/crawl" class="user-menu__link">Start Crawl</a></li>
                       <li><a href="/reports/" class="user-menu__link">View Reports</a></li>
-                      ${user.isAdmin ? '<li><a href="/admin/users" class="user-menu__link">User Management</a></li>' : ''}
+                      ${isAdmin ? '<li><a href="/admin/users" class="user-menu__link">User Management</a></li>' : ''}
                     </ul>
                     <div class="user-menu__footer">
                       <button class="user-menu__logout" id="logout-button">Sign Out</button>
