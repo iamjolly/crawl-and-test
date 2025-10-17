@@ -330,6 +330,35 @@ function generateHTMLReport(data, filename) {
     }
   }
 
+  // Calculate crawl duration from first to last page timestamp
+  let crawlDuration = '';
+  if (pages.length > 0 && pages[0].timestamp && pages[pages.length - 1].timestamp) {
+    const startTime = new Date(pages[0].timestamp);
+    const endTime = new Date(pages[pages.length - 1].timestamp);
+    const durationSeconds = Math.floor((endTime - startTime) / 1000);
+
+    const minutes = Math.floor(durationSeconds / 60);
+    const seconds = durationSeconds % 60;
+
+    if (minutes > 0) {
+      crawlDuration = `${minutes} minute${minutes !== 1 ? 's' : ''} ${seconds} second${seconds !== 1 ? 's' : ''}`;
+    } else {
+      crawlDuration = `${seconds} second${seconds !== 1 ? 's' : ''}`;
+    }
+  }
+
+  // Get page count
+  const pageCount = pages.length;
+
+  // Create report stats string
+  let reportStats = '';
+  if (pageCount > 0) {
+    reportStats = `${pageCount} page${pageCount !== 1 ? 's' : ''} analyzed`;
+    if (crawlDuration) {
+      reportStats += ` • ${crawlDuration}`;
+    }
+  }
+
   // Get WCAG info from first page toolOptions or filename
   let wcagInfo = 'WCAG 2.1 Level AA';
 
@@ -540,6 +569,7 @@ function generateHTMLReport(data, filename) {
     jsonFilename,
     summaryCards,
     content: pagesContent,
+    reportStats,
   });
 
   return html;
