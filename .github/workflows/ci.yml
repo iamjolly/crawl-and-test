@@ -52,6 +52,17 @@ jobs:
       - name: Run linting
         run: npm run lint
 
+      - name: Run database migrations
+        run: npx sequelize-cli db:migrate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/cats_test
+          CATS_DB_HOST: localhost
+          CATS_DB_PORT: 5432
+          CATS_DB_NAME: cats_test
+          CATS_DB_USER: postgres
+          CATS_DB_PASSWORD: postgres
+          NODE_ENV: test
+
       - name: Run tests
         run: npm test
         env:
